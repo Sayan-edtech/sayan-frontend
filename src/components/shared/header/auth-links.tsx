@@ -1,9 +1,13 @@
 import { Link } from "react-router-dom";
 import { buttonVariants } from "../../ui/button";
 
-function AuthLinks() {
+interface AuthLinksProps {
+  className?: string;
+}
+
+export default function AuthLinks({ className = "" }: AuthLinksProps) {
   return (
-    <div className="flex items-center gap-6">
+    <div className={`hidden lg:flex items-center gap-6 ${className}`}>
       <Link
         to="/auth/login"
         className={`${buttonVariants({
@@ -21,5 +25,3 @@ function AuthLinks() {
     </div>
   );
 }
-
-export default AuthLinks;

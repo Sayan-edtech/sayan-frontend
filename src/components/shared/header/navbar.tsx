@@ -1,30 +1,30 @@
 import { Link, useLocation } from "react-router-dom";
 
-function Navbar() {
-  const location = useLocation();
+export const links = [
+  {
+    id: crypto.randomUUID(),
+    title: "الرئيسية",
+    href: "/",
+  },
+  {
+    id: crypto.randomUUID(),
+    title: "اطلق اكادميتك",
+    href: "/launch-academy",
+  },
+  {
+    id: crypto.randomUUID(),
+    title: "الذكاء الاصطناعي",
+    href: "/ai",
+  },
+  {
+    id: crypto.randomUUID(),
+    title: "تدريب وتطوير الموظفين",
+    href: "/employee-training",
+  },
+];
 
-  const links = [
-    {
-      id: crypto.randomUUID(),
-      title: "الرئيسية",
-      href: "/",
-    },
-    {
-      id: crypto.randomUUID(),
-      title: "اطلق اكادميتك",
-      href: "/launch-academy",
-    },
-    {
-      id: crypto.randomUUID(),
-      title: "الذكاء الاصطناعي",
-      href: "/ai",
-    },
-    {
-      id: crypto.randomUUID(),
-      title: "تدريب وتطوير الموظفين",
-      href: "/employee-training",
-    },
-  ];
+export default function Navbar() {
+  const location = useLocation();
 
   return (
     <nav className="hidden lg:block">
@@ -47,5 +47,3 @@ function Navbar() {
     </nav>
   );
 }
-
-export default Navbar;
