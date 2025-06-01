@@ -1,10 +1,9 @@
-import { useParams } from "react-router-dom";
 import CourseLayout from "./components/CourseLayout";
 import Hero from "./components/Hero";
 import RelatedCourses from "./components/RelatedCourses";
 
 export default function CourseDetails() {
-  const { slug } = useParams();
+  // const { slug } = useParams();
 
   const courseData = {
     id: 1,

@@ -32,11 +32,7 @@ function Hero({ courseData }: { courseData: Course }) {
             className="w-full h-full object-cover rounded-lg"
             controls
           />
-          <CourseNavigation
-            courseData={courseData}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-          />
+          <CourseNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
         <div className="lg:w-[350px] flex flex-col gap-6">
           <CourseCard
@@ -45,7 +41,7 @@ function Hero({ courseData }: { courseData: Course }) {
             lessonsCount={courseData.lessonsCount}
             insteadOf={courseData.insteadOf}
           />
-          <AcademyCard academy={null} />
+          <AcademyCard />
         </div>
       </div>
       <CourseNavigationContent courseData={courseData} activeTab={activeTab} />
@@ -136,7 +132,7 @@ function CourseCard({
   );
 }
 
-function AcademyCard({ academy }: { academy: any }) {
+function AcademyCard() {
   return (
     <div className="bg-card rounded-[20px] shadow-sm element-center flex-col gap-6 p-6">
       <div className="flex items-center gap-4">
@@ -149,11 +145,9 @@ function AcademyCard({ academy }: { academy: any }) {
 }
 
 function CourseNavigation({
-  courseData,
   activeTab,
   setActiveTab,
 }: {
-  courseData: Course;
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
 }) {
