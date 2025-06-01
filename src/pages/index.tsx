@@ -1,17 +1,17 @@
 import Courses from "./components/Courses";
 import Features from "./components/Features";
 import Hero from "./components/Hero";
-import HomeLayout from "./components/HomeLayout";
+import Layout from "./components/Layout";
 
 function Home() {
   return (
-    <HomeLayout>
+    <Layout>
       <main>
         <Hero />
         <Features />
         <Courses />
       </main>
-    </HomeLayout>
+    </Layout>
   );
 }
 

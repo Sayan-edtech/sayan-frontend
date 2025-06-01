@@ -18,33 +18,41 @@ function Hero({ courseData }: { courseData: Course }) {
 
   return (
     <section>
-      <div className="flex items-center flex-wrap gap-4 justify-between lg:justify-start lg:gap-40">
-        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold">
-          {courseData.title}
-        </h1>
-        <CourseRating rating={courseData.rating} />
-      </div>
+      <div className="container">
+        <div className="flex items-center flex-wrap gap-4 justify-between lg:justify-start lg:gap-40">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold">
+            {courseData.title}
+          </h1>
+          <CourseRating rating={courseData.rating} />
+        </div>
 
-      <div className="flex items-stretch lg:flex-row flex-col gap-6 mt-6 md:mt-10 mb-6">
-        <div className="flex-1 bg-card rounded-[20px] shadow-sm p-4 flex flex-col">
-          <video
-            src={courseData.videoUrl}
-            className="w-full h-full object-cover rounded-lg"
-            controls
-          />
-          <CourseNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+        <div className="flex items-stretch lg:flex-row flex-col gap-6 mt-6 md:mt-10 mb-6">
+          <div className="flex-1 bg-card rounded-[20px] shadow-sm p-4 flex flex-col">
+            <video
+              src={courseData.videoUrl}
+              className="w-full h-full object-cover rounded-lg"
+              controls
+            />
+            <CourseNavigation
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+          </div>
+          <div className="lg:w-[350px] flex flex-col gap-6">
+            <CourseCard
+              price={courseData.price}
+              level={courseData.level}
+              lessonsCount={courseData.lessonsCount}
+              insteadOf={courseData.insteadOf}
+            />
+            <AcademyCard />
+          </div>
         </div>
-        <div className="lg:w-[350px] flex flex-col gap-6">
-          <CourseCard
-            price={courseData.price}
-            level={courseData.level}
-            lessonsCount={courseData.lessonsCount}
-            insteadOf={courseData.insteadOf}
-          />
-          <AcademyCard />
-        </div>
+        <CourseNavigationContent
+          courseData={courseData}
+          activeTab={activeTab}
+        />
       </div>
-      <CourseNavigationContent courseData={courseData} activeTab={activeTab} />
     </section>
   );
 }

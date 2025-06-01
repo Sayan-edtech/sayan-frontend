@@ -145,7 +145,7 @@ export default function RelatedCourses() {
   ] as const;
 
   return (
-    <div>
+    <div className="container">
       <h3 className="text-2xl font-bold text-center mb-6 text-foreground">
         مواد تعليمية مناسبة لك
       </h3>

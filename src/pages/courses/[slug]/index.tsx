@@ -39,10 +39,8 @@ export default function CourseDetails() {
         }}
         className="pt-44 pb-20"
       >
-        <div className="container">
-          <Hero courseData={courseData} />
-          <RelatedCourses />
-        </div>
+        <Hero courseData={courseData} />
+        <RelatedCourses />
       </main>
     </CourseLayout>
   );

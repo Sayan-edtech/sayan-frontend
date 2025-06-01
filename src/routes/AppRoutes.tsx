@@ -7,6 +7,9 @@ import Home from "@/pages";
 import About from "@/pages/about";
 import NotFound from "@/pages/not-found";
 import CourseDetails from "@/pages/courses/[slug]";
+import LaunchAcademy from "@/pages/launch-academy";
+import EmployeeTraining from "@/pages/launch-academy";
+import Ai from "@/pages/ai";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -14,6 +17,9 @@ export const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path="about" element={<About />} />
       <Route path="courses/:slug" element={<CourseDetails />} />
+      <Route path="launch-academy" element={<LaunchAcademy />} />
+      <Route path="ai" element={<Ai />} />
+      <Route path="employee-training" element={<EmployeeTraining />} />
       <Route path="*" element={<NotFound />} />
     </>
   )
