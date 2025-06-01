@@ -5,8 +5,7 @@ export default function Hero() {
   return (
     <section
       style={{
-        background:
-          "linear-gradient(152.72deg, #0062FF -2.94%, rgba(15, 232, 232, 0.01) 78.41%)",
+        background: "linear-gradient(to bottom, #1e5fff, #87ceeb, #f0f8ff)",
       }}
       className="pt-40"
     >

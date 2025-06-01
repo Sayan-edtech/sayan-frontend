@@ -1,6 +1,5 @@
+import CourseCard from "@/components/shared/CourseCard";
 import Searchbar from "@/components/shared/searchbar";
-import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
 
 const courses = [
   {
@@ -18,6 +17,12 @@ const courses = [
     },
     type: "تطوير الويب",
     category: "برمجة",
+    slug: "react-js",
+    videoUrl: "https://example.com/video.mp4",
+    duration: "8 ساعات",
+    lessonsCount: 24,
+    enrolledStudents: 1200,
+    level: "متوسط",
   },
   {
     id: 2,
@@ -35,6 +40,12 @@ const courses = [
     type: "تصميم",
     category: "تصميم",
     insteadOf: 350,
+    slug: "ui-ux",
+    videoUrl: "https://example.com/video.mp4",
+    duration: "8 ساعات",
+    lessonsCount: 24,
+    enrolledStudents: 1200,
+    level: "متوسط",
   },
   {
     id: 3,
@@ -52,6 +63,12 @@ const courses = [
     type: "تسويق رقمي",
     category: "تسويق",
     insteadOf: 400,
+    slug: "digital-marketing",
+    videoUrl: "https://example.com/video.mp4",
+    duration: "8 ساعات",
+    lessonsCount: 24,
+    enrolledStudents: 1200,
+    level: "متوسط",
   },
   {
     id: 4,
@@ -69,6 +86,12 @@ const courses = [
     type: "ذكاء اصطناعي",
     category: "برمجة",
     insteadOf: 539,
+    slug: "ai-and-machine-learning",
+    videoUrl: "https://example.com/video.mp4",
+    duration: "8 ساعات",
+    lessonsCount: 24,
+    enrolledStudents: 1200,
+    level: "متوسط",
   },
   {
     id: 5,
@@ -85,6 +108,12 @@ const courses = [
     },
     type: "تطوير الويب",
     category: "برمجة",
+    slug: "mobile-development",
+    videoUrl: "https://example.com/video.mp4",
+    duration: "8 ساعات",
+    lessonsCount: 24,
+    enrolledStudents: 1200,
+    level: "متوسط",
   },
   {
     id: 6,
@@ -102,8 +131,14 @@ const courses = [
     type: "إدارة",
     category: "أعمال",
     insteadOf: 350,
+    slug: "project-management",
+    videoUrl: "https://example.com/video.mp4",
+    duration: "8 ساعات",
+    lessonsCount: 24,
+    enrolledStudents: 1200,
+    level: "متوسط",
   },
-];
+] as const;
 
 const filters = {
   price: ["مجاني", "مدفوع"],
@@ -160,74 +195,14 @@ function CoursesList() {
     <div className="lg:col-span-3">
       <ul className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {courses.map((course) => (
-          <CourseCard key={course.id} course={course} />
+          <li
+            key={course.id}
+            className="bg-card hover:shadow-sm transition-colors duration-200 rounded-[20px] p-4"
+          >
+            <CourseCard course={course} />
+          </li>
         ))}
       </ul>
     </div>
-  );
-}
-function CourseCard({ course }: { course: any }) {
-  return (
-    <li className="bg-card rounded-[20px] p-4">
-      {/* Course Image */}
-      <div className="aspect-video relative">
-        <img
-          src={course.image}
-          alt={course.title}
-          className="w-full h-[180px] object-cover rounded-[20px]"
-        />
-      </div>
-
-      {/* Course Content */}
-      <div className="p-4 space-y-4">
-        <div className="space-y-1">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-card-foreground line-clamp-2">
-              {course.title}
-            </h3>
-            <Badge className="bg-[#009AFF] text-white font-semibold px-4 h-7 rounded-[20px]">
-              مجاني
-            </Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              تقييمات المادة العلمية
-            </span>
-            <div className="flex items-center gap-1 text-yellow-500">
-              <Star className="fill-current w-4 h-4" />
-              <span className="text-sm font-medium">
-                {course.rating.toFixed(1)}
-              </span>
-            </div>
-          </div>
-        </div>
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {course.description}
-        </p>
-
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-2">
-            <img
-              src={course.instructor.image}
-              alt={course.instructor.name}
-              className="w-8 h-8 rounded-full object-cover"
-            />
-            <span className="text-sm font-medium">
-              {course.instructor.name}
-            </span>
-          </div>
-          <div className="flex flex-col gap-1 items-center">
-            <strong className="text-foreground text-lg">
-              {course.price === 0 ? "مجاناً" : `${course.price} ريال`}
-            </strong>
-            {course.insteadOf && (
-              <strong className="text-sm text-[#33333394] line-through decoration-[#FF4747]">
-                {course.insteadOf} ريال
-              </strong>
-            )}
-          </div>
-        </div>
-      </div>
-    </li>
   );
 }
