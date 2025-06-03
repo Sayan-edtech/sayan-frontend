@@ -1,6 +1,6 @@
-import CourseLayout from "./components/CourseLayout";
-import Hero from "./components/Hero";
-import RelatedCourses from "./components/RelatedCourses";
+import CourseLayout from "@/features/course/components/CourseLayout";
+import Hero from "@/features/course/components/Hero";
+import RelatedCourses from "@/features/course/components/RelatedCourses";
 
 export default function CourseDetails() {
   // const { slug } = useParams();

@@ -59,7 +59,7 @@ export default function MobileMenu({ links }: MobileMenuProps) {
           </nav>
           <div className="py-6 flex flex-col items-stretch gap-4 border-t border-border">
             <Link
-              to="/auth/login"
+              to="/auth/signin"
               className={buttonVariants({
                 variant: "outline",
                 className: "w-full justify-center",
@@ -68,7 +68,7 @@ export default function MobileMenu({ links }: MobileMenuProps) {
               دخول
             </Link>
             <Link
-              to="/auth/register"
+              to="/auth/signup"
               className={buttonVariants({
                 className: "w-full justify-center",
               })}

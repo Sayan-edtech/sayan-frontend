@@ -9,7 +9,7 @@ export default function AuthLinks({ className = "" }: AuthLinksProps) {
   return (
     <div className={`hidden lg:flex items-center gap-6 ${className}`}>
       <Link
-        to="/auth/login"
+        to="/auth/signin"
         className={`${buttonVariants({
           variant: "link",
         })} !text-lg !font-medium`}
@@ -17,7 +17,7 @@ export default function AuthLinks({ className = "" }: AuthLinksProps) {
         دخول
       </Link>
       <Link
-        to="/auth/register"
+        to="/auth/signup"
         className={`${buttonVariants({ size: "lg" })} !font-bold`}
       >
         انضم الان

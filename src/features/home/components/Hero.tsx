@@ -21,7 +21,7 @@ export default function Hero() {
             </p>
             <div className="flex items-center gap-4">
               <Link
-                to="/auth/register"
+                to="/auth/signup"
                 className={`${buttonVariants({ size: "lg" })}`}
               >
                 انضم الان

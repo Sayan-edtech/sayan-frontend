@@ -1,17 +1,17 @@
-import Courses from "./components/Courses";
-import Features from "./components/Features";
-import Hero from "./components/Hero";
-import Layout from "./components/Layout";
+import Courses from "@/features/home/components/Courses";
+import Features from "@/features/home/components/Features";
+import Hero from "@/features/home/components/Hero";
+import HomeLayout from "@/features/home/components/HomeLayout";
 
 function Home() {
   return (
-    <Layout>
+    <HomeLayout>
       <main>
         <Hero />
         <Features />
         <Courses />
       </main>
-    </Layout>
+    </HomeLayout>
   );
 }
 

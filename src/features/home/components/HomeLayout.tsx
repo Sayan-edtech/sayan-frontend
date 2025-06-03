@@ -1,5 +1,5 @@
-import Header from "../../components/shared/header";
-import Footer from "../../components/shared/footer";
+import Footer from "@/components/shared/footer";
+import Header from "@/components/shared/header";
 
 function HomeLayout({ children }: { children: React.ReactNode }) {
   return (
