@@ -37,6 +37,7 @@ export enum InputTypes {
   CHECKBOX = "checkbox",
   RADIO = "radio",
   SELECT = "select",
+  PHONE = "phone",
   TEXTAREA = "textarea",
   FILE = "file",
   IMAGE = "image",

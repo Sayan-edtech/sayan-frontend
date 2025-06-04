@@ -20,17 +20,33 @@ const useFormFields = ({ slug }: IFormFieldsVariables) => {
 
   const signupFields = (): IFormField[] => [
     {
-      label: "الاسم الأول",
-      name: "first_name",
-      type: "text",
-      placeholder: "أدخل اسمك الأول",
+      label: "نوع الحساب",
+      name: "role",
+      type: "select",
+      placeholder: "اختر نوع حسابك",
       autoFocus: true,
+      options: [
+        { value: "student", label: "طالب" },
+        { value: "academy", label: "أكاديمية" },
+      ],
     },
     {
-      label: "الاسم الأخير",
-      name: "last_name",
+      label: "صورة الملف الشخصي",
+      name: "profile_picture",
+      type: "image",
+      placeholder: "اختر صورة شخصية (مطلوب)",
+    },
+    {
+      label: "الاسم",
+      name: "name",
       type: "text",
-      placeholder: "أدخل اسمك الأخير",
+      placeholder: "أدخل اسمك الكامل",
+    },
+    {
+      label: "رقم الهاتف",
+      name: "phone",
+      type: "phone",
+      placeholder: "أدخل رقم هاتفك",
     },
     {
       label: "البريد الإلكتروني",

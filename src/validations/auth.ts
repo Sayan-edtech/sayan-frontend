@@ -1,8 +1,47 @@
 import * as z from "zod";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 const userData = {
-  first_name: z.string().trim().min(1, { message: "الاسم الأول مطلوب" }),
-  last_name: z.string().trim().min(1, { message: "الاسم الأخير مطلوب" }),
+  role: z.enum(["student", "academy"], {
+    errorMap: () => ({ message: "يجب اختيار نوع الحساب" }),
+  }),
+  profile_picture: z
+    .any()
+    .refine(
+      (file) => {
+        return file instanceof File;
+      },
+      { message: "صورة الملف الشخصي مطلوبة" }
+    )
+    .refine(
+      (file) => {
+        return file.size <= 5 * 1024 * 1024; // 5MB max
+      },
+      { message: "حجم الصورة يجب أن يكون أقل من 5 ميجابايت" }
+    )
+    .refine(
+      (file) => {
+        const allowedTypes = [
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/webp",
+        ];
+        return allowedTypes.includes(file.type);
+      },
+      { message: "نوع الملف يجب أن يكون JPG أو PNG أو WebP" }
+    ),
+  name: z
+    .string()
+    .trim()
+    .min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" })
+    .max(50, { message: "الاسم يجب أن يكون أقل من 50 حرف" }),
+  phone: z
+    .string()
+    .min(1, { message: "رقم الهاتف مطلوب" })
+    .refine((phone) => isValidPhoneNumber(phone), {
+      message: "رقم الهاتف غير صحيح",
+    }),
   email: z
     .string()
     .trim()

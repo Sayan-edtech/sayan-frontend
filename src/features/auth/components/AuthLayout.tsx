@@ -24,7 +24,7 @@ function AuthLayout() {
         </div>
       </div>
       {/* Left Side - Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col py-10">
         <div className="flex-1 flex items-center justify-center px-8">
           <div className="w-full max-w-md">
             <Outlet />

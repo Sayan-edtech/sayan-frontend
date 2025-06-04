@@ -16,12 +16,14 @@ export interface IFormField {
     | "checkbox"
     | "radio"
     | "select"
+    | "phone"
     | "hidden"
-    | "textarea";
+    | "textarea"
+    | "image";
   placeholder?: string;
   disabled?: boolean;
   autoFocus?: boolean;
-  options?: IOption;
+  options?: IOption[];
   id?: string;
 }
 export interface IFormFieldsVariables {
