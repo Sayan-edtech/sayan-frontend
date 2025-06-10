@@ -1,7 +1,7 @@
 import Footer from "@/components/shared/footer";
 import Header from "@/components/shared/header";
 
-function CourseLayout({ children }: { children: React.ReactNode }) {
+function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Header />
@@ -11,4 +11,4 @@ function CourseLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default CourseLayout;
+export default Layout;

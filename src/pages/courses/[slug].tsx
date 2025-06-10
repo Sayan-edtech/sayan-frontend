@@ -1,4 +1,4 @@
-import CourseLayout from "@/features/course/components/CourseLayout";
+import Layout from "@/features/course/components/Layout";
 import Hero from "@/features/course/components/Hero";
 import RelatedCourses from "@/features/course/components/RelatedCourses";
 
@@ -31,7 +31,7 @@ export default function CourseDetails() {
   };
 
   return (
-    <CourseLayout>
+    <Layout>
       <main
         style={{
           background:
@@ -42,6 +42,6 @@ export default function CourseDetails() {
         <Hero courseData={courseData} />
         <RelatedCourses />
       </main>
-    </CourseLayout>
+    </Layout>
   );
 }
