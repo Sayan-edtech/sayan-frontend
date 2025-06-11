@@ -165,19 +165,6 @@ const ImageField = ({
                 </div>
               )}
             </div>
-
-            {/* Upload button - only show when no image is selected */}
-            {!preview && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleFileSelect}
-                disabled={disabled}
-                className="w-full"
-              >
-                اختيار صورة
-              </Button>
-            )}
           </div>
         )}
       />
