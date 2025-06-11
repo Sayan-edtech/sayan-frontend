@@ -71,6 +71,7 @@ function Slider() {
                 <img
                   src={feature.icon}
                   alt={feature.title}
+                  loading="lazy"
                   className="w-6 h-6"
                 />
               </div>

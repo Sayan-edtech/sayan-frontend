@@ -15,6 +15,7 @@ function AuthLayout() {
             <img
               src="/assets/images/footer-logo.svg"
               alt="Sayan Logo"
+              loading="eager"
               className="w-32 h-[75px]"
             />
           </div>

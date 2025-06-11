@@ -35,6 +35,7 @@ function SiginWithGoogle() {
         <img
           src="/assets/icons/google.svg"
           alt="Google Icon"
+          loading="lazy"
           className="w-4 h-4"
         />
       </button>

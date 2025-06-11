@@ -30,7 +30,12 @@ function SocialMedia() {
             target="_blank"
             className="bg-[#1E02AA] hover:bg-[#009AFF] duration-200 transition-colors rounded-[8px] w-10  h-10 element-center"
           >
-            <img src={link.icon} alt={link.href} className="w-5 h-5" />
+            <img
+              src={link.icon}
+              alt={link.href}
+              className="w-5 h-5"
+              loading="lazy"
+            />
           </a>
         </li>
       ))}

@@ -14,6 +14,7 @@ function Footer() {
               <img
                 src="/assets/images/footer-logo.svg"
                 alt="Logo"
+                loading="lazy"
                 className="w-[100px] h-[45px]"
               />
             </Link>

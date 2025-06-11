@@ -13,6 +13,7 @@ function Hero() {
             <img
               src="/assets/images/ai/stats1.png"
               alt="Statistics 2"
+              loading="eager"
               className="w-full h-full object-contain"
             />
           </div>
@@ -20,6 +21,7 @@ function Hero() {
             <img
               src="/assets/images/ai/ai.png"
               alt="Book"
+              loading="eager"
               className="w-full h-full object-contain"
             />
           </div>
@@ -28,6 +30,7 @@ function Hero() {
             <img
               src="/assets/images/ai/stats2.png"
               alt="Statistics"
+              loading="eager"
               className="w-full h-full object-contain"
             />
           </div>

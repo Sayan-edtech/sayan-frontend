@@ -94,6 +94,7 @@ const ImageField = ({
                     <img
                       src={preview}
                       alt="Preview"
+                      loading="lazy"
                       className="mx-auto h-32 w-32 rounded-full object-cover border-4 border-background shadow-lg transition-opacity group-hover:opacity-75"
                     />
                     {/* Overlay icon on hover */}

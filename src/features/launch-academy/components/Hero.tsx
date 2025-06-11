@@ -17,6 +17,7 @@ function Hero() {
             <img
               src="/assets/images/launch-academy/stats2.png"
               alt="Statistics 2"
+              loading="eager"
               className="w-full h-full object-contain"
             />
           </div>
@@ -24,6 +25,7 @@ function Hero() {
             <img
               src="/assets/images/launch-academy/book.png"
               alt="Book"
+              loading="eager"
               className="w-full h-full object-contain"
             />
           </div>
@@ -32,6 +34,7 @@ function Hero() {
             <img
               src="/assets/images/launch-academy/stats.png"
               alt="Statistics"
+              loading="eager"
               className="w-full h-full object-contain"
             />
           </div>

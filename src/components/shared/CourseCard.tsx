@@ -11,6 +11,7 @@ function CourseCard({ course }: { course: Course }) {
         <img
           src={course.image}
           alt={course.title}
+          loading="lazy"
           className="w-full h-[180px] object-cover rounded-[20px]"
         />
       </div>
@@ -47,6 +48,7 @@ function CourseCard({ course }: { course: Course }) {
             <img
               src={course.instructor.image}
               alt={course.instructor.name}
+              loading="lazy"
               className="w-8 h-8 rounded-full object-cover"
             />
             <span className="text-sm font-medium">

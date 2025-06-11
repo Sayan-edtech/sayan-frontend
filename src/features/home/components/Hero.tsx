@@ -32,6 +32,7 @@ export default function Hero() {
             <img
               src="/assets/images/home/hero.png"
               alt="Hero"
+              loading="eager"
               className="w-full min-h-[400px] object-cover"
             />
           </div>

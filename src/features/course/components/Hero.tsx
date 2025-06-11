@@ -128,7 +128,11 @@ function CourseCard({
         <ul className="space-y-4">
           {courseInfo.map((item) => (
             <li key={item.title} className="flex items-center gap-3 text-sm">
-              <img src={`/assets/icons/${item.icon}`} className="w-4 h-4" />
+              <img
+                src={`/assets/icons/${item.icon}`}
+                className="w-4 h-4"
+                loading="lazy"
+              />
               <span className="text-muted-foreground text-sm md:text-base font-semibold">
                 {item.title}
               </span>

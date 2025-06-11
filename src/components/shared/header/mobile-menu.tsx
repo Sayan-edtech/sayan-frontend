@@ -36,6 +36,7 @@ export default function MobileMenu({ links }: MobileMenuProps) {
             <img
               src="/assets/images/logo.svg"
               alt="Logo"
+              loading="eager"
               className="w-[100px] h-[45px]"
             />
           </SheetHeader>
