@@ -9,7 +9,7 @@ function Hero() {
         background:
           "linear-gradient(156.58deg, rgba(15, 232, 232, 0.33) 17.14%, rgba(217, 217, 217, 0) 75.12%)",
       }}
-      className="pt-40"
+      className="pt-40 md:pb-20"
     >
       <div className="container mx-auto px-4">
         <div className="element-center gap-20">

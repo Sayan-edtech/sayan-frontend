@@ -6,11 +6,11 @@ function Features({
   features: { icon: React.ReactNode; title: string; description: string }[];
 }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {features.map((feature, index) => (
-        <div
+        <li
           key={index}
-          className="bg-white rounded-2xl p-8 text-right group hover:shadow-lg transition-all duration-300 border border-gray-100"
+          className="bg-white rounded-2xl p-6 text-right group hover:shadow-lg transition-all duration-300 border border-gray-100"
         >
           {/* Icon */}
           <div
@@ -29,9 +29,9 @@ function Features({
           <p className="text-muted-foreground leading-relaxed text-right">
             {feature.description}
           </p>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 

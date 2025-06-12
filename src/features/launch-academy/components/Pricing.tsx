@@ -82,7 +82,7 @@ function Pricing() {
   ];
 
   return (
-    <section className="pb-14 sm:pb-20 relative">
+    <section className="py-14 sm:py-20 relative">
       <div
         style={{
           background:
