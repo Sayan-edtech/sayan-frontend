@@ -1,3 +1,28 @@
+import { motion } from "framer-motion";
+
+const imageVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      ease: "easeOut",
+    },
+  },
+};
+
+const floatingAnimation = {
+  animate: {
+    y: [0, -10, 0],
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+};
+
 function Hero() {
   return (
     <section
@@ -9,31 +34,52 @@ function Hero() {
     >
       <div className="container mx-auto px-4">
         <div className="element-center gap-20">
-          <div className="w-32 h-32 md:w-52 md:h-52 hidden md:block">
+          <motion.div
+            className="w-32 h-32 md:w-52 md:h-52 hidden md:block"
+            variants={imageVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            {...floatingAnimation}
+          >
             <img
               src="/assets/images/ai/stats1.png"
               alt="Statistics 2"
               loading="eager"
               className="w-full h-full object-contain"
             />
-          </div>
-          <div className="w-52 h-52 md:w-80 md:h-80">
+          </motion.div>
+          <motion.div
+            className="w-52 h-52 md:w-80 md:h-80"
+            variants={imageVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            {...floatingAnimation}
+          >
             <img
               src="/assets/images/ai/ai.png"
               alt="Book"
               loading="eager"
               className="w-full h-full object-contain"
             />
-          </div>
+          </motion.div>
 
-          <div className="w-32 h-32 md:w-52 md:h-52 hidden md:block">
+          <motion.div
+            className="w-32 h-32 md:w-52 md:h-52 hidden md:block"
+            variants={imageVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            {...floatingAnimation}
+          >
             <img
               src="/assets/images/ai/stats2.png"
               alt="Statistics"
               loading="eager"
               className="w-full h-full object-contain"
             />
-          </div>
+          </motion.div>
         </div>
 
         {/* Text Content */}

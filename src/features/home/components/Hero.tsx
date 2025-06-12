@@ -1,5 +1,19 @@
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+
+const imageVariants = {
+  hidden: { opacity: 0, scale: 0.8, rotate: -5 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    transition: {
+      duration: 0.8,
+      ease: "easeOut",
+    },
+  },
+};
 
 export default function Hero() {
   return (
@@ -28,14 +42,19 @@ export default function Hero() {
               </Link>
             </div>
           </div>
-          <div>
+          <motion.div
+            variants={imageVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+          >
             <img
               src="/assets/images/home/hero.png"
               alt="Hero"
               loading="eager"
               className="w-full min-h-[400px] object-cover"
             />
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

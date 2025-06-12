@@ -8,6 +8,19 @@ import GoalVision from "@/features/launch-academy/components/GoalVision";
 import Layout from "@/features/launch-academy/components/Layout";
 import Pricing from "@/features/launch-academy/components/Pricing";
 import FAQs from "@/components/shared/faqs";
+import { motion } from "framer-motion";
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  },
+};
 
 const faqItems = [
   {
@@ -40,15 +53,71 @@ function LaunchAcademy() {
   return (
     <Layout>
       <main>
-        <Hero />
-        <About />
-        <WhyUs />
-        <Certification />
-        <Stats />
-        <GoalVision />
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <Hero />
+        </motion.div>
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <About />
+        </motion.div>
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <WhyUs />
+        </motion.div>
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <Certification />
+        </motion.div>
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <Stats />
+        </motion.div>
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <GoalVision />
+        </motion.div>
         {/* <Clients /> */}
-        <Pricing />
-        <FAQs faqItems={faqItems} />
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <Pricing />
+        </motion.div>
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <FAQs faqItems={faqItems} />
+        </motion.div>
       </main>
     </Layout>
   );

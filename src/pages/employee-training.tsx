@@ -4,6 +4,19 @@ import FAQs from "@/components/shared/faqs";
 import EmployeeFeatures from "@/features/employee-training/components/EmployeeFeatures";
 import Features from "@/features/employee-training/components/Features";
 import Services from "@/features/employee-training/components/Services";
+import { motion } from "framer-motion";
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  },
+};
 
 const faqItems = [
   {
@@ -36,11 +49,46 @@ function EmployeeTraining() {
   return (
     <Layout>
       <main>
-        <Hero />
-        <EmployeeFeatures />
-        <Features />
-        <Services />
-        <FAQs faqItems={faqItems} />
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <Hero />
+        </motion.div>
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <EmployeeFeatures />
+        </motion.div>
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <Features />
+        </motion.div>
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <Services />
+        </motion.div>
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <FAQs faqItems={faqItems} />
+        </motion.div>
       </main>
     </Layout>
   );
