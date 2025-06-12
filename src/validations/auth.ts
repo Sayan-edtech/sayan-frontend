@@ -1,26 +1,31 @@
 import * as z from "zod";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import { UserType } from "@/constants/enums";
 
 const userData = {
-  role: z.enum(["student", "academy"], {
+  user_type: z.enum([UserType.STUDENT, UserType.ACADEMY], {
     errorMap: () => ({ message: "يجب اختيار نوع الحساب" }),
   }),
   profile_picture: z
     .any()
+    .optional()
     .refine(
       (file) => {
+        if (!file) return true; // Allow undefined/null values
         return file instanceof File;
       },
-      { message: "صورة الملف الشخصي مطلوبة" }
+      { message: "صورة الملف الشخصي يجب أن تكون ملف صحيح" }
     )
     .refine(
       (file) => {
+        if (!file) return true; // Allow undefined/null values
         return file.size <= 5 * 1024 * 1024; // 5MB max
       },
       { message: "حجم الصورة يجب أن يكون أقل من 5 ميجابايت" }
     )
     .refine(
       (file) => {
+        if (!file) return true; // Allow undefined/null values
         const allowedTypes = [
           "image/jpeg",
           "image/jpg",
@@ -51,8 +56,7 @@ const userData = {
     }),
   password: z
     .string()
-    .min(8, { message: "كلمة المرور يجب أن تكون 8 أحرف على الأقل" })
-    .max(40),
+    .min(6, { message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" }),
   confirm_password: z.string().min(8, { message: "تأكيد كلمة المرور مطلوب" }),
 };
 
@@ -66,8 +70,7 @@ export const signinSchema = z.object({
     }),
   password: z
     .string()
-    .min(8, { message: "كلمة المرور يجب أن تكون 8 أحرف على الأقل" })
-    .max(40),
+    .min(6, { message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" }),
 });
 export const signupSchema = z
   .object(userData)

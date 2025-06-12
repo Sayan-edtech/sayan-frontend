@@ -3,6 +3,7 @@ import AuthForm from "../../features/auth/components/AuthForm";
 
 const Signin: React.FC = () => {
   return (
+    // <PublicRoute>
     <div className="space-y-6">
       <div className="space-y-2">
         <h1 className="text-3xl lg:text-4xl font-bold text-card-foreground">
@@ -20,6 +21,7 @@ const Signin: React.FC = () => {
       </div>
       <AuthForm slug={Pages.SIGNIN} />
     </div>
+    // </PublicRoute>
   );
 };
 

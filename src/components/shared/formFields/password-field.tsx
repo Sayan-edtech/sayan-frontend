@@ -61,7 +61,7 @@ const PasswordField = ({
               className={`${
                 errors[name]
                   ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
-                  : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
+                  : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border placeholder:text-input-placeholder"
               } h-10 !bg-transparent`}
               aria-invalid={errors[name] ? "true" : "false"}
             />

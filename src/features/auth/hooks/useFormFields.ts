@@ -1,4 +1,4 @@
-import { Pages } from "@/constants/enums";
+import { Pages, UserType } from "@/constants/enums";
 import type { IFormField, IFormFieldsVariables } from "@/types/app";
 
 const useFormFields = ({ slug }: IFormFieldsVariables) => {
@@ -21,20 +21,20 @@ const useFormFields = ({ slug }: IFormFieldsVariables) => {
   const signupFields = (): IFormField[] => [
     {
       label: "نوع الحساب",
-      name: "role",
+      name: "user_type",
       type: "select",
       placeholder: "اختر نوع حسابك",
       autoFocus: true,
       options: [
-        { value: "student", label: "طالب" },
-        { value: "academy", label: "أكاديمية" },
+        { value: UserType.STUDENT, label: "طالب" },
+        { value: UserType.ACADEMY, label: "أكاديمية" },
       ],
     },
     {
       label: "صورة الملف الشخصي",
       name: "profile_picture",
       type: "image",
-      placeholder: "اختر صورة شخصية (مطلوب)",
+      placeholder: "اختر صورة شخصية",
     },
     {
       label: "الاسم",

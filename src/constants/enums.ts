@@ -99,7 +99,7 @@ export enum Environments {
   PROD = "production",
   DEV = "development",
 }
-export enum Role {
-  USER = "USER",
-  ADMIN = "ADMIN",
+export enum UserType {
+  STUDENT = "STUDENT",
+  ACADEMY = "ACADEMY",
 }

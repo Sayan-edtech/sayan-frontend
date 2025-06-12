@@ -1,18 +1,25 @@
 import { Pages, Routes } from "@/constants/enums";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback } from "react";
 import FormFields from "@/components/shared/formFields/form-fields";
 import type { IFormField } from "@/types/app";
 import { useForm, type Control, type FieldErrors } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/shared/Loader";
+import { toast } from "sonner";
+import { UserType } from "@/constants/enums";
+import { useAuth } from "@/features/auth/hooks/useAuthStore";
 import useFormFields from "../hooks/useFormFields";
 import useFormValidations from "../hooks/useFormValidations";
 
 const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
+  const navigate = useNavigate();
   const { getFormFields } = useFormFields({ slug });
-
   const { getValidationSchema } = useFormValidations({ slug });
+
+  const { login, signup, isLoading } = useAuth();
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const DEFAULT_VALUES: any = {};
   for (const field of getFormFields()) {
@@ -29,7 +36,40 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
     defaultValues: DEFAULT_VALUES,
   });
 
-  const onSubmit = useCallback(async () => {}, []);
+  const onSubmit = useCallback(
+    async (data: Record<string, unknown>) => {
+      try {
+        if (slug === Pages.SIGNIN) {
+          await login({
+            email: data.email as string,
+            password: data.password as string,
+          });
+          toast.success("تم تسجيل الدخول بنجاح");
+          navigate("/");
+        } else if (slug === Pages.SIGNUP) {
+          await signup({
+            name: data.name as string,
+            email: data.email as string,
+            phone: data.phone as string,
+            password: data.password as string,
+            confirm_password: data.confirm_password as string,
+            user_type: data.user_type as UserType,
+            profile_picture: data.profile_picture as File,
+          });
+          toast.success("تم إنشاء الحساب بنجاح");
+          navigate("/");
+        }
+      } catch (error: unknown) {
+        const errorMessage =
+          (error as { response?: { data?: { message?: string } } })?.response
+            ?.data?.message || "حدث خطأ ما";
+        toast.error(errorMessage);
+      }
+    },
+    [slug, login, signup, navigate]
+  );
+
+  const formLoading = isSubmitting || isLoading;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -42,7 +82,7 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
       {slug === Pages.SIGNIN && (
         <ForgotPassword control={control} errors={errors} />
       )}
-      <SubmitButton slug={slug} disabled={isSubmitting} />
+      <SubmitButton slug={slug} disabled={formLoading} loading={formLoading} />
       <NavigationLink slug={slug} />
     </form>
   );
@@ -80,8 +120,12 @@ function ForgotPassword({
 
 function SubmitButton({
   slug,
+  loading,
   ...rest
-}: { slug: string } & React.ComponentProps<typeof Button>) {
+}: {
+  slug: string;
+  loading?: boolean;
+} & React.ComponentProps<typeof Button>) {
   const renderButtonText = () => {
     switch (slug) {
       case Pages.SIGNIN:
@@ -100,13 +144,20 @@ function SubmitButton({
         return "تسجيل الدخول";
     }
   };
+
   return (
     <Button
       type="submit"
       className="w-full h-10 text-white font-medium"
       {...rest}
     >
-      {renderButtonText()}
+      <LoadingButton
+        loading={loading}
+        loadingText="جار التحميل..."
+        loaderSize="sm"
+      >
+        {renderButtonText()}
+      </LoadingButton>
     </Button>
   );
 }
