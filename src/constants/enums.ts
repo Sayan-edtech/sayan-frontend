@@ -13,6 +13,9 @@ export enum Routes {
   AUTH = "auth",
   PROFILE = "profile",
   ADMIN = "admin",
+  DASHBOARD = "/dashboard",
+  DASHBOARD_PROFILE = "/dashboard/profile",
+  DASHBOARD_SETTINGS = "/dashboard/settings",
 }
 
 export enum Pages {
