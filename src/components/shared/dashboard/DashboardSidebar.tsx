@@ -2,7 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 import {
   Home,
   User,
-  Users,
   Briefcase,
   BookOpen,
   Package,
@@ -12,13 +11,28 @@ import {
   ShoppingCart,
   ChevronDown,
   X,
-  TrendingUp,
+  FileText,
+  Calendar,
+  Layers,
+  Edit3,
+  Settings,
+  Palette,
+  List,
+  Info,
+  Star,
+  HelpCircle,
+  UserCheck,
+  Users,
+  ClipboardCheck,
+  Award,
+  MessageSquare,
+  Database,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { Routes } from "@/constants/enums";
+import { Routes, UserType } from "@/constants/enums";
 
 interface SidebarSubItem {
   id: string;
@@ -44,12 +58,14 @@ interface DashboardSidebarProps {
   isMobile?: boolean;
   isOpen?: boolean;
   onClose?: () => void;
+  userType: UserType;
 }
 
 function DashboardSidebar({
   isMobile = false,
   isOpen = true,
   onClose,
+  userType,
 }: DashboardSidebarProps) {
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
@@ -62,19 +78,139 @@ function DashboardSidebar({
     );
   };
 
-  const sidebarItems: SidebarItem[] = [
+  const academySidebarItems: SidebarItem[] = [
     {
-      id: "dashboard",
-      title: "لوحة التحكم",
-      href: "/dashboard",
-      icon: <Home className="w-5 h-5" />,
+      id: "content-management",
+      title: "ادارة المحتوى",
+      icon: <FileText className="w-5 h-5" />,
+      isExpandable: true,
+      subItems: [
+        {
+          id: "training-courses",
+          title: "الدورات التدريبية",
+          href: "/dashboard/training-courses",
+          icon: <GraduationCap className="w-4 h-4" />,
+        },
+        {
+          id: "live-sessions",
+          title: "الجلسات الحضورية",
+          href: "/dashboard/live-sessions",
+          icon: <Calendar className="w-4 h-4" />,
+          badge: "قريباً",
+          comingSoon: true,
+        },
+        {
+          id: "content-digital-products",
+          title: "المنتجات الرقمية",
+          href: "/dashboard/content-digital-products",
+          icon: <Package className="w-4 h-4" />,
+          badge: "قريباً",
+          comingSoon: true,
+        },
+        {
+          id: "product-packages",
+          title: "حزم المنتجات",
+          href: "/dashboard/product-packages",
+          icon: <Layers className="w-4 h-4" />,
+          badge: "قريباً",
+          comingSoon: true,
+        },
+        {
+          id: "blogs",
+          title: "المدونات",
+          href: "/dashboard/blogs",
+          icon: <Edit3 className="w-4 h-4" />,
+          badge: "قريباً",
+          comingSoon: true,
+        },
+      ],
     },
     {
-      id: "profile",
-      title: "الملف الشخصي",
-      href: "/dashboard/profile",
-      icon: <User className="w-5 h-5" />,
+      id: "student-information",
+      title: "معلومات الطلاب",
+      icon: <Database className="w-5 h-5" />,
+      isExpandable: true,
+      subItems: [
+        {
+          id: "student-data",
+          title: "بيانات الطلاب",
+          href: "/dashboard/student-data",
+          icon: <Users className="w-4 h-4" />,
+          badge: "قريباً",
+          comingSoon: true,
+        },
+        {
+          id: "exams",
+          title: "الاختبارات",
+          href: "/dashboard/exams",
+          icon: <ClipboardCheck className="w-4 h-4" />,
+          badge: "قريباً",
+          comingSoon: true,
+        },
+        {
+          id: "certificates-management",
+          title: "الشهادات",
+          href: "/dashboard/certificates-management",
+          icon: <Award className="w-4 h-4" />,
+          badge: "قريباً",
+          comingSoon: true,
+        },
+        {
+          id: "comments",
+          title: "التعليقات",
+          href: "/dashboard/comments",
+          icon: <MessageSquare className="w-4 h-4" />,
+          badge: "قريباً",
+          comingSoon: true,
+        },
+      ],
     },
+    {
+      id: "academy-interface-editing",
+      title: "تعديل واجهات الأكاديمية",
+      icon: <Palette className="w-5 h-5" />,
+      isExpandable: true,
+      subItems: [
+        {
+          id: "main-settings",
+          title: "الاعدادات الرئيسية",
+          href: "/dashboard/main-settings",
+          icon: <Settings className="w-4 h-4" />,
+        },
+        {
+          id: "main-menu",
+          title: "القائمة الرئيسية",
+          href: "/dashboard/main-menu",
+          icon: <List className="w-4 h-4" />,
+        },
+        {
+          id: "about-us",
+          title: "من نحن",
+          href: "/dashboard/about-us",
+          icon: <Info className="w-4 h-4" />,
+        },
+        {
+          id: "student-reviews",
+          title: "تقييمات الطلاب",
+          href: "/dashboard/student-reviews",
+          icon: <Star className="w-4 h-4" />,
+        },
+        {
+          id: "faqs",
+          title: "الأسئلة الشائعة",
+          href: "/dashboard/faqs",
+          icon: <HelpCircle className="w-4 h-4" />,
+        },
+      ],
+    },
+    {
+      id: "trainers-management",
+      title: "ادارة المديرين",
+      href: "/dashboard/trainers-management",
+      icon: <UserCheck className="w-5 h-5" />,
+    },
+  ];
+  const studentSidebarItems: SidebarItem[] = [
     {
       id: "students-bag",
       title: "حقيبة الطلاب",
@@ -121,22 +257,28 @@ function DashboardSidebar({
       href: "/dashboard/shopping-cart",
       icon: <ShoppingCart className="w-5 h-5" />,
     },
+  ];
+
+  const baseSidebarItems: SidebarItem[] = [
     {
-      id: "marketing",
-      title: "التسويق",
-      icon: <TrendingUp className="w-5 h-5" />,
-      isExpandable: true,
-      subItems: [
-        {
-          id: "affiliate-marketing",
-          title: "التسويق بالعمولة",
-          href: "/dashboard/affiliate-marketing",
-          icon: <Users className="w-4 h-4" />,
-          badge: "قريباً",
-          comingSoon: true,
-        },
-      ],
+      id: "dashboard",
+      title: "لوحة التحكم",
+      href: "/dashboard",
+      icon: <Home className="w-5 h-5" />,
     },
+    {
+      id: "profile",
+      title: "الملف الشخصي",
+      href: "/dashboard/profile",
+      icon: <User className="w-5 h-5" />,
+    },
+  ];
+
+  const sidebarItems: SidebarItem[] = [
+    ...baseSidebarItems,
+    ...(userType === UserType.ACADEMY
+      ? academySidebarItems
+      : studentSidebarItems),
   ];
 
   const isActivePath = (href: string) => {

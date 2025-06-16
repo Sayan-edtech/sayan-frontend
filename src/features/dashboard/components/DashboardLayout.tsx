@@ -2,17 +2,19 @@ import { Outlet } from "react-router-dom";
 import DashboardSidebar from "@/components/shared/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/shared/dashboard/DashboardHeader";
 import { useState } from "react";
+import { UserType } from "@/constants/enums";
 
 export function DashboardLayout() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background flex">
-      <DashboardSidebar />
+      <DashboardSidebar userType={UserType.STUDENT} />
       <DashboardSidebar
         isMobile={true}
         isOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}
+        userType={UserType.STUDENT}
       />
       <div className="flex-1 flex flex-col">
         <DashboardHeader
