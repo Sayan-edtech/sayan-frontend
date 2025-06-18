@@ -86,9 +86,9 @@ function DashboardSidebar({
       isExpandable: true,
       subItems: [
         {
-          id: "training-courses",
+          id: "courses",
           title: "الدورات التدريبية",
-          href: "/dashboard/training-courses",
+          href: "/dashboard/courses",
           icon: <GraduationCap className="w-4 h-4" />,
         },
         {
@@ -204,9 +204,9 @@ function DashboardSidebar({
       ],
     },
     {
-      id: "trainers-management",
+      id: "trainers",
       title: "ادارة المديرين",
-      href: "/dashboard/trainers-management",
+      href: "/dashboard/trainers",
       icon: <UserCheck className="w-5 h-5" />,
     },
   ];
@@ -488,13 +488,30 @@ function DashboardSidebar({
       )}
       <div className="p-6 space-y-6">
         <div className="hidden lg:flex items-center gap-2">
-          <Link to={Routes.ROOT}>
-            <img
-              src="/assets/images/logo.svg"
-              alt="Sayan"
-              className="w-24 h-24"
-            />
-          </Link>
+          {userType === UserType.ACADEMY ? (
+            <Link
+              to="/"
+              target="_blank"
+              className="flex items-center gap-4 group"
+            >
+              <img
+                src="https://avatars.githubusercontent.com/u/87553297?v=4"
+                alt="Sayan"
+                className="w-24 h-24 rounded-full"
+              />
+              <h3 className="text-muted-foreground group-hover:text-primary transition-colors duration-200 font-semibold text-lg">
+                SAC Academy
+              </h3>
+            </Link>
+          ) : (
+            <Link to={Routes.ROOT}>
+              <img
+                src="/assets/images/logo.svg"
+                alt="Sayan"
+                className="w-24 h-24"
+              />
+            </Link>
+          )}
         </div>
         <nav>
           <ul className="flex flex-col gap-2">
