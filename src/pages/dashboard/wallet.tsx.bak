@@ -1,0 +1,358 @@
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Download, Wallet } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
+
+function WalletPage() {
+  const [activeTab, setActiveTab] = useState("weekly");
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Header with Tabs */}
+            <div className="border-b border-gray-200">
+              <h1 className="text-center text-2xl font-bold text-blue-600 mb-4">الإيراد</h1>
+              <Tabs defaultValue="weekly" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 rounded-none bg-transparent">
+                  <TabsTrigger 
+                    value="yearly" 
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:shadow-none rounded-none"
+                    onClick={() => setActiveTab("yearly")}
+                  >
+                    السنة السابقة
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="monthly" 
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:shadow-none rounded-none"
+                    onClick={() => setActiveTab("monthly")}
+                  >
+                    شهري
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="weekly" 
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:shadow-none rounded-none bg-blue-100 text-blue-700"
+                    onClick={() => setActiveTab("weekly")}
+                  >
+                    أسبوعي
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            
+            {/* Income/Expense Overview */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">المصروفات الشهرية</h3>
+                  <p className="text-3xl font-bold mt-1 flex items-center">
+                    <span>﷼</span>
+                    <span className="mr-1">0</span>
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">الإيرادات الشهرية</h3>
+                  <p className="text-3xl font-bold mt-1 flex items-center text-right">
+                    <span>﷼</span>
+                    <span className="mr-1">81,000,019.8</span>
+                    <span className="text-green-500 text-sm font-medium mr-2">+0.5%</span>
+                  </p>
+                  <p className="text-xs text-gray-500 text-right">مقارنة بالشهر السابق</p>
+                </div>
+              </div>
+              <div className="mt-8 mb-4">
+                <h4 className="mb-4 font-bold">طلبات سحب معتمدة</h4>
+                <div className="h-[200px] flex items-center justify-center">
+                  {activeTab === "weekly" && (
+                    <div className="w-full">
+                      {/* Revenue Analysis Chart */}
+                      <div className="flex justify-between items-end w-full h-[150px] px-4">
+                        {Array.from({ length: 7 }).map((_, index) => (
+                          <div key={index} className="flex flex-col items-center">
+                            <div 
+                              className={`w-2 bg-blue-500 rounded-full`}
+                              style={{ 
+                                height: `${Math.random() * 50 + (index === 3 ? 100 : 10)}px`,
+                                opacity: index === 3 ? 1 : 0.7
+                              }}
+                            />
+                            <span className="text-xs mt-2 text-gray-500">
+                              {`Jun ${13 + index}`}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex justify-between mt-4 text-xs text-gray-500">
+                        <span>0 ﷼</span>
+                        <span>50 ﷼</span>
+                        <span>100 ﷼</span>
+                      </div>
+                    </div>
+                  )}
+                  {(activeTab === "monthly" || activeTab === "yearly") && (
+                    <p className="text-gray-400">البيانات غير متوفرة للعرض المحدد</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Credit Card Visualization */}
+            <div className="relative overflow-hidden rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-6">
+              <div className="absolute top-3 left-3">
+                <span className="font-mono text-xs opacity-70">CARD</span>
+              </div>
+              <div className="mt-2">
+                <div className="w-12 h-8 bg-gray-200 opacity-70 rounded mb-6"></div>
+                <h3 className="text-lg font-medium opacity-90">محفظة الأكاديمية</h3>
+                <p className="text-3xl font-bold mt-2 tracking-wider">
+                  <span>﷼</span>
+                  <span className="mr-1">81,000,019.8</span>
+                </p>
+              </div>
+              <div className="absolute bottom-3 left-3">
+                <span className="font-mono text-xs opacity-70">1890 **** **** ****</span>
+              </div>
+            </div>
+            
+            <div className="text-center text-lg font-bold">
+              تحليل الإيرادات
+            </div>
+          </div>
+          
+          {/* Right Sidebar */}
+          <div className="lg:col-span-1 space-y-8">
+            {/* Balance Overview */}
+            <Card className="p-6 text-right">
+              <h2 className="text-gray-500 text-sm mb-2">رصيد المحفظة</h2>
+              <div className="flex items-center justify-end">
+                <span className="text-3xl font-bold">81,000,019.8</span>
+                <span className="mr-2 text-lg">﷼</span>
+              </div>
+              <p className="text-green-500 text-sm mt-2">
+                <span>+%0.0</span>
+                <span className="mr-1">الفوائد الشهرية</span>
+              </p>
+              <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2">
+                <Download className="w-4 h-4" />
+                سحب الأرباح
+              </Button>
+            </Card>
+
+function WalletPage() {
+  const [activeTab, setActiveTab] = useState("weekly");
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Header with Tabs */}
+            <div className="border-b border-gray-200">
+              <h1 className="text-center text-2xl font-bold text-blue-600 mb-4">الإيراد</h1>
+              <Tabs defaultValue="weekly" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 rounded-none bg-transparent">
+                  <TabsTrigger 
+                    value="yearly" 
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:shadow-none rounded-none"
+                    onClick={() => setActiveTab("yearly")}
+                  >
+                    السنة السابقة
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="monthly" 
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:shadow-none rounded-none"
+                    onClick={() => setActiveTab("monthly")}
+                  >
+                    شهري
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="weekly" 
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:shadow-none rounded-none bg-blue-100 text-blue-700"
+                    onClick={() => setActiveTab("weekly")}
+                  >
+                    أسبوعي
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            
+            {/* Income/Expense Overview */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">المصروفات الشهرية</h3>
+                  <p className="text-3xl font-bold mt-1 flex items-center">
+                    <span>﷼</span>
+                    <span className="mr-1">0</span>
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">الإيرادات الشهرية</h3>
+                  <p className="text-3xl font-bold mt-1 flex items-center text-right">
+                    <span>﷼</span>
+                    <span className="mr-1">81,000,019.8</span>
+                    <span className="text-green-500 text-sm font-medium mr-2">+0.5%</span>
+                  </p>
+                  <p className="text-xs text-gray-500 text-right">مقارنة بالشهر السابق</p>
+                </div>
+              </div>
+              <div className="mt-8 mb-4">
+                <h4 className="mb-4 font-bold">طلبات سحب معتمدة</h4>
+                <div className="h-[200px] flex items-center justify-center">
+                  {activeTab === "weekly" && (
+                    <div className="w-full">
+                      {/* Revenue Analysis Chart */}
+                      <div className="flex justify-between items-end w-full h-[150px] px-4">
+                        {Array.from({ length: 7 }).map((_, index) => (
+                          <div key={index} className="flex flex-col items-center">
+                            <div 
+                              className={`w-2 bg-blue-500 rounded-full`}
+                              style={{ 
+                                height: `${Math.random() * 50 + (index === 3 ? 100 : 10)}px`,
+                                opacity: index === 3 ? 1 : 0.7
+                              }}
+                            />
+                            <span className="text-xs mt-2 text-gray-500">
+                              {`Jun ${13 + index}`}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex justify-between mt-4 text-xs text-gray-500">
+                        <span>0 ﷼</span>
+                        <span>50 ﷼</span>
+                        <span>100 ﷼</span>
+                      </div>
+                    </div>
+                  )}
+                  {(activeTab === "monthly" || activeTab === "yearly") && (
+                    <p className="text-gray-400">البيانات غير متوفرة للعرض المحدد</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Credit Card Visualization */}
+            <div className="relative overflow-hidden rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-6">
+              <div className="absolute top-3 left-3">
+                <span className="font-mono text-xs opacity-70">CARD</span>
+              </div>
+              <div className="mt-2">
+                <div className="w-12 h-8 bg-gray-200 opacity-70 rounded mb-6"></div>
+                <h3 className="text-lg font-medium opacity-90">محفظة الأكاديمية</h3>
+                <p className="text-3xl font-bold mt-2 tracking-wider">
+                  <span>﷼</span>
+                  <span className="mr-1">81,000,019.8</span>
+                </p>
+              </div>
+              <div className="absolute bottom-3 left-3">
+                <span className="font-mono text-xs opacity-70">1890 **** **** ****</span>
+              </div>
+            </div>
+            
+            <div className="text-center text-lg font-bold">
+              تحليل الإيرادات
+            </div>
+          </div>
+          
+          {/* Right Sidebar */}
+          <div className="lg:col-span-1 space-y-8">
+            {/* Balance Overview */}
+            <Card className="p-6 text-right">
+              <h2 className="text-gray-500 text-sm mb-2">رصيد المحفظة</h2>
+              <div className="flex items-center justify-end">
+                <span className="text-3xl font-bold">81,000,019.8</span>
+                <span className="mr-2 text-lg">﷼</span>
+              </div>
+              <p className="text-green-500 text-sm mt-2">
+                <span>+%0.0</span>
+                <span className="mr-1">الفوائد الشهرية</span>
+              </p>
+              <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2">
+                <Download className="w-4 h-4" />
+                سحب الأرباح
+              </Button>
+            </Card>
+
+        {/* Recent Transactions */}
+        <h2 className="text-xl font-bold text-gray-900 mb-4">
+          المعاملات الأخيرة
+        </h2>
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-right">
+              <thead className="bg-gray-50 text-gray-600">
+                <tr>
+                  <th className="px-6 py-3 font-medium">التاريخ</th>
+                  <th className="px-6 py-3 font-medium">المبلغ</th>
+                  <th className="px-6 py-3 font-medium">النوع</th>
+                  <th className="px-6 py-3 font-medium">الوصف</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {transactions.map((transaction) => (
+                  <tr key={transaction.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {new Date(transaction.date).toLocaleDateString("ar-SA")}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`font-medium ${
+                          transaction.type === "income"
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {transaction.type === "income" ? "+" : "-"}{" "}
+                        {transaction.amount} ر.س
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex rounded-full px-2 text-xs font-semibold ${
+                          transaction.type === "income"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {transaction.type === "income" ? "إيداع" : "سحب"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">{transaction.description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        {/* Pagination */}
+        <div className="flex justify-center mt-6">
+          <nav className="flex items-center gap-1">
+            <Button variant="outline" size="sm" className="text-xs">
+              السابق
+            </Button>
+            <Button variant="outline" size="sm" className="text-xs bg-blue-50">
+              1
+            </Button>
+            <Button variant="outline" size="sm" className="text-xs">
+              2
+            </Button>
+            <Button variant="outline" size="sm" className="text-xs">
+              3
+            </Button>
+            <Button variant="outline" size="sm" className="text-xs">
+              التالي
+            </Button>
+          </nav>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default WalletPage;

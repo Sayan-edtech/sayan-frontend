@@ -27,6 +27,7 @@ import {
   Award,
   MessageSquare,
   Database,
+  Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -202,6 +203,12 @@ function DashboardSidebar({
           icon: <HelpCircle className="w-4 h-4" />,
         },
       ],
+    },
+    {
+      id: "wallet",
+      title: "المحفظة",
+      href: "/dashboard/wallet",
+      icon: <Wallet className="w-5 h-5" />,
     },
     {
       id: "trainers",

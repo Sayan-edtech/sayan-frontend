@@ -7,6 +7,7 @@ import Profile from "@/pages/dashboard/profile";
 import Purchases from "@/pages/dashboard/purchases";
 import Settings from "@/pages/dashboard/settings";
 import ShoppingCart from "@/pages/dashboard/shopping-cart";
+import Wallet from "@/pages/dashboard/wallet";
 import { Route } from "react-router-dom";
 import AcademyCourses from "../pages/dashboard/courses";
 import AddNewCourse from "@/pages/dashboard/courses/new";
@@ -30,6 +31,7 @@ export const dashboardRoutes = (
     {/* Other Routes */}
     <Route path="purchases" element={<Purchases />} />
     <Route path="shopping-cart" element={<ShoppingCart />} />
+    <Route path="wallet" element={<Wallet />} />
     {/* Shopping Cart Routes */}
     <Route
       path="affiliate-marketing"
