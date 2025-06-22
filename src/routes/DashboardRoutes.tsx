@@ -13,6 +13,7 @@ import AcademyCourses from "../pages/dashboard/courses";
 import AddNewCourse from "@/pages/dashboard/courses/new";
 import Trainers from "../pages/dashboard/trainers";
 import AddNewTrainer from "@/pages/dashboard/trainers/new";
+import { templateRoutes } from "./TemplateRoutes";
 
 export const dashboardRoutes = (
   <Route path="dashboard" element={<DashboardLayout />}>
@@ -37,5 +38,6 @@ export const dashboardRoutes = (
       path="affiliate-marketing"
       element={<div>التسويق بالعمولة - قريباً</div>}
     />
+    {templateRoutes}
   </Route>
 );

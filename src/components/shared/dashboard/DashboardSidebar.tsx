@@ -173,33 +173,33 @@ function DashboardSidebar({
       isExpandable: true,
       subItems: [
         {
-          id: "main-settings",
+          id: "template",
           title: "الاعدادات الرئيسية",
-          href: "/dashboard/main-settings",
+          href: "/dashboard/template",
           icon: <Settings className="w-4 h-4" />,
         },
         {
           id: "main-menu",
           title: "القائمة الرئيسية",
-          href: "/dashboard/main-menu",
+          href: "/dashboard/template/main-menu",
           icon: <List className="w-4 h-4" />,
         },
         {
-          id: "about-us",
+          id: "about",
           title: "من نحن",
-          href: "/dashboard/about-us",
+          href: "/dashboard/template/about",
           icon: <Info className="w-4 h-4" />,
         },
         {
           id: "student-reviews",
           title: "تقييمات الطلاب",
-          href: "/dashboard/student-reviews",
+          href: "/dashboard/template/student-reviews",
           icon: <Star className="w-4 h-4" />,
         },
         {
           id: "faqs",
           title: "الأسئلة الشائعة",
-          href: "/dashboard/faqs",
+          href: "/dashboard/template/faqs",
           icon: <HelpCircle className="w-4 h-4" />,
         },
       ],
@@ -291,6 +291,8 @@ function DashboardSidebar({
   const isActivePath = (href: string) => {
     if (href === "/dashboard") {
       return location.pathname === "/dashboard";
+    } else if (href === "/dashboard/template") {
+      return location.pathname === "/dashboard/template";
     }
     return location.pathname.startsWith(href);
   };
@@ -385,7 +387,7 @@ function DashboardSidebar({
                             className={cn(
                               "transition-colors",
                               isActivePath(subItem.href!)
-                                ? "text-white"
+                                ? "text-white group-hover:text-foreground"
                                 : "text-muted-foreground group-hover:text-primary"
                             )}
                           >
