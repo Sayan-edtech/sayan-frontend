@@ -499,7 +499,7 @@ function DashboardSidebar({
         <div className="hidden lg:flex items-center gap-2">
           {userType === UserType.ACADEMY ? (
             <Link
-              to="/"
+              to="/academy/simple-arab-code"
               target="_blank"
               className="flex items-center gap-4 group"
             >
