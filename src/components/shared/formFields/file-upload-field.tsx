@@ -66,8 +66,14 @@ const FileUploadField = ({
       onChange(file);
       setFileName(file.name);
 
-      // Create preview for images
+      // Create preview for images and videos
       if (fileType === "image" && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setPreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else if (fileType === "video" && file.type.startsWith("video/")) {
         const reader = new FileReader();
         reader.onload = (e) => {
           setPreview(e.target?.result as string);
@@ -129,7 +135,7 @@ const FileUploadField = ({
 
             {value ? (
               <div className="relative">
-                {preview ? (
+                {preview && fileType === "image" ? (
                   // Image preview
                   <div className="relative inline-block">
                     <img
@@ -147,6 +153,31 @@ const FileUploadField = ({
                     >
                       <X className="w-3 h-3" />
                     </Button>
+                  </div>
+                ) : preview && fileType === "video" ? (
+                  // Video preview
+                  <div className="relative inline-block w-full">
+                    <video
+                      src={preview}
+                      className="w-full max-w-md h-48 object-cover rounded-lg border"
+                      controls
+                      preload="metadata"
+                    >
+                      متصفحك لا يدعم تشغيل الفيديو.
+                    </video>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                      onClick={() => handleFileRemove(onChange)}
+                      disabled={disabled}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                    <div className="mt-2 text-sm text-muted-foreground">
+                      <p className="font-medium truncate">{fileName}</p>
+                    </div>
                   </div>
                 ) : (
                   // File name display
