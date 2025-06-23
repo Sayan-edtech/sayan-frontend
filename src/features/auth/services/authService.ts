@@ -10,7 +10,10 @@ import type {
 export const authService = {
   // Login user
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/login", credentials);
+    const response = await api.post<AuthResponse>("/auth/login", {
+      ...credentials,
+      user_type: "student",
+    });
     return response.data;
   },
 

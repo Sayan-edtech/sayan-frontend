@@ -40,12 +40,12 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
     async (data: Record<string, unknown>) => {
       try {
         if (slug === Pages.SIGNIN) {
-          // await login({
-          //   email: data.email as string,
-          //   password: data.password as string,
-          // });
-          toast.success("تم تسجيل الدخول بنجاح");
-          navigate("/dashboard");
+          await login({
+            email: data.email as string,
+            password: data.password as string,
+          });
+          // toast.success("تم تسجيل الدخول بنجاح");
+          // navigate("/dashboard");
         } else if (slug === Pages.SIGNUP) {
           await signup({
             name: data.name as string,
