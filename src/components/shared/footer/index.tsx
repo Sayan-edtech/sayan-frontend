@@ -6,7 +6,7 @@ function Footer() {
   const linkStyles =
     "text-[#EAEFF4] hover:text-white hover:underline duration-200 transition-colors";
   return (
-    <header className="bg-primary pt-10 lg:pt-20 pb-8">
+    <footer className="bg-primary pt-10 lg:pt-20 pb-8">
       <div className="container flex flex-col gap-20">
         <div className="flex justify-between flex-wrap gap-10">
           <div className="flex flex-col gap-6">
@@ -34,10 +34,14 @@ function Footer() {
           |{" "}
           <Link to="/privacy" target="_blank" className={linkStyles}>
             سياسة الخصوصية
+          </Link>{" "}
+          |{" "}
+          <Link to="/updates" target="_blank" className={linkStyles}>
+            تحديثات المنصة
           </Link>
         </p>
       </div>
-    </header>
+    </footer>
   );
 }
 

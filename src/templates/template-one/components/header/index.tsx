@@ -17,10 +17,10 @@ export default function Header() {
           <div className="flex items-center flex-1 justify-between lg:justify-start gap-4 lg:gap-10">
             <Link to="/">
               <img
-                src="/assets/images/logo.svg"
+                src="https://www.sayan-server.com/storage/academy/image/uqeh6BuRGvAmQ8tdvoGa.png"
                 alt="Logo"
                 loading="eager"
-                className="w-[100px] h-[45px] object-contain"
+                className="h-[45px] object-contain"
               />
             </Link>
             <MobileMenu links={links} />
