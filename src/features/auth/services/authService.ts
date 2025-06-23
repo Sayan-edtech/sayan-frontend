@@ -17,7 +17,6 @@ export const authService = {
     return response.data;
   },
 
-  // Register user
   async signup(userData: SignupRequest): Promise<AuthResponse> {
     const formData = new FormData();
 
