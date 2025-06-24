@@ -7,6 +7,7 @@ import { Pages, Routes } from "@/constants/enums";
 import type { Trainer } from "@/types/trainer";
 import { useState, useMemo } from "react";
 import TrainersTable from "@/features/trainers/components/TrainersTable";
+import type { Table } from "@tanstack/react-table";
 
 const trainers: Trainer[] = [
   {
@@ -62,7 +63,7 @@ const trainers: Trainer[] = [
 function Trainers() {
   const [selectedSpecialization, setSelectedSpecialization] = useState("الكل");
   const [minCoursesCount, setMinCoursesCount] = useState(0);
-  const [table, setTable] = useState<any>(null);
+  const [table, setTable] = useState<Table<Trainer> | null>(null);
 
   const filteredTrainers = useMemo(() => {
     return trainers.filter((trainer) => {

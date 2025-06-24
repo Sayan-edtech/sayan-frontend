@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import AddTrainerForm from "@/features/trainers/components/AddTrainerForm";
 import type { ITrainerForm } from "@/validations/trainer";
-import { Plus, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 
 function AddNewTrainer() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ function AddNewTrainer() {
   return (
     <div className="space-y-6">
       <Header />
-      
+
       {/* Form */}
       <AddTrainerForm onSubmit={handleSubmit} onCancel={handleCancel} />
     </div>

@@ -1,5 +1,5 @@
 import { Pages, Routes } from "@/constants/enums";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback } from "react";
 import FormFields from "@/components/shared/formFields/form-fields";
@@ -163,6 +163,8 @@ function SubmitButton({
 }
 
 function NavigationLink({ slug }: { slug: string }) {
+  const { academySlug } = useParams();
+
   const getText = () => {
     switch (slug) {
       case Pages.SIGNIN:
@@ -189,7 +191,7 @@ function NavigationLink({ slug }: { slug: string }) {
     <div className="mt-6 flex items-center gap-2">
       <p className="text-card-foreground text-sm">{getText().desc}</p>
       <Link
-        to={`/${Routes.AUTH}/${getText().slug}`}
+        to={`/academy/${academySlug}/${Routes.AUTH}/${getText().slug}`}
         replace
         className="text-primary hover:underline text-sm font-medium transition-colors duration-200"
       >

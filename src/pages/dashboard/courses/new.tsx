@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import AddCourseForm from "@/features/courses/components/AddCourseForm";
 import type { ICourseForm } from "@/validations/course";
-import { Plus, BookOpen } from "lucide-react";
+import { Plus } from "lucide-react";
 
 function AddNewCourse() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ function AddNewCourse() {
   return (
     <div className="space-y-6">
       <Header />
-      
+
       {/* Form */}
       <AddCourseForm onSubmit={handleSubmit} onCancel={handleCancel} />
     </div>

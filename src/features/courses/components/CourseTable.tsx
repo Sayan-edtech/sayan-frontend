@@ -13,16 +13,9 @@ import type {
   SortingState,
   VisibilityState,
 } from "@tanstack/react-table";
-import { ChevronDown, Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -31,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import type { Table as TanstackTable } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 
 interface Course {
@@ -48,7 +42,7 @@ interface Course {
 
 interface CourseTableProps {
   courses: Course[];
-  onTableReady?: (table: any) => void;
+  onTableReady?: (table: TanstackTable<Course>) => void;
 }
 
 const columns: ColumnDef<Course>[] = [
@@ -146,20 +140,20 @@ const columns: ColumnDef<Course>[] = [
     cell: () => {
       return (
         <div className="flex items-center justify-center gap-2">
-                      <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       );
     },
@@ -201,7 +195,7 @@ function CourseTable({ courses, onTableReady }: CourseTableProps) {
     }
   }, [table, onTableReady]);
 
-    return (
+  return (
     <div className="w-full">
       {/* Mobile Card View */}
       <div className="block lg:hidden space-y-4">
@@ -226,20 +220,20 @@ function CourseTable({ courses, onTableReady }: CourseTableProps) {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                                      <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-blue-600"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-blue-600"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
 

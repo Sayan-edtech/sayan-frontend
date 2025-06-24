@@ -6,6 +6,7 @@ import CourseFilters from "@/features/courses/components/CourseFilters";
 import { Link } from "react-router-dom";
 import { Pages, Routes } from "@/constants/enums";
 import { useState, useMemo } from "react";
+import type { Table } from "@tanstack/react-table";
 
 interface Course {
   id: number;
@@ -65,7 +66,7 @@ function AcademyCourses() {
   const [selectedLevel, setSelectedLevel] = useState("الكل");
   const [selectedType, setSelectedType] = useState("الكل");
   const [minPrice, setMinPrice] = useState(0);
-  const [table, setTable] = useState<any>(null);
+  const [table, setTable] = useState<Table<Course> | null>(null);
 
   const filteredCourses = useMemo(() => {
     return courses.filter((course) => {
@@ -83,12 +84,7 @@ function AcademyCourses() {
         (minPrice === -1 && course.price === 0) ||
         (minPrice > 0 && course.price >= minPrice);
 
-      return (
-        matchesCategory &&
-        matchesLevel &&
-        matchesType &&
-        matchesPrice
-      );
+      return matchesCategory && matchesLevel && matchesType && matchesPrice;
     });
   }, [selectedCategory, selectedLevel, selectedType, minPrice]);
 
