@@ -10,13 +10,11 @@ import type {
 export const authService = {
   // Login user
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/login", {
-      ...credentials,
-      user_type: "student",
-    });
+    const response = await api.post<AuthResponse>("/auth/login", credentials);
     return response.data;
   },
 
+  // Register user
   async signup(userData: SignupRequest): Promise<AuthResponse> {
     const formData = new FormData();
 

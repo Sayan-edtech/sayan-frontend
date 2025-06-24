@@ -48,6 +48,7 @@ interface Course {
 
 interface CourseTableProps {
   courses: Course[];
+  onTableReady?: (table: any) => void;
 }
 
 const columns: ColumnDef<Course>[] = [
@@ -145,27 +146,27 @@ const columns: ColumnDef<Course>[] = [
     cell: () => {
       return (
         <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+                      <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
         </div>
       );
     },
   },
 ];
 
-function CourseTable({ courses }: CourseTableProps) {
+function CourseTable({ courses, onTableReady }: CourseTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -193,61 +194,22 @@ function CourseTable({ courses }: CourseTableProps) {
     },
   });
 
-  return (
-    <div className="w-full">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 py-4">
-        <Input
-          placeholder="البحث في الدورات..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
-          className="w-full sm:max-w-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full sm:w-auto sm:ml-auto">
-              الأعمدة <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                const columnHeaders = {
-                  image: "الصورة",
-                  title: "اسم المادة",
-                  category: "الفئة",
-                  type: "النوع",
-                  level: "المستوى",
-                  instructor: "اسم المدرب",
-                  price: "السعر",
-                };
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {columnHeaders[column.id as keyof typeof columnHeaders] ||
-                      column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+  // Pass table object to parent for filters
+  React.useEffect(() => {
+    if (onTableReady) {
+      onTableReady(table);
+    }
+  }, [table, onTableReady]);
 
+    return (
+    <div className="w-full">
       {/* Mobile Card View */}
       <div className="block lg:hidden space-y-4">
         {table.getRowModel().rows?.length ? (
           table.getRowModel().rows.map((row) => (
             <div
               key={row.id}
-              className="bg-white rounded-lg border border-gray-200 p-4 space-y-3"
+              className="bg-white rounded-lg border-0 shadow-sm p-4 space-y-3"
             >
               <div className="flex items-start gap-3">
                 <img
@@ -264,20 +226,20 @@ function CourseTable({ courses }: CourseTableProps) {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 text-blue-600"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 text-red-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                                      <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-blue-600"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                 </div>
               </div>
 
@@ -326,7 +288,7 @@ function CourseTable({ courses }: CourseTableProps) {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden lg:block rounded-lg border border-gray-200 bg-white overflow-hidden">
+      <div className="hidden lg:block rounded-lg border-0 shadow-sm bg-white overflow-hidden">
         <Table>
           <TableHeader className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
