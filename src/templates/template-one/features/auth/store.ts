@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { User, LoginRequest, SignupRequest } from "@/types/user";
 import { authService } from "./services/authService";
 import { authCookies } from "@/lib/cookies";
-import { Pages, Routes } from "@/constants/enums";
+import { Pages, Routes, UserType } from "@/constants/enums";
 
 interface AuthState {
   // State
@@ -14,7 +14,6 @@ interface AuthState {
 
   // Actions
   setUser: (user: User | null) => void;
-  setTokens: (accessToken: string | null, refreshToken: string | null) => void;
   setAccessToken: (token: string | null) => void;
   setRefreshToken: (token: string | null) => void;
   setLoading: (loading: boolean) => void;
@@ -45,13 +44,6 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       isAuthenticated: !!user && !!get().accessToken,
     })),
 
-  setTokens: (accessToken, refreshToken) =>
-    set(() => ({
-      accessToken,
-      refreshToken,
-      isAuthenticated: !!get().user && !!accessToken,
-    })),
-
   setAccessToken: (accessToken) =>
     set(() => ({
       accessToken,
@@ -76,14 +68,14 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       set(() => ({
         user: response.user,
-        accessToken: response.access_token,
-        refreshToken: response.refresh_token,
+        accessToken: response.data.access_token,
+        refreshToken: response.data.refresh_token,
         isAuthenticated: true,
         isLoading: false,
       }));
 
       // Store in cookies
-      authCookies.setTokens(response.access_token, response.refresh_token);
+      // authCookies.setTokens(response.access_token, response.refresh_token);
     } catch (error) {
       set(() => ({ isLoading: false }));
       throw error;
@@ -98,14 +90,15 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       set(() => ({
         user: response.user,
-        accessToken: response.access_token,
-        refreshToken: response.refresh_token,
         isAuthenticated: true,
         isLoading: false,
       }));
 
       // Store in cookies
-      authCookies.setTokens(response.access_token, response.refresh_token);
+      authCookies.setTokens(
+        response.data.access_token,
+        response.data.refresh_token
+      );
     } catch (error) {
       set(() => ({ isLoading: false }));
       throw error;
@@ -121,8 +114,6 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       // Clear state regardless of API success
       set(() => ({
         user: null,
-        accessToken: null,
-        refreshToken: null,
         isAuthenticated: false,
         isLoading: false,
       }));
@@ -199,12 +190,12 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   // Computed getters
   isStudent: () => {
     const { user } = get();
-    return user?.user_type === "STUDENT";
+    return user?.user_type === UserType.STUDENT;
   },
 
   isAcademy: () => {
     const { user } = get();
-    return user?.user_type === "ACADEMY";
+    return user?.user_type === UserType.ACADEMY;
   },
 }));
 

@@ -5,7 +5,6 @@ import type {
   InternalAxiosRequestConfig,
 } from "axios";
 import { authCookies } from "@/lib/cookies";
-import { Pages, Routes } from "@/constants/enums";
 
 // Create axios instance
 export const api = axios.create({
@@ -66,13 +65,13 @@ api.interceptors.response.use(
           console.error("Token refresh failed:", refreshError);
           // Clear invalid auth cookies and redirect to login
           authCookies.clearAll();
-          window.location.href = `${Routes.AUTH}/${Pages.SIGNIN}`;
+          // window.location.href = `${Routes.AUTH}/${Pages.SIGNIN}`;
           return Promise.reject(refreshError);
         }
       } else {
         // No refresh token available, clear auth and redirect
         authCookies.clearAll();
-        window.location.href = `${Routes.AUTH}/${Pages.SIGNIN}`;
+        // window.location.href = `${Routes.AUTH}/${Pages.SIGNIN}`;
       }
     }
 

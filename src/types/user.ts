@@ -2,19 +2,22 @@ import { UserType } from "@/constants/enums";
 
 export type User = {
   id: string;
-  name: string;
   email: string;
-  phone?: string;
+  fname: string;
+  lname: string;
   user_type: UserType;
-  profile_picture?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  verified: boolean;
 };
 
 export type AuthResponse = {
+  status_code: number;
+  message: string;
   user: User;
-  access_token: string;
-  refresh_token: string;
+  data: {
+    user_data: User;
+    access_token: string;
+    refresh_token: string;
+  };
 };
 
 export type TokenRefreshResponse = {
@@ -28,9 +31,10 @@ export type LoginRequest = {
 };
 
 export type SignupRequest = {
-  name: string;
+  fname: string;
+  lname: string;
   email: string;
-  phone: string;
+  phone_number: string;
   password: string;
   confirm_password: string;
   user_type: UserType;

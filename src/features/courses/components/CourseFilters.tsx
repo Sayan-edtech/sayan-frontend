@@ -15,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Filter, X, ChevronDown, Search } from "lucide-react";
+import type { Table as TanstackTable } from "@tanstack/react-table";
+import type { Course } from "@/pages/dashboard/courses";
 
 interface CourseFiltersProps {
   selectedCategory: string;
@@ -26,7 +28,7 @@ interface CourseFiltersProps {
   minPrice: number;
   onMinPriceChange: (price: number) => void;
   onClearFilters: () => void;
-  table?: any; // للتحكم في الأعمدة
+  table: TanstackTable<Course> | null; // للتحكم في الأعمدة
 }
 
 function CourseFilters({
@@ -96,7 +98,9 @@ function CourseFilters({
           <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
             placeholder="البحث في الدورات..."
-            value={(table?.getColumn("title")?.getFilterValue() as string) ?? ""}
+            value={
+              (table?.getColumn("title")?.getFilterValue() as string) ?? ""
+            }
             onChange={(event) =>
               table?.getColumn("title")?.setFilterValue(event.target.value)
             }
@@ -174,8 +178,8 @@ function CourseFilters({
             <DropdownMenuContent align="end">
               {table
                 .getAllColumns()
-                .filter((column: any) => column.getCanHide())
-                .map((column: any) => {
+                .filter((column) => column.getCanHide())
+                .map((column) => {
                   const columnHeaders = {
                     image: "الصورة",
                     title: "اسم المادة",

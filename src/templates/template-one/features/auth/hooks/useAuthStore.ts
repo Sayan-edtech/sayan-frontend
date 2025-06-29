@@ -2,8 +2,6 @@ import {
   useUser,
   useIsAuthenticated,
   useIsLoading,
-  useAccessToken,
-  useRefreshToken,
   useLogin,
   useSignup,
   useLogout,
@@ -17,8 +15,6 @@ export function useAuth() {
   const user = useUser();
   const isAuthenticated = useIsAuthenticated();
   const isLoading = useIsLoading();
-  const accessToken = useAccessToken();
-  const refreshToken = useRefreshToken();
   const login = useLogin();
   const signup = useSignup();
   const logout = useLogout();
@@ -30,8 +26,6 @@ export function useAuth() {
     user,
     isAuthenticated,
     isLoading,
-    accessToken,
-    refreshToken,
     login,
     signup,
     logout,

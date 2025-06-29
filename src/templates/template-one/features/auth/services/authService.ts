@@ -19,9 +19,10 @@ export const authService = {
     const formData = new FormData();
 
     // Append text fields
-    formData.append("name", userData.name);
+    formData.append("fname", userData.fname);
+    formData.append("lname", userData.lname);
     formData.append("email", userData.email);
-    formData.append("phone", userData.phone);
+    formData.append("phone_number", userData.phone_number);
     formData.append("password", userData.password);
     formData.append("user_type", userData.user_type);
 

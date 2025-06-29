@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { isValidPhoneNumber } from "libphonenumber-js";
+import { isValidPhoneNumber, parsePhoneNumber } from "libphonenumber-js";
 import { UserType } from "@/constants/enums";
 
 const userData = {
@@ -36,16 +36,33 @@ const userData = {
       },
       { message: "نوع الملف يجب أن يكون JPG أو PNG أو WebP" }
     ),
-  name: z
+  fname: z
     .string()
     .trim()
-    .min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" })
+    .min(2, { message: "الاسم الاول يجب أن يكون حرفين على الأقل" })
     .max(50, { message: "الاسم يجب أن يكون أقل من 50 حرف" }),
-  phone: z
+  lname: z
+    .string()
+    .trim()
+    .min(2, { message: "الاسم الاول يجب أن يكون حرفين على الأقل" })
+    .max(50, { message: "الاسم يجب أن يكون أقل من 50 حرف" }),
+  phone_number: z
     .string()
     .min(1, { message: "رقم الهاتف مطلوب" })
     .refine((phone) => isValidPhoneNumber(phone), {
       message: "رقم الهاتف غير صحيح",
+    })
+    .transform((phone) => {
+      // Clean the phone number - extract only digits from national number
+      if (isValidPhoneNumber(phone)) {
+        const phoneNumber = parsePhoneNumber(phone);
+        return phoneNumber.nationalNumber;
+      }
+      // Fallback: remove all non-digits
+      return phone.replace(/\D/g, "");
+    })
+    .refine((cleanPhone) => /^[0-9]{10,15}$/.test(cleanPhone), {
+      message: "رقم الهاتف يجب أن يكون بين 10-15 رقم",
     }),
   email: z
     .string()

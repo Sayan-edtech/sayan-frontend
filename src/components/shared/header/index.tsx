@@ -2,6 +2,7 @@ import Navbar, { links } from "./navbar";
 import AuthLinks from "./auth-links";
 import MobileMenu from "./mobile-menu";
 import { Link } from "react-router-dom";
+import ShoppingCart from "./shopping-cart";
 
 export default function Header() {
   return (
@@ -26,6 +27,7 @@ export default function Header() {
             <MobileMenu links={links} />
             <Navbar />
           </div>
+          <ShoppingCart />
           <AuthLinks />
         </div>
       </div>

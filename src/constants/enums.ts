@@ -106,6 +106,6 @@ export enum Environments {
   DEV = "development",
 }
 export enum UserType {
-  STUDENT = "STUDENT",
-  ACADEMY = "ACADEMY",
+  STUDENT = "student",
+  ACADEMY = "academy",
 }

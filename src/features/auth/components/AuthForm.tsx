@@ -18,7 +18,7 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
   const { getFormFields } = useFormFields({ slug });
   const { getValidationSchema } = useFormValidations({ slug });
 
-  const { signup, isLoading } = useAuth();
+  const { login, signup, isLoading } = useAuth();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const DEFAULT_VALUES: any = {};
@@ -40,24 +40,34 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
     async (data: Record<string, unknown>) => {
       try {
         if (slug === Pages.SIGNIN) {
-          // await login({
-          //   email: data.email as string,
-          //   password: data.password as string,
-          // });
+          await login({
+            email: data.email as string,
+            password: data.password as string,
+          });
+
           toast.success("تم تسجيل الدخول بنجاح");
           navigate("/dashboard");
         } else if (slug === Pages.SIGNUP) {
-          await signup({
-            name: data.name as string,
+          console.log("Form data:", data);
+          console.log(
+            "Phone number (after schema processing):",
+            data.phone_number
+          );
+
+          const { status_code, message } = await signup({
+            fname: data.fname as string,
+            lname: data.lname as string,
             email: data.email as string,
-            phone: data.phone as string,
+            phone_number: data.phone_number as string,
             password: data.password as string,
             confirm_password: data.confirm_password as string,
             user_type: data.user_type as UserType,
             profile_picture: data.profile_picture as File,
           });
-          toast.success("تم إنشاء الحساب بنجاح");
-          navigate("/");
+          if (status_code === 201) {
+            toast.success(message);
+            navigate(Routes.DASHBOARD);
+          }
         }
       } catch (error: unknown) {
         const errorMessage =
@@ -66,7 +76,7 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
         toast.error(errorMessage);
       }
     },
-    [slug, signup, navigate]
+    [slug, login, navigate, signup]
   );
 
   const formLoading = isSubmitting || isLoading;

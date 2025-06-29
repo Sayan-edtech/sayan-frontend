@@ -6,9 +6,9 @@ import CourseFilters from "@/features/courses/components/CourseFilters";
 import { Link } from "react-router-dom";
 import { Pages, Routes } from "@/constants/enums";
 import { useState, useMemo } from "react";
-import type { Table } from "@tanstack/react-table";
+import type { Table as TanstackTable } from "@tanstack/react-table";
 
-interface Course {
+export interface Course {
   id: number;
   title: string;
   category: string;
@@ -66,7 +66,7 @@ function AcademyCourses() {
   const [selectedLevel, setSelectedLevel] = useState("الكل");
   const [selectedType, setSelectedType] = useState("الكل");
   const [minPrice, setMinPrice] = useState(0);
-  const [table, setTable] = useState<Table<Course> | null>(null);
+  const [table, setTable] = useState<TanstackTable<Course> | null>(null);
 
   const filteredCourses = useMemo(() => {
     return courses.filter((course) => {
