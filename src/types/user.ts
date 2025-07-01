@@ -12,7 +12,6 @@ export type User = {
 export type AuthResponse = {
   status_code: number;
   message: string;
-  user: User;
   data: {
     user_data: User;
     access_token: string;

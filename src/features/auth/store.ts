@@ -26,7 +26,8 @@ interface AuthState {
   refreshUser: () => Promise<void>;
   refreshTokens: () => Promise<void>;
   clearAuth: () => void;
-
+  forgotPassword: (email: string) => Promise<AuthResponse>;
+  verifyAccount: (otp: string) => Promise<AuthResponse>;
   // Computed
   isStudent: () => boolean;
   isAcademy: () => boolean;
@@ -34,14 +35,14 @@ interface AuthState {
 
 // Initialize authentication state from cookies
 const initializeAuthState = () => {
-  const { accessToken, refreshToken } = authCookies.getTokens();
+  const { accessToken, refreshToken, user } = authCookies.getAuthData();
 
   return {
-    user: null,
+    user,
     accessToken,
     refreshToken,
     isLoading: false,
-    isAuthenticated: Boolean(accessToken && refreshToken),
+    isAuthenticated: Boolean(accessToken && refreshToken && user),
   };
 };
 
@@ -67,15 +68,16 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       const response = await authService.login(credentials);
 
       set(() => ({
-        user: response.user,
+        user: response.data.user_data,
         isAuthenticated: true,
         isLoading: false,
       }));
 
       // Store in cookies
-      authCookies.setTokens(
+      authCookies.setAuthData(
         response.data.access_token,
-        response.data.refresh_token
+        response.data.refresh_token,
+        response.data.user_data
       );
     } catch (error) {
       set(() => ({ isLoading: false }));
@@ -90,15 +92,16 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       const response = await authService.signup(userData);
 
       set(() => ({
-        user: response.user,
+        user: response.data.user_data,
         isAuthenticated: true,
         isLoading: false,
       }));
 
       // Store in cookies
-      authCookies.setTokens(
+      authCookies.setAuthData(
         response.data.access_token,
-        response.data.refresh_token
+        response.data.refresh_token,
+        response.data.user_data
       );
       return response;
     } catch (error) {
@@ -192,6 +195,30 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     const { user } = get();
     return user?.user_type === UserType.ACADEMY;
   },
+  forgotPassword: async (email) => {
+    set(() => ({ isLoading: true }));
+
+    try {
+      const response = await authService.forgotPassword(email);
+      set(() => ({ isLoading: false }));
+      return response;
+    } catch (error) {
+      set(() => ({ isLoading: false }));
+      throw error;
+    }
+  },
+  verifyAccount: async (otp) => {
+    set(() => ({ isLoading: true }));
+
+    try {
+      const response = await authService.verifyAccount(otp);
+      set(() => ({ isLoading: false }));
+      return response;
+    } catch (error) {
+      set(() => ({ isLoading: false }));
+      throw error;
+    }
+  },
 }));
 
 // Selectors for specific state slices
@@ -208,3 +235,9 @@ export const useRefreshUser = () => useAuthStore((state) => state.refreshUser);
 export const useRefreshTokens = () =>
   useAuthStore((state) => state.refreshTokens);
 export const useClearAuth = () => useAuthStore((state) => state.clearAuth);
+
+export const useForgotPassword = () =>
+  useAuthStore((state) => state.forgotPassword);
+
+export const useVerifyAccount = () =>
+  useAuthStore((state) => state.verifyAccount);

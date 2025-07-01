@@ -8,6 +8,8 @@ import {
   useRefreshUser,
   useRefreshTokens,
   useClearAuth,
+  useForgotPassword,
+  useVerifyAccount,
 } from "@/features/auth/store";
 
 // Main authentication hook that combines all the functionality
@@ -21,6 +23,8 @@ export function useAuth() {
   const refreshUser = useRefreshUser();
   const refreshTokens = useRefreshTokens();
   const clearAuth = useClearAuth();
+  const forgotPassword = useForgotPassword();
+  const verifyAccount = useVerifyAccount();
 
   return {
     user,
@@ -32,6 +36,8 @@ export function useAuth() {
     refreshUser,
     refreshTokens,
     clearAuth,
+    forgotPassword,
+    verifyAccount,
   };
 }
 

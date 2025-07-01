@@ -101,6 +101,15 @@ const useFormFields = ({ slug }: IFormFieldsVariables) => {
     },
   ];
 
+  const verifyAccountFields = (): IFormField[] => [
+    {
+      label: "رمز التحقق",
+      name: "otp",
+      type: "otp",
+      autoFocus: true,
+    },
+  ];
+
   const getFormFields = (): IFormField[] => {
     switch (slug) {
       case Pages.SIGNIN:
@@ -111,6 +120,8 @@ const useFormFields = ({ slug }: IFormFieldsVariables) => {
         return forgotFields();
       case Pages.RESET_PASSWORD:
         return resetFields();
+      case Pages.VERIFY_ACCOUNT:
+        return verifyAccountFields();
 
       default:
         return [];

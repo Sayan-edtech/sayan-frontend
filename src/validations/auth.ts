@@ -96,5 +96,36 @@ export const signupSchema = z
     path: ["confirm_password"],
   });
 
+export const verifyAccountSchema = z.object({
+  otp: z
+    .string()
+    .min(6, { message: "رمز التحقق يجب أن يكون 6 أرقام" })
+    .max(6, { message: "رمز التحقق يجب أن يكون 6 أرقام" })
+    .regex(/^\d{6}$/, { message: "رمز التحقق يجب أن يحتوي على أرقام فقط" }),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, { message: "البريد الإلكتروني مطلوب" })
+    .email({
+      message: "يجب أن يكون بريد إلكتروني صحيح",
+    }),
+});
+export const resetPassordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(6, { message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" }),
+    confirm_password: z.string().min(8, { message: "تأكيد كلمة المرور مطلوب" }),
+  })
+  .refine((data) => data.password === data.confirm_password, {
+    message: "كلمات المرور غير متطابقة",
+    path: ["confirm_password"],
+  });
+
 export type ISignin = z.infer<typeof signinSchema>;
 export type ISignup = z.infer<typeof signupSchema>;
+export type IVerifyAccount = z.infer<typeof verifyAccountSchema>;
+export type IForgotPassword = z.infer<typeof forgotPasswordSchema>;

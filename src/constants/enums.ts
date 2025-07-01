@@ -14,6 +14,7 @@ export enum Routes {
   PROFILE = "profile",
   ADMIN = "admin",
   DASHBOARD = "/dashboard",
+  CONTACT = "/contact",
   DASHBOARD_PROFILE = "/dashboard/profile",
   DASHBOARD_SETTINGS = "/dashboard/settings",
 }
@@ -47,6 +48,7 @@ export enum InputTypes {
   TEXTAREA = "textarea",
   FILE = "file",
   IMAGE = "image",
+  OTP = "otp",
   COLOR = "color",
   RANGE = "range",
   TEL = "tel",

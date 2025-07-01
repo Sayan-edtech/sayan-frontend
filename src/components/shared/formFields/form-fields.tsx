@@ -7,6 +7,7 @@ import PhoneField from "./phone-field";
 import ImageField from "./image-field";
 import TextareaField from "./textarea-field";
 import FileUploadField from "./file-upload-field";
+import OtpField from "./otp-field";
 import type { Control, FieldErrors } from "react-hook-form";
 import Checkbox from "./checkbox";
 
@@ -54,6 +55,10 @@ const FormFields = (props: Props) => {
 
     if (type === "file") {
       return <FileUploadField {...props} />;
+    }
+
+    if (type === "otp") {
+      return <OtpField {...props} />;
     }
 
     return null;

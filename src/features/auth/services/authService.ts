@@ -38,6 +38,18 @@ export const authService = {
     });
     return response.data;
   },
+  // Forgot password
+  async forgotPassword(email: string): Promise<AuthResponse> {
+    const response = await api.post("/auth/password/forgot", { email });
+    return response.data;
+  },
+  // Verify account
+  async verifyAccount(otp: string): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>("/auth/otp/verify", {
+      otp,
+    });
+    return response.data;
+  },
 
   // Get current user
   async getCurrentUser(): Promise<User> {
