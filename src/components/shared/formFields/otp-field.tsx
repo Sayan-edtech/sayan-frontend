@@ -4,6 +4,7 @@ import OtpInput from "react-otp-input";
 import { Label } from "@/components/ui/label";
 import type { Control, FieldErrors } from "react-hook-form";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
+import { useSearchParams } from "react-router-dom";
 
 interface OtpFieldProps {
   name: string;
@@ -25,6 +26,8 @@ const OtpField: React.FC<OtpFieldProps> = ({
   numInputs = 6,
   autoFocus = false,
 }) => {
+  const searchParams = useSearchParams();
+  const { email: verifiedEmail } = Object.fromEntries(searchParams[0]);
   const { verifyAccount } = useAuth();
   const error = errors[name];
 
@@ -47,7 +50,10 @@ const OtpField: React.FC<OtpFieldProps> = ({
               // Only send request when all inputs are filled with valid numbers
               if (otp.length === numInputs && /^\d+$/.test(otp)) {
                 try {
-                  await verifyAccount(otp);
+                  await verifyAccount({
+                    email: verifiedEmail,
+                    otp,
+                  });
                 } catch (error) {
                   console.error("OTP verification failed:", error);
                 }

@@ -67,7 +67,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       const response = await authService.login(credentials);
 
       set(() => ({
-        user: response.user,
+        user: response.data.user_data,
         accessToken: response.data.access_token,
         refreshToken: response.data.refresh_token,
         isAuthenticated: true,
@@ -89,7 +89,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       const response = await authService.signup(userData);
 
       set(() => ({
-        user: response.user,
+        user: response.data.user_data,
         isAuthenticated: true,
         isLoading: false,
       }));
