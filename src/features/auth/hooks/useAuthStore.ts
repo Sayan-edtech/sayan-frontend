@@ -10,6 +10,8 @@ import {
   useClearAuth,
   useForgotPassword,
   useVerifyAccount,
+  useResnedOtp,
+  useResetPassword,
 } from "@/features/auth/store";
 
 // Main authentication hook that combines all the functionality
@@ -25,7 +27,8 @@ export function useAuth() {
   const clearAuth = useClearAuth();
   const forgotPassword = useForgotPassword();
   const verifyAccount = useVerifyAccount();
-
+  const resendOtp = useResnedOtp();
+  const resetPassword = useResetPassword();
   return {
     user,
     isAuthenticated,
@@ -38,6 +41,8 @@ export function useAuth() {
     clearAuth,
     forgotPassword,
     verifyAccount,
+    resendOtp,
+    resetPassword,
   };
 }
 

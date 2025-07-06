@@ -27,7 +27,19 @@ interface AuthState {
   refreshTokens: () => Promise<void>;
   clearAuth: () => void;
   forgotPassword: (email: string) => Promise<AuthResponse>;
-  verifyAccount: (otp: string) => Promise<AuthResponse>;
+  verifyAccount: ({
+    email,
+    otp,
+  }: {
+    email: string;
+    otp: string;
+  }) => Promise<AuthResponse>;
+  resendOtp: (email: string) => Promise<AuthResponse>;
+  resetPasswprd: (data: {
+    new_password: string;
+    confirm_password: string;
+    verification_token: string;
+  }) => Promise<AuthResponse>;
   // Computed
   isStudent: () => boolean;
   isAcademy: () => boolean;
@@ -207,11 +219,35 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       throw error;
     }
   },
-  verifyAccount: async (otp) => {
+  verifyAccount: async (data) => {
     set(() => ({ isLoading: true }));
 
     try {
-      const response = await authService.verifyAccount(otp);
+      const response = await authService.verifyAccount(data);
+      set(() => ({ isLoading: false }));
+      return response;
+    } catch (error) {
+      set(() => ({ isLoading: false }));
+      throw error;
+    }
+  },
+  resendOtp: async (data) => {
+    set(() => ({ isLoading: true }));
+
+    try {
+      const response = await authService.resendOtp(data);
+      set(() => ({ isLoading: false }));
+      return response;
+    } catch (error) {
+      set(() => ({ isLoading: false }));
+      throw error;
+    }
+  },
+  resetPasswprd: async (data) => {
+    set(() => ({ isLoading: true }));
+
+    try {
+      const response = await authService.resetPassword(data);
       set(() => ({ isLoading: false }));
       return response;
     } catch (error) {
@@ -241,3 +277,7 @@ export const useForgotPassword = () =>
 
 export const useVerifyAccount = () =>
   useAuthStore((state) => state.verifyAccount);
+
+export const useResnedOtp = () => useAuthStore((state) => state.resendOtp);
+export const useResetPassword = () =>
+  useAuthStore((state) => state.resetPasswprd);

@@ -1,7 +1,13 @@
-import { Pages } from "@/constants/enums";
+import { Pages, Routes } from "@/constants/enums";
 import AuthForm from "@/features/auth/components/AuthForm";
+import { Navigate, useSearchParams } from "react-router-dom";
 
 function VerifyAccount() {
+  const searchParams = useSearchParams();
+  const { email } = Object.fromEntries(searchParams[0]);
+  if (!email) {
+    return <Navigate to={`/${Routes.AUTH}/${Pages.SIGNIN}`} replace />;
+  }
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -9,7 +15,8 @@ function VerifyAccount() {
           تحقق من حسابك
         </h1>
         <p className="text-muted-foreground text-lg">
-          أدخل رمز التحقق المكون من 6 أرقام المرسل إلى هاتفك أو بريدك الإلكتروني
+          أدخل رمز التحقق المكون من 6 أرقام المرسل إلى بريدك الإلكتروني
+          <span className="text-primary mr-2">{email}</span>
         </p>
       </div>
       <AuthForm slug={Pages.VERIFY_ACCOUNT} />

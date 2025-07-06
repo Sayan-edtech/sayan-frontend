@@ -1,5 +1,5 @@
 import { Pages, Routes } from "@/constants/enums";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useState, useEffect } from "react";
 import FormFields from "@/components/shared/formFields/form-fields";
@@ -19,8 +19,18 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
   const { getValidationSchema } = useFormValidations({ slug });
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const searchParams = useSearchParams();
+  const { email: verifiedEmail } = Object.fromEntries(searchParams[0]);
+  const { token } = Object.fromEntries(searchParams[0]);
 
-  const { login, signup, isLoading, forgotPassword, verifyAccount } = useAuth();
+  const {
+    login,
+    signup,
+    isLoading,
+    forgotPassword,
+    verifyAccount,
+    resetPassword,
+  } = useAuth();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const DEFAULT_VALUES: any = {};
@@ -64,14 +74,18 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
           });
           if (status_code === 201) {
             toast.success(message);
-            navigate(`/${Routes.AUTH}/${Pages.VERIFY_ACCOUNT}`, {
-              replace: true,
-            });
+            navigate(
+              `/${Routes.AUTH}/${Pages.VERIFY_ACCOUNT}?email=${data.email}`,
+              {
+                replace: true,
+              }
+            );
           }
         } else if (slug === Pages.VERIFY_ACCOUNT) {
-          const { status_code, message } = await verifyAccount(
-            data.otp as string
-          );
+          const { status_code, message } = await verifyAccount({
+            email: verifiedEmail as string,
+            otp: data.otp as string,
+          });
           if (status_code === 200) {
             toast.success(message);
             navigate(`/${Routes.AUTH}/${Pages.SIGNIN}`, {
@@ -88,13 +102,17 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
             toast.success(message);
           }
         } else if (slug === Pages.RESET_PASSWORD) {
-          // Handle reset password form submission
-          console.log("Reset password data:", data);
-          toast.success("تم تغيير كلمة المرور بنجاح");
-          // You can add API call here to reset the password
-          navigate(`/${Routes.AUTH}/${Pages.SIGNIN}`, {
-            replace: true,
+          const { status_code, message } = await resetPassword({
+            confirm_password: data.confirm_password as string,
+            new_password: data.password as string,
+            verification_token: token,
           });
+          if (status_code === 200) {
+            toast.success(message);
+            navigate(`/${Routes.AUTH}/${Pages.SIGNIN}`, {
+              replace: true,
+            });
+          }
         }
       } catch (error: unknown) {
         const errorMessage =
@@ -103,7 +121,17 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
         toast.error(errorMessage);
       }
     },
-    [slug, login, navigate, signup, verifyAccount, forgotPassword]
+    [
+      slug,
+      login,
+      navigate,
+      signup,
+      verifyAccount,
+      verifiedEmail,
+      forgotPassword,
+      resetPassword,
+      token,
+    ]
   );
 
   const formLoading = isSubmitting || isLoading;
@@ -185,7 +213,7 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
         <ForgotPassword control={control} errors={errors} />
       )}
       <SubmitButton slug={slug} disabled={formLoading} loading={formLoading} />
-      <NavigationLink slug={slug} />
+      <NavigationLink slug={slug} verifiedEmail={verifiedEmail} />
     </form>
   );
 };
@@ -262,8 +290,14 @@ function SubmitButton({
   );
 }
 
-function NavigationLink({ slug }: { slug: string }) {
-  const { forgotPassword, isLoading } = useAuth();
+function NavigationLink({
+  slug,
+  verifiedEmail,
+}: {
+  slug: string;
+  verifiedEmail: string;
+}) {
+  const { resendOtp, isLoading } = useAuth();
   const [countdown, setCountdown] = useState(60); // Start with 60 seconds
 
   useEffect(() => {
@@ -277,13 +311,19 @@ function NavigationLink({ slug }: { slug: string }) {
   const handleResendOtp = async () => {
     try {
       // Using forgotPassword as a placeholder for resend OTP
-      // You should replace this with the actual resend OTP API call
-      await forgotPassword("user@example.com"); // This should be the user's email
-      toast.success("تم إرسال رمز التحقق بنجاح");
+      const { message, status_code } = await resendOtp(verifiedEmail); // This should be the user's email
+      if (status_code === 200) {
+        toast.success(message);
+      }
+
       setCountdown(60); // Reset countdown after successful resend
     } catch (error) {
       console.error("Resend OTP failed:", error);
-      toast.error("فشل في إرسال رمز التحقق");
+      toast.error(
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || "فشل في إعادة إرسال رمز التحقق"
+      );
+      // toast.error("فشل في إرسال رمز التحقق");
     }
   };
 

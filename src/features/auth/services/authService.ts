@@ -40,13 +40,27 @@ export const authService = {
   },
   // Forgot password
   async forgotPassword(email: string): Promise<AuthResponse> {
-    const response = await api.post("/auth/password/forgot", { email });
+    const url = new URL(import.meta.env.VITE_API_URL);
+    const response = await api.post("/auth/password/forgot", {
+      email,
+      redirect_url: `${url.origin}/auth/reset-password`,
+    });
     return response.data;
   },
   // Verify account
-  async verifyAccount(otp: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/otp/verify", {
-      otp,
+  async verifyAccount(data: {
+    email: string;
+    otp: string;
+  }): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>("/auth/otp/verify", data);
+    return response.data;
+  },
+  // Resend OTP
+  async resendOtp(email: string): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>("/auth/otp/request", {
+      email,
+      expires_in_minutes: 1,
+      purpose: "email_verification",
     });
     return response.data;
   },
@@ -70,13 +84,13 @@ export const authService = {
     return response.data;
   },
 
-  // Request password reset
-  async requestPasswordReset(email: string): Promise<void> {
-    await api.post("/auth/forgot-password", { email });
-  },
-
   // Reset password
-  async resetPassword(token: string, newPassword: string): Promise<void> {
-    await api.post("/auth/reset-password", { token, password: newPassword });
+  async resetPassword(data: {
+    new_password: string;
+    confirm_password: string;
+    verification_token: string;
+  }): Promise<AuthResponse> {
+    const response = await api.post("/auth/password/reset-with-token", data);
+    return response.data;
   },
 };
