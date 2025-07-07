@@ -40,10 +40,9 @@ export const authService = {
   },
   // Forgot password
   async forgotPassword(email: string): Promise<AuthResponse> {
-    const url = new URL(import.meta.env.VITE_API_URL);
     const response = await api.post("/auth/password/forgot", {
       email,
-      redirect_url: `${url.origin}/auth/reset-password`,
+      redirect_url: `${location.origin}/auth/reset-password`,
     });
     return response.data;
   },

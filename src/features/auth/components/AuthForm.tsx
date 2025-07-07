@@ -21,7 +21,7 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
   const [userEmail, setUserEmail] = useState("");
   const searchParams = useSearchParams();
   const { email: verifiedEmail } = Object.fromEntries(searchParams[0]);
-  const { token } = Object.fromEntries(searchParams[0]);
+  const { verification_token } = Object.fromEntries(searchParams[0]);
 
   const {
     login,
@@ -88,7 +88,7 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
           });
           if (status_code === 200) {
             toast.success(message);
-            navigate(`/${Routes.AUTH}/${Pages.SIGNIN}`, {
+            navigate(`/${Routes.DASHBOARD}`, {
               replace: true,
             });
           }
@@ -105,7 +105,7 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
           const { status_code, message } = await resetPassword({
             confirm_password: data.confirm_password as string,
             new_password: data.password as string,
-            verification_token: token,
+            verification_token,
           });
           if (status_code === 200) {
             toast.success(message);
@@ -130,7 +130,7 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
       verifiedEmail,
       forgotPassword,
       resetPassword,
-      token,
+      verification_token,
     ]
   );
 

@@ -7,12 +7,8 @@ import { courseSchema, type ICourseForm } from "@/validations/course";
 import { toast } from "sonner";
 import { ArrowRight, Save, Trash2 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
-
-interface AddCourseFormProps {
-  onSubmit?: (data: ICourseForm) => void;
-  onCancel?: () => void;
-  isLoading?: boolean;
-}
+// import { useCreateCourse } from "../hooks/useCoursesMutations";
+import { useNavigate } from "react-router-dom";
 
 // Local storage key for persisting form data
 const FORM_DATA_KEY = "addCourseForm_draft";
@@ -57,11 +53,11 @@ const removeFromLocalStorage = (key: string) => {
   }
 };
 
-const AddCourseForm = ({
-  onSubmit,
-  onCancel,
-  isLoading = false,
-}: AddCourseFormProps) => {
+const AddCourseForm = () => {
+  // React Query mutation for creating course
+  // const  = useCreateCourse();
+  const navigate = useNavigate();
+
   // Get saved step from localStorage or default to 1
   const [currentStep, setCurrentStep] = useState(() => {
     const savedStep = getFromLocalStorage(FORM_STEP_KEY);
@@ -101,7 +97,7 @@ const AddCourseForm = ({
     defaultValues: getSavedFormData(),
   });
 
-  const formLoading = isSubmitting || isLoading;
+  const formLoading = isSubmitting;
 
   // Watch all form values for auto-save
   const watchedValues = watch();
@@ -148,15 +144,15 @@ const AddCourseForm = ({
   const handleFormSubmit = async (data: ICourseForm) => {
     try {
       console.log("Course Form Data:", data);
-      toast.success("تم إنشاء المادة التعليمية بنجاح!");
+
+      // Use React Query mutation to create course
+      // await createCourseMutation.mutateAsync(data);
 
       // Clear draft data after successful submission
       clearDraftData();
-
-      onSubmit?.(data);
     } catch (error) {
       console.error("Error creating course:", error);
-      toast.error("حدث خطأ أثناء إنشاء المادة التعليمية");
+      // Error handling is done in the mutation hook
     }
   };
 
@@ -169,7 +165,7 @@ const AddCourseForm = ({
     ) {
       clearDraftData();
       reset();
-      onCancel?.();
+      navigate("/dashboard/courses");
     }
   };
 
@@ -200,7 +196,16 @@ const AddCourseForm = ({
   const getFieldsForStep = (step: number): (keyof ICourseForm)[] => {
     switch (step) {
       case 1:
-        return ["image", "video", "title", "category", "type", "instructor", "level", "price"];
+        return [
+          "image",
+          "video",
+          "title",
+          "category",
+          "type",
+          "instructor",
+          "level",
+          "price",
+        ];
       case 2:
         return ["description", "shortContent", "skills", "requirements"];
       default:
@@ -276,7 +281,7 @@ const AddCourseForm = ({
               {/* الصف الأول: الوسائط */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <FormFields 
+                  <FormFields
                     name="image"
                     label="صورة المادة التعليمية"
                     type="file"
@@ -284,13 +289,18 @@ const AddCourseForm = ({
                     fileType="image"
                     accept="image/*"
                     maxSize={5}
-                    allowedTypes={["image/jpeg", "image/png", "image/jpg", "image/webp"]}
-                    control={control} 
-                    errors={errors} 
+                    allowedTypes={[
+                      "image/jpeg",
+                      "image/png",
+                      "image/jpg",
+                      "image/webp",
+                    ]}
+                    control={control}
+                    errors={errors}
                   />
                 </div>
                 <div>
-                  <FormFields 
+                  <FormFields
                     name="video"
                     label="فيديو تعريفي للمادة"
                     type="file"
@@ -298,27 +308,32 @@ const AddCourseForm = ({
                     fileType="video"
                     accept="video/*"
                     maxSize={100}
-                    allowedTypes={["video/mp4", "video/avi", "video/mov", "video/wmv"]}
-                    control={control} 
-                    errors={errors} 
+                    allowedTypes={[
+                      "video/mp4",
+                      "video/avi",
+                      "video/mov",
+                      "video/wmv",
+                    ]}
+                    control={control}
+                    errors={errors}
                   />
                 </div>
               </div>
-              
+
               {/* الصفوف التالية: المعلومات الأساسية */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <FormFields 
+                  <FormFields
                     name="title"
                     label="عنوان المادة التعليمية"
                     type="text"
                     placeholder="أدخل عنوان المادة التعليمية"
-                    control={control} 
-                    errors={errors} 
+                    control={control}
+                    errors={errors}
                   />
                 </div>
                 <div>
-                  <FormFields 
+                  <FormFields
                     name="category"
                     label="الفئة"
                     type="select"
@@ -330,29 +345,16 @@ const AddCourseForm = ({
                       { label: "أعمال", value: "أعمال" },
                       { label: "تطوير شخصي", value: "تطوير شخصي" },
                     ]}
-                    control={control} 
-                    errors={errors} 
+                    control={control}
+                    errors={errors}
                   />
                 </div>
               </div>
-              
+
               {/* صف نوع المادة والمدرب والمستوى */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <FormFields 
-                    name="type"
-                    label="نوع المادة"
-                    type="select"
-                    placeholder="اختر نوع المادة"
-                    options={[
-                      { label: "تفاعلية", value: "تفاعلية" },
-                    ]}
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
-                <div>
-                  <FormFields 
+                  <FormFields
                     name="instructor"
                     label="المدرب"
                     type="select"
@@ -365,12 +367,12 @@ const AddCourseForm = ({
                       { label: "عمر حسن", value: "عمر حسن" },
                       { label: "ليلى كمال", value: "ليلى كمال" },
                     ]}
-                    control={control} 
-                    errors={errors} 
+                    control={control}
+                    errors={errors}
                   />
                 </div>
                 <div>
-                  <FormFields 
+                  <FormFields
                     name="level"
                     label="مستوى الطالب المطلوب"
                     type="select"
@@ -380,22 +382,22 @@ const AddCourseForm = ({
                       { label: "متوسط", value: "متوسط" },
                       { label: "متقدم", value: "متقدم" },
                     ]}
-                    control={control} 
-                    errors={errors} 
+                    control={control}
+                    errors={errors}
                   />
                 </div>
               </div>
-              
+
               {/* صف السعر */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <FormFields 
+                  <FormFields
                     name="price"
                     label="السعر (ريال سعودي)"
                     type="number"
                     placeholder="0"
-                    control={control} 
-                    errors={errors} 
+                    control={control}
+                    errors={errors}
                   />
                 </div>
               </div>
@@ -405,47 +407,47 @@ const AddCourseForm = ({
               {/* الصف الأول: الوصف التفصيلي والمحتوى المختصر */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <FormFields 
+                  <FormFields
                     name="description"
                     label="الوصف التفصيلي للمادة"
                     type="textarea"
                     placeholder="اكتب وصفاً شاملاً للمادة التعليمية وما سيتعلمه الطلاب..."
-                    control={control} 
-                    errors={errors} 
+                    control={control}
+                    errors={errors}
                   />
                 </div>
                 <div>
-                  <FormFields 
+                  <FormFields
                     name="shortContent"
                     label="المحتوى المختصر"
                     type="textarea"
                     placeholder="ملخص قصير عن محتوى المادة..."
-                    control={control} 
-                    errors={errors} 
+                    control={control}
+                    errors={errors}
                   />
                 </div>
               </div>
-              
-              {/* الصف الثاني: المهارات المكتسبة والمتطلبات الأساسية */}
+
+              {/* الصف الثاني: ما ستتعلمه والمتطلبات الأساسية */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <FormFields 
+                  <FormFields
                     name="skills"
-                    label="المهارات المكتسبة"
+                    label="ما سيتعلمه الطلاب"
                     type="textarea"
-                    placeholder="اذكر المهارات التي سيكتسبها الطلاب من هذه المادة..."
-                    control={control} 
-                    errors={errors} 
+                    placeholder="اذكر ما سيتعلمه الطلاب..."
+                    control={control}
+                    errors={errors}
                   />
                 </div>
                 <div>
-                  <FormFields 
+                  <FormFields
                     name="requirements"
                     label="المتطلبات الأساسية"
                     type="textarea"
                     placeholder="اذكر المتطلبات والمعرفة المسبقة المطلوبة..."
-                    control={control} 
-                    errors={errors} 
+                    control={control}
+                    errors={errors}
                   />
                 </div>
               </div>
@@ -455,16 +457,14 @@ const AddCourseForm = ({
           {/* Form Actions */}
           <div className="flex items-center justify-between pt-6 border-t">
             <div className="flex gap-4">
-              {onCancel && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={formLoading}
-                >
-                  إلغاء
-                </Button>
-              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+                disabled={formLoading}
+              >
+                إلغاء
+              </Button>
 
               {/* Clear draft button */}
               <Button

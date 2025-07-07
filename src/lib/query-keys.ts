@@ -10,9 +10,21 @@ export const authKeys = {
   userProfile: (id: string) => [...authKeys.profile(), id] as const,
 };
 
+// User/Profile query keys
+export const userKeys = {
+  all: ["user"] as const,
+  profile: () => [...userKeys.all, "profile"] as const,
+  settings: () => [...userKeys.all, "settings"] as const,
+
+  // Specific user queries
+  profileById: (id: string) => [...userKeys.profile(), id] as const,
+  currentUser: () => [...userKeys.profile(), "current"] as const,
+};
+
 // General query key factory patterns
 export const queryKeys = {
   auth: authKeys,
+  user: userKeys,
 
   // Add other feature query keys here as the app grows
   courses: {

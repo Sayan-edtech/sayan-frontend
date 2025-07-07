@@ -97,15 +97,9 @@ export const useShoppingCart = create<ShoppingCartState>()(
       name: "shopping-cart", // Key for localStorage
       partialize: (state) => ({ items: state.items }), // Only persist items
       onRehydrateStorage: () => {
-        console.log("Shopping cart: Starting rehydration...");
-        return (state, error) => {
+        return (_state, error) => {
           if (error) {
             console.log("Shopping cart: Rehydration error:", error);
-          } else {
-            console.log(
-              "Shopping cart: Rehydration finished, items:",
-              state?.items?.length || 0
-            );
           }
         };
       },

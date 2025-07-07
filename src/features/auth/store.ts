@@ -224,7 +224,23 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
     try {
       const response = await authService.verifyAccount(data);
-      set(() => ({ isLoading: false }));
+
+      // Update auth state with verified user data and tokens
+      set(() => ({
+        user: response.data.data?.user_data,
+        accessToken: response.data.data?.access_token,
+        refreshToken: response.data.data?.refresh_token,
+        isAuthenticated: true,
+        isLoading: false,
+      }));
+
+      // Store in cookies
+      authCookies.setAuthData(
+        response.data.access_token,
+        response.data.refresh_token,
+        response.data.user_data
+      );
+
       return response;
     } catch (error) {
       set(() => ({ isLoading: false }));

@@ -4,7 +4,9 @@ import OtpInput from "react-otp-input";
 import { Label } from "@/components/ui/label";
 import type { Control, FieldErrors } from "react-hook-form";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
+import { Routes } from "@/constants/enums";
 
 interface OtpFieldProps {
   name: string;
@@ -30,7 +32,7 @@ const OtpField: React.FC<OtpFieldProps> = ({
   const { email: verifiedEmail } = Object.fromEntries(searchParams[0]);
   const { verifyAccount } = useAuth();
   const error = errors[name];
-
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col space-y-4">
       {label && (
@@ -50,10 +52,16 @@ const OtpField: React.FC<OtpFieldProps> = ({
               // Only send request when all inputs are filled with valid numbers
               if (otp.length === numInputs && /^\d+$/.test(otp)) {
                 try {
-                  await verifyAccount({
+                  const { status_code, message } = await verifyAccount({
                     email: verifiedEmail,
                     otp,
                   });
+                  if (status_code === 200) {
+                    toast.success(message);
+                    navigate(`/${Routes.DASHBOARD}`, {
+                      replace: true,
+                    });
+                  }
                 } catch (error) {
                   console.error("OTP verification failed:", error);
                 }

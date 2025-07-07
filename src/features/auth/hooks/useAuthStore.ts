@@ -45,35 +45,3 @@ export function useAuth() {
     resetPassword,
   };
 }
-
-// Individual hooks for specific functionality
-export function useCurrentUser() {
-  return useUser();
-}
-
-export function useAuthState() {
-  return {
-    user: useUser(),
-    isAuthenticated: useIsAuthenticated(),
-    isLoading: useIsLoading(),
-  };
-}
-
-// Hook for authentication actions only
-export function useAuthMutations() {
-  const login = useLogin();
-  const signup = useSignup();
-  const logout = useLogout();
-  const refreshUser = useRefreshUser();
-  const refreshTokens = useRefreshTokens();
-  const clearAuth = useClearAuth();
-
-  return {
-    login,
-    signup,
-    logout,
-    refreshUser,
-    refreshTokens,
-    clearAuth,
-  };
-}

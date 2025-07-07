@@ -4,8 +4,8 @@ import { Navigate, useSearchParams } from "react-router-dom";
 
 function ResetPassword() {
   const searchParams = useSearchParams();
-  const { token } = Object.fromEntries(searchParams[0]);
-  if (!token) {
+  const { verification_token } = Object.fromEntries(searchParams[0]);
+  if (!verification_token) {
     return <Navigate to={`/${Routes.AUTH}/${Pages.FORGOT_PASSWORD}`} replace />;
   }
   return (

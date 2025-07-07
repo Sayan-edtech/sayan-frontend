@@ -1,4 +1,3 @@
-import { DashboardLayout } from "@/features/dashboard/components/DashboardLayout";
 import Dashboard from "@/pages/dashboard";
 import MyCourses from "@/pages/dashboard/my-courses";
 import DigitalProducts from "@/pages/dashboard/digital-products";
@@ -14,9 +13,18 @@ import AddNewCourse from "@/pages/dashboard/courses/new";
 import Trainers from "../pages/dashboard/trainers";
 import AddNewTrainer from "@/pages/dashboard/trainers/new";
 import { templateRoutes } from "./TemplateRoutes";
+import { DashboardLayout } from "@/features/dashboard/components/DashboardLayout";
+import { ProtectedRoute } from "@/components/shared/GuardRoute";
 
 export const dashboardRoutes = (
-  <Route path="dashboard" element={<DashboardLayout />}>
+  <Route
+    path="dashboard"
+    element={
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    }
+  >
     <Route index element={<Dashboard />} />
     <Route path="profile" element={<Profile />} />
     <Route path="settings" element={<Settings />} />

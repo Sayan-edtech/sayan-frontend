@@ -1,8 +1,8 @@
 import { Plus, Users } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import CourseTable from "@/features/courses/components/CourseTable";
-import CourseStats from "@/features/courses/components/CourseStats";
-import CourseFilters from "@/features/courses/components/CourseFilters";
+import CourseTable from "@/features/dashboard/courses/components/CourseTable";
+import CourseStats from "@/features/dashboard/courses/components/CourseStats";
+import CourseFilters from "@/features/dashboard/courses/components/CourseFilters";
 import { Link } from "react-router-dom";
 import { Pages, Routes } from "@/constants/enums";
 import { useState, useMemo } from "react";

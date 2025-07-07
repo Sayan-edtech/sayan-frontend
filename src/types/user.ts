@@ -1,5 +1,23 @@
 import { UserType } from "@/constants/enums";
 
+export type AcademyMembership = {
+  membership_id: number;
+  academy_id: number;
+  academy_name: string;
+  academy_slug: string;
+  user_role: "owner" | "admin" | "member";
+  is_active: boolean;
+  joined_at: string;
+  academy_details: {
+    about: string | null;
+    image: string | null;
+    email: string;
+    phone: string;
+    address: string | null;
+    status: "active" | "inactive";
+    created_at: string;
+  };
+};
 export type User = {
   id: string;
   email: string;
@@ -7,6 +25,8 @@ export type User = {
   lname: string;
   user_type: UserType;
   verified: boolean;
+  avatar?: string;
+  academy_memberships?: AcademyMembership[];
 };
 
 export type AuthResponse = {
@@ -16,6 +36,11 @@ export type AuthResponse = {
     user_data: User;
     access_token: string;
     refresh_token: string;
+    data?: {
+      access_token: string;
+      refresh_token: string;
+      user_data: User;
+    };
   };
 };
 
