@@ -1,4 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+} from "react-router-dom";
 import {
   Home,
   Briefcase,
@@ -14,8 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import type { User } from "@/types/user";
 
 interface SidebarSubItem {
   id: string;
@@ -42,6 +49,7 @@ interface StudentSidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
   baseSidebarItems?: SidebarItem[];
+  user: User;
 }
 
 function StudentSidebar({
@@ -49,120 +57,186 @@ function StudentSidebar({
   isOpen = true,
   onClose,
   baseSidebarItems = [],
+  user,
 }: StudentSidebarProps) {
-  const { data: user } = useCurrentUserProfile();
   const location = useLocation();
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [
+    expandedItems,
+    setExpandedItems,
+  ] = useState<string[]>([]);
 
-  const toggleExpanded = (itemId: string) => {
+  const toggleExpanded = (
+    itemId: string
+  ) => {
     setExpandedItems((prev) =>
       prev.includes(itemId)
-        ? prev.filter((id) => id !== itemId)
+        ? prev.filter(
+            (id) => id !== itemId
+          )
         : [...prev, itemId]
     );
   };
 
-  const studentSidebarItems: SidebarItem[] = [
-    {
-      id: "students-bag",
-      title: "حقيبة الطلاب",
-      icon: <Briefcase className="w-5 h-5" />,
-      isExpandable: true,
-      subItems: [
-        {
-          id: "courses",
-          title: "المواد التعليمية",
-          href: "/dashboard/courses",
-          icon: <BookOpen className="w-4 h-4" />,
-        },
-        {
-          id: "digital-products",
-          title: "المنتجات الرقمية",
-          href: "/dashboard/digital-products",
-          icon: <Package className="w-4 h-4" />,
-        },
-        {
-          id: "certificates",
-          title: "الشهادات",
-          href: "/dashboard/certificates",
-          icon: <GraduationCap className="w-4 h-4" />,
-          badge: "قريباً",
-          comingSoon: true,
-        },
-        {
-          id: "favorites",
-          title: "قائمة المفضلة",
-          href: "/dashboard/favorites",
-          icon: <Heart className="w-4 h-4" />,
-        },
-      ],
-    },
-    {
-      id: "purchases",
-      title: "المشتريات",
-      href: "/dashboard/purchases",
-      icon: <Menu className="w-5 h-5" />,
-    },
-    {
-      id: "shopping-cart",
-      title: "عربة التسوق",
-      href: "/dashboard/shopping-cart",
-      icon: <ShoppingCart className="w-5 h-5" />,
-    },
-  ];
+  const studentSidebarItems: SidebarItem[] =
+    [
+      {
+        id: "students-bag",
+        title: "حقيبة الطلاب",
+        icon: (
+          <Briefcase className="w-5 h-5" />
+        ),
+        isExpandable: true,
+        subItems: [
+          {
+            id: "courses",
+            title: "المواد التعليمية",
+            href: "/dashboard/courses",
+            icon: (
+              <BookOpen className="w-4 h-4" />
+            ),
+          },
+          {
+            id: "digital-products",
+            title: "المنتجات الرقمية",
+            href: "/dashboard/digital-products",
+            icon: (
+              <Package className="w-4 h-4" />
+            ),
+          },
+          {
+            id: "certificates",
+            title: "الشهادات",
+            href: "/dashboard/certificates",
+            icon: (
+              <GraduationCap className="w-4 h-4" />
+            ),
+            badge: "قريباً",
+            comingSoon: true,
+          },
+          {
+            id: "favorites",
+            title: "قائمة المفضلة",
+            href: "/dashboard/favorites",
+            icon: (
+              <Heart className="w-4 h-4" />
+            ),
+          },
+        ],
+      },
+      {
+        id: "purchases",
+        title: "المشتريات",
+        href: "/dashboard/purchases",
+        icon: (
+          <Menu className="w-5 h-5" />
+        ),
+      },
+      {
+        id: "shopping-cart",
+        title: "عربة التسوق",
+        href: "/dashboard/shopping-cart",
+        icon: (
+          <ShoppingCart className="w-5 h-5" />
+        ),
+      },
+    ];
 
   const sidebarItems: SidebarItem[] = [
     ...baseSidebarItems,
     ...studentSidebarItems,
   ];
 
-  const isActivePath = (href: string) => {
+  const isActivePath = (
+    href: string
+  ) => {
     if (href === "/dashboard") {
-      return location.pathname === "/dashboard";
+      return (
+        location.pathname ===
+        "/dashboard"
+      );
     }
-    return location.pathname.startsWith(href);
+    return location.pathname.startsWith(
+      href
+    );
   };
 
-  const renderSidebarItem = (item: SidebarItem) => {
-    if (item.isExpandable && item.subItems) {
-      const isExpanded = expandedItems.includes(item.id);
-      const hasActiveSubItem = item.subItems.some(
-        (subItem) => subItem.href && isActivePath(subItem.href)
-      );
+  const renderSidebarItem = (
+    item: SidebarItem
+  ) => {
+    if (
+      item.isExpandable &&
+      item.subItems
+    ) {
+      const isExpanded =
+        expandedItems.includes(item.id);
+      const hasActiveSubItem =
+        item.subItems.some(
+          (subItem) =>
+            subItem.href &&
+            isActivePath(subItem.href)
+        );
 
       return (
-        <li key={item.id} className="space-y-1">
+        <li
+          key={item.id}
+          className="space-y-1"
+        >
           {/* Parent Item */}
           <Button
             variant="ghost"
-            onClick={() => toggleExpanded(item.id)}
+            onClick={() =>
+              toggleExpanded(item.id)
+            }
             className={cn(
               "w-full justify-between h-auto px-4 py-3 text-right rounded-lg transition-colors group",
-              hasActiveSubItem || isExpanded
+              hasActiveSubItem ||
+                isExpanded
                 ? "text-white hover:text-white"
                 : "bg-white text-gray-900 hover:text-white"
             )}
             style={
-              hasActiveSubItem || isExpanded
-                ? { backgroundColor: "#0062ff" }
+              hasActiveSubItem ||
+              isExpanded
+                ? {
+                    backgroundColor:
+                      "#0062ff",
+                  }
                 : {}
             }
             onMouseEnter={(e) => {
-              if (!(hasActiveSubItem || isExpanded)) {
-                e.currentTarget.style.backgroundColor = "#0062ff";
-                const icon = e.currentTarget.querySelector(
-                  ".sidebar-icon"
-                ) as HTMLElement;
-                if (icon) icon.style.color = "white";
+              if (
+                !(
+                  hasActiveSubItem ||
+                  isExpanded
+                )
+              ) {
+                e.currentTarget.style.backgroundColor =
+                  "#0062ff";
+                const icon =
+                  e.currentTarget.querySelector(
+                    ".sidebar-icon"
+                  ) as HTMLElement;
+                if (icon)
+                  icon.style.color =
+                    "white";
               }
             }}
             onMouseLeave={(e) => {
-              if (!(hasActiveSubItem || isExpanded)) {
-                e.currentTarget.style.backgroundColor = "white";
-                const icon = e.currentTarget.querySelector(
-                  ".sidebar-icon"
-                ) as HTMLElement;
-                if (icon) icon.style.color = "#0062ff";
+              if (
+                !(
+                  hasActiveSubItem ||
+                  isExpanded
+                )
+              ) {
+                e.currentTarget.style.backgroundColor =
+                  "white";
+                const icon =
+                  e.currentTarget.querySelector(
+                    ".sidebar-icon"
+                  ) as HTMLElement;
+                if (icon)
+                  icon.style.color =
+                    "#0062ff";
               }
             }}
           >
@@ -170,21 +244,33 @@ function StudentSidebar({
               <div
                 className="sidebar-icon transition-colors w-6 h-6 flex items-center justify-center"
                 style={{
-                  color: hasActiveSubItem || isExpanded ? "white" : "#0062ff",
+                  color:
+                    hasActiveSubItem ||
+                    isExpanded
+                      ? "white"
+                      : "#0062ff",
                 }}
               >
                 {item.icon}
               </div>
-              <span className="font-medium">{item.title}</span>
+              <span className="font-medium">
+                {item.title}
+              </span>
             </div>
             {item.isExpandable && (
               <svg
                 className={cn(
                   "w-5 h-5 transition-transform",
-                  isExpanded ? "rotate-180" : "rotate-0"
+                  isExpanded
+                    ? "rotate-180"
+                    : "rotate-0"
                 )}
                 style={{
-                  color: hasActiveSubItem || isExpanded ? "white" : "#0062ff",
+                  color:
+                    hasActiveSubItem ||
+                    isExpanded
+                      ? "white"
+                      : "#0062ff",
                 }}
                 fill="none"
                 stroke="currentColor"
@@ -203,89 +289,137 @@ function StudentSidebar({
           {/* Sub Items */}
           {isExpanded && (
             <div className="ml-6 space-y-1">
-              {item.subItems.map((subItem) => (
-                <div key={subItem.id}>
-                  {subItem.comingSoon ? (
-                    <div
-                      className={cn(
-                        "flex items-center justify-between w-full px-4 py-2 text-right rounded-md transition-colors",
-                        "text-gray-500 bg-white cursor-not-allowed"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-5 h-5 flex items-center justify-center text-gray-400">
-                          {subItem.icon}
-                        </div>
-                        <span className="font-medium text-sm">
-                          {subItem.title}
-                        </span>
-                      </div>
-                      {subItem.badge && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full"
-                        >
-                          {subItem.badge}
-                        </Badge>
-                      )}
-                    </div>
-                  ) : (
-                    <Link
-                      to={subItem.href!}
-                      onClick={isMobile ? onClose : undefined}
-                    >
-                      <Button
-                        variant="ghost"
+              {item.subItems.map(
+                (subItem) => (
+                  <div key={subItem.id}>
+                    {subItem.comingSoon ? (
+                      <div
                         className={cn(
-                          "w-full justify-between h-auto px-4 py-2 text-right rounded-md transition-colors group",
-                          isActivePath(subItem.href!)
-                            ? "text-white hover:text-white"
-                            : "bg-white text-gray-900 hover:text-white"
+                          "flex items-center justify-between w-full px-4 py-2 text-right rounded-md transition-colors",
+                          "text-gray-500 bg-white cursor-not-allowed"
                         )}
-                        style={
-                          isActivePath(subItem.href!)
-                            ? { backgroundColor: "#0062ff" }
-                            : {}
-                        }
-                        onMouseEnter={(e) => {
-                          if (!isActivePath(subItem.href!)) {
-                            e.currentTarget.style.backgroundColor = "#0062ff";
-                            const icon = e.currentTarget.querySelector(
-                              ".sidebar-subicon"
-                            ) as HTMLElement;
-                            if (icon) icon.style.color = "white";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isActivePath(subItem.href!)) {
-                            e.currentTarget.style.backgroundColor = "white";
-                            const icon = e.currentTarget.querySelector(
-                              ".sidebar-subicon"
-                            ) as HTMLElement;
-                            if (icon) icon.style.color = "#0062ff";
-                          }
-                        }}
                       >
                         <div className="flex items-center gap-3">
-                          <div
-                            className="sidebar-subicon transition-colors w-5 h-5 flex items-center justify-center"
-                            style={{
-                              color: isActivePath(subItem.href!)
-                                ? "white"
-                                : "#0062ff",
-                            }}
-                          >
-                            {subItem.icon}
+                          <div className="w-5 h-5 flex items-center justify-center text-gray-400">
+                            {
+                              subItem.icon
+                            }
                           </div>
                           <span className="font-medium text-sm">
-                            {subItem.title}
+                            {
+                              subItem.title
+                            }
                           </span>
                         </div>
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              ))}
+                        {subItem.badge && (
+                          <Badge
+                            variant="secondary"
+                            className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full"
+                          >
+                            {
+                              subItem.badge
+                            }
+                          </Badge>
+                        )}
+                      </div>
+                    ) : (
+                      <Link
+                        to={
+                          subItem.href!
+                        }
+                        onClick={
+                          isMobile
+                            ? onClose
+                            : undefined
+                        }
+                      >
+                        <Button
+                          variant="ghost"
+                          className={cn(
+                            "w-full justify-between h-auto px-4 py-2 text-right rounded-md transition-colors group",
+                            isActivePath(
+                              subItem.href!
+                            )
+                              ? "text-white hover:text-white"
+                              : "bg-white text-gray-900 hover:text-white"
+                          )}
+                          style={
+                            isActivePath(
+                              subItem.href!
+                            )
+                              ? {
+                                  backgroundColor:
+                                    "#0062ff",
+                                }
+                              : {}
+                          }
+                          onMouseEnter={(
+                            e
+                          ) => {
+                            if (
+                              !isActivePath(
+                                subItem.href!
+                              )
+                            ) {
+                              e.currentTarget.style.backgroundColor =
+                                "#0062ff";
+                              const icon =
+                                e.currentTarget.querySelector(
+                                  ".sidebar-subicon"
+                                ) as HTMLElement;
+                              if (icon)
+                                icon.style.color =
+                                  "white";
+                            }
+                          }}
+                          onMouseLeave={(
+                            e
+                          ) => {
+                            if (
+                              !isActivePath(
+                                subItem.href!
+                              )
+                            ) {
+                              e.currentTarget.style.backgroundColor =
+                                "white";
+                              const icon =
+                                e.currentTarget.querySelector(
+                                  ".sidebar-subicon"
+                                ) as HTMLElement;
+                              if (icon)
+                                icon.style.color =
+                                  "#0062ff";
+                            }
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="sidebar-subicon transition-colors w-5 h-5 flex items-center justify-center"
+                              style={{
+                                color:
+                                  isActivePath(
+                                    subItem.href!
+                                  )
+                                    ? "white"
+                                    : "#0062ff",
+                              }}
+                            >
+                              {
+                                subItem.icon
+                              }
+                            </div>
+                            <span className="font-medium text-sm">
+                              {
+                                subItem.title
+                              }
+                            </span>
+                          </div>
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                )
+              )}
             </div>
           )}
         </li>
@@ -306,7 +440,9 @@ function StudentSidebar({
             <div className="w-6 h-6 flex items-center justify-center text-gray-400">
               {item.icon}
             </div>
-            <span className="font-medium">{item.title}</span>
+            <span className="font-medium">
+              {item.title}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             {item.badge && (
@@ -326,7 +462,9 @@ function StudentSidebar({
       <Link
         key={item.id}
         to={item.href!}
-        onClick={isMobile ? onClose : undefined}
+        onClick={
+          isMobile ? onClose : undefined
+        }
       >
         <Button
           variant="ghost"
@@ -336,44 +474,74 @@ function StudentSidebar({
               ? "text-white hover:text-white shadow-sm"
               : "bg-white text-gray-900 hover:text-white"
           )}
-          style={isActivePath(item.href!) ? { backgroundColor: "#0062ff" } : {}}
+          style={
+            isActivePath(item.href!)
+              ? {
+                  backgroundColor:
+                    "#0062ff",
+                }
+              : {}
+          }
           onMouseEnter={(e) => {
-            if (!isActivePath(item.href!)) {
-              e.currentTarget.style.backgroundColor = "#0062ff";
-              const icon = e.currentTarget.querySelector(
-                ".sidebar-mainicon"
-              ) as HTMLElement;
-              if (icon) icon.style.color = "white";
+            if (
+              !isActivePath(item.href!)
+            ) {
+              e.currentTarget.style.backgroundColor =
+                "#0062ff";
+              const icon =
+                e.currentTarget.querySelector(
+                  ".sidebar-mainicon"
+                ) as HTMLElement;
+              if (icon)
+                icon.style.color =
+                  "white";
             }
           }}
           onMouseLeave={(e) => {
-            if (!isActivePath(item.href!)) {
-              e.currentTarget.style.backgroundColor = "white";
-              const icon = e.currentTarget.querySelector(
-                ".sidebar-mainicon"
-              ) as HTMLElement;
-              if (icon) icon.style.color = "#0062ff";
+            if (
+              !isActivePath(item.href!)
+            ) {
+              e.currentTarget.style.backgroundColor =
+                "white";
+              const icon =
+                e.currentTarget.querySelector(
+                  ".sidebar-mainicon"
+                ) as HTMLElement;
+              if (icon)
+                icon.style.color =
+                  "#0062ff";
             }
           }}
         >
           <div className="flex items-center gap-3">
             <div
               className="sidebar-mainicon transition-colors w-6 h-6 flex items-center justify-center"
-              style={{ color: isActivePath(item.href!) ? "white" : "#0062ff" }}
+              style={{
+                color: isActivePath(
+                  item.href!
+                )
+                  ? "white"
+                  : "#0062ff",
+              }}
             >
               {item.icon}
             </div>
-            <span className="font-medium">{item.title}</span>
+            <span className="font-medium">
+              {item.title}
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            {item.badge && !isActivePath(item.href!) && (
-              <Badge
-                variant="secondary"
-                className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
-              >
-                {item.badge}
-              </Badge>
-            )}
+            {item.badge &&
+              !isActivePath(
+                item.href!
+              ) && (
+                <Badge
+                  variant="secondary"
+                  className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
+                >
+                  {item.badge}
+                </Badge>
+              )}
           </div>
         </Button>
       </Link>
@@ -385,7 +553,9 @@ function StudentSidebar({
       {/* Mobile Header */}
       {isMobile && (
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-lg font-semibold">القائمة</h2>
+          <h2 className="text-lg font-semibold">
+            القائمة
+          </h2>
           <Button
             variant="ghost"
             size="sm"
@@ -400,7 +570,11 @@ function StudentSidebar({
       {/* Mobile Back to Main Site Button */}
       {isMobile && (
         <div className="p-4 border-b border-gray-100">
-          <Link to="/" className="block" onClick={onClose}>
+          <Link
+            to="/"
+            className="block"
+            onClick={onClose}
+          >
             <Button
               size="sm"
               variant="outline"
@@ -416,7 +590,10 @@ function StudentSidebar({
       <div className="p-5 space-y-4">
         {/* Back to Main Site Button */}
         <div className="hidden lg:block">
-          <Link to="/" className="block">
+          <Link
+            to="/"
+            className="block"
+          >
             <Button
               size="sm"
               variant="outline"
@@ -431,22 +608,33 @@ function StudentSidebar({
         {/* Profile Section */}
         <div className="flex items-center gap-3">
           <Avatar className="w-12 h-12 rounded-lg object-cover shadow-sm">
-            {user?.avatar && <AvatarImage src={user.avatar} alt={user.fname} />}
+            {user?.avatar && (
+              <AvatarImage
+                src={user.avatar}
+                alt={user.fname}
+              />
+            )}
             <AvatarFallback className="bg-green-100 text-green-700">
-              {user?.fname?.charAt(0) || "S"}
+              {user?.fname?.charAt(0) ||
+                "S"}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 text-base truncate">
-              {user?.fname} {user?.lname}
+              {user?.fname}{" "}
+              {user?.lname}
             </h3>
-            <p className="text-xs text-gray-500 truncate">طالب</p>
+            <p className="text-xs text-gray-500 truncate">
+              طالب
+            </p>
           </div>
         </div>
 
         <nav>
           <ul className="flex flex-col gap-1">
-            {sidebarItems.map((item) => renderSidebarItem(item))}
+            {sidebarItems.map((item) =>
+              renderSidebarItem(item)
+            )}
           </ul>
         </nav>
       </div>
@@ -468,7 +656,9 @@ function StudentSidebar({
         <aside
           className={cn(
             "fixed top-0 right-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 z-50 lg:hidden",
-            isOpen ? "translate-x-0" : "translate-x-full"
+            isOpen
+              ? "translate-x-0"
+              : "translate-x-full"
           )}
         >
           {sidebarContent}
