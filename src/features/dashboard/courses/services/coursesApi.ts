@@ -1,8 +1,8 @@
 import axios from "@/lib/axios";
-import type { Course } from "@/types/couse";
+import type { Category, Course } from "@/types/couse";
 
 // Types for API requests
-export interface CreateCoursePayload {
+export interface CoursePayload {
   category_id: string;
   trainer_id?: string;
   title: string;
@@ -31,7 +31,14 @@ export interface CoursesListResponse {
   };
 }
 
-export interface CreateCourseResponse {
+export interface CategoriesListResponse {
+  status: string;
+  status_code: number;
+  message: string;
+  data: Category[];
+}
+
+export interface CourseResponse {
   status: string;
   status_code: number;
   error_type: string | null;
@@ -45,17 +52,19 @@ export const coursesApi = {
     const response = await axios.get("/academy/courses");
     return response.data;
   },
+  getCategories: async (): Promise<CategoriesListResponse> => {
+    const response = await axios.get("/categories");
+    return response.data;
+  },
 
   // Get single course by ID
-  getCourse: async (id: string): Promise<CreateCourseResponse> => {
+  getCourse: async (id: string): Promise<CourseResponse> => {
     const response = await axios.get(`/academy/courses/${id}`);
     return response.data;
   },
 
   // Create new course
-  createCourse: async (
-    courseData: CreateCoursePayload
-  ): Promise<CreateCourseResponse> => {
+  createCourse: async (courseData: CoursePayload): Promise<CourseResponse> => {
     // Create FormData for file uploads
     const formData = new FormData();
 
@@ -89,8 +98,8 @@ export const coursesApi = {
   // Update existing course
   updateCourse: async (
     id: string,
-    courseData: Partial<CreateCoursePayload>
-  ): Promise<Course> => {
+    courseData: Partial<CoursePayload>
+  ): Promise<CourseResponse> => {
     // Create FormData for file uploads if needed
     const formData = new FormData();
 
@@ -111,13 +120,13 @@ export const coursesApi = {
       }
     });
 
-    const response = await axios.put(`/courses/${id}`, formData, {
+    const response = await axios.put(`/academy/courses/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
 
-    return response.data.course;
+    return response.data;
   },
 
   // Delete course

@@ -1,25 +1,28 @@
 import type { UserType } from "@/constants/enums";
 
+export interface Category {
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  image: string | null;
+  status: boolean;
+}
+
+export interface Trainer {
+  avatar: string | null;
+  email: string;
+  fname: string;
+  id: number;
+  lname: string;
+  user_type: UserType;
+}
 export interface Course {
   id: string;
   academy_id: number;
   category_id: number;
-  category: {
-    content: string;
-    id: number;
-    image: string | null;
-    slug: string;
-    status: boolean;
-    title: string;
-  };
-  trainer: {
-    avatar: string | null;
-    email: string;
-    fname: string;
-    id: number;
-    lname: string;
-    user_type: UserType;
-  };
+  category: Category;
+  trainer: Trainer;
   trainer_id: number;
   slug: string;
   image: string;

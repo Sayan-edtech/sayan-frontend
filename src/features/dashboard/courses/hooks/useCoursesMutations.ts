@@ -2,9 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   coursesApi,
-  type CoursesListResponse,
-  type CreateCoursePayload,
-  type CreateCourseResponse,
+  type CoursePayload,
+  type CourseResponse,
 } from "../services/coursesApi";
 import { queryKeys } from "@/lib/query-keys";
 import type { Course } from "@/types/couse";
@@ -24,16 +23,12 @@ export const useCreateCourse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (courseData: CreateCoursePayload) =>
+    mutationFn: (courseData: CoursePayload) =>
       coursesApi.createCourse(courseData),
-    onSuccess: (response: CreateCourseResponse) => {
-      const course = response.data;
-
-      // Invalidate related queries to ensure freshness
+    onSuccess: (response: CourseResponse) => {
+      // Invalidate all courses-related queries to ensure freshness
       queryClient.invalidateQueries({
-        queryKey: queryKeys.courses.list(
-          JSON.stringify({ academy_id: course.academy_id })
-        ),
+        queryKey: queryKeys.courses.all,
       });
 
       toast.success(response.message || "تم إنشاء المادة التعليمية بنجاح!");
@@ -58,27 +53,15 @@ export const useUpdateCourse = () => {
       courseData,
     }: {
       id: string;
-      courseData: Partial<CreateCoursePayload>;
+      courseData: Partial<CoursePayload>;
     }) => coursesApi.updateCourse(id, courseData),
-    onSuccess: (
-      updatedCourse: Course,
-      variables: { id: string; courseData: Partial<CreateCoursePayload> }
-    ) => {
-      // 1. Update general courses cache
-      queryClient.setQueryData(
-        queryKeys.courses.lists(),
-        (oldData: CoursesListResponse | undefined) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            data: oldData.data.courses.map((course) =>
-              course.id === variables.id ? updatedCourse : course
-            ),
-          };
-        }
-      );
+    onSuccess: (response: CourseResponse) => {
+      // Invalidate all courses-related queries to ensure freshness
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.courses.all,
+      });
 
-      toast.success("تم تحديث المادة التعليمية بنجاح!");
+      toast.success(response.message || "تم تحديث المادة التعليمية بنجاح!");
     },
     onError: (error: ApiError) => {
       const errorMessage =
@@ -99,49 +82,27 @@ export const useDeleteCourse = () => {
     onMutate: async (course: Course) => {
       // Cancel any outgoing refetches to avoid optimistic update conflicts
       await queryClient.cancelQueries({
-        queryKey: queryKeys.courses.list(String(course.academy_id)),
+        queryKey: queryKeys.courses.all,
       });
 
       // Get the previous data for rollback
-      const previousData = queryClient.getQueryData(
-        queryKeys.courses.list(String(course.academy_id))
-      );
-
-      // Optimistically remove the course from the cache
-      queryClient.setQueryData(
-        queryKeys.courses.list(String(course.academy_id)),
-        (oldData: CoursesListResponse | undefined) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            data: {
-              ...oldData.data,
-              courses: oldData.data.courses.filter(
-                (existingCourse: Course) => existingCourse.id !== course.id
-              ),
-            },
-          };
-        }
-      );
+      const previousData = queryClient.getQueryData(queryKeys.courses.lists());
 
       return { previousData, course };
     },
-    onSuccess: (_, course: Course) => {
-      // Invalidate the academy courses query to ensure freshness
+    onSuccess: () => {
+      // Invalidate all courses queries to ensure freshness
       queryClient.invalidateQueries({
-        queryKey: queryKeys.courses.list(String(course.academy_id)),
+        queryKey: queryKeys.courses.all,
       });
 
       toast.success("تم حذف المادة التعليمية بنجاح!");
     },
-    onError: (error: ApiError, course: Course, context) => {
-      // Revert optimistic updates on error
-      if (context?.previousData) {
-        queryClient.setQueryData(
-          queryKeys.courses.list(String(course.academy_id)),
-          context.previousData
-        );
-      }
+    onError: (error: ApiError) => {
+      // Revert optimistic updates on error by invalidating queries
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.courses.all,
+      });
 
       const errorMessage =
         error?.response?.data?.message || "حدث خطأ أثناء حذف المادة التعليمية";

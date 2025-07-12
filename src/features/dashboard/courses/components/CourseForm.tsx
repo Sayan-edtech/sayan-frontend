@@ -5,13 +5,18 @@ import { Card } from "@/components/ui/card";
 import FormFields from "@/components/shared/formFields/form-fields";
 import { courseSchema, type ICourseForm } from "@/validations/course";
 import { toast } from "sonner";
-import { ArrowRight, Save, Trash2 } from "lucide-react";
+import { ArrowRight, Save, Trash2, Edit, X } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
-import { useCreateCourse } from "../hooks/useCoursesMutations";
+import { useCreateCourse, useUpdateCourse } from "../hooks/useCoursesMutations";
 import { useNavigate } from "react-router-dom";
-import type { CreateCoursePayload } from "../services/coursesApi";
+import type { CoursePayload } from "../services/coursesApi";
 import { CourseLevels } from "@/constants/enums";
 import type { Course } from "@/types/couse";
+import { useCategories } from "../hooks/useCoursesQueries";
+import * as z from "zod";
+
+const url = import.meta.env.VITE_API_URL;
+const origin = new URL(url).origin;
 
 // Local storage key for persisting form data
 const FORM_DATA_KEY = "addCourseForm_draft";
@@ -57,11 +62,14 @@ const removeFromLocalStorage = (key: string) => {
 };
 
 const CourseForm = ({ course }: { course?: Course }) => {
-  console.log("course", course);
   // React Query mutation for creating course
   const createCourseMutation = useCreateCourse();
+  const updateCourseMutation = useUpdateCourse();
   const navigate = useNavigate();
-
+  const { data: categories } = useCategories();
+  // State for managing media change forms
+  const [showImageChangeForm, setShowImageChangeForm] = useState(false);
+  const [showVideoChangeForm, setShowVideoChangeForm] = useState(false);
   // Get saved step from localStorage or default to 1
   const [currentStep, setCurrentStep] = useState(() => {
     const savedStep = getFromLocalStorage(FORM_STEP_KEY);
@@ -69,23 +77,39 @@ const CourseForm = ({ course }: { course?: Course }) => {
   });
   const totalSteps = 2;
 
+  // Create conditional schema for editing vs creating
+  const getValidationSchema = useCallback(() => {
+    if (course) {
+      // For editing: make image and video optional
+      return courseSchema.extend({
+        image: z.any().optional(),
+        video: z.any().optional(),
+      });
+    }
+    // For creating: use original schema
+    return courseSchema;
+  }, [course]);
+
   // Get saved form data from localStorage
   const getSavedFormData = useCallback(() => {
     const savedData = getFromLocalStorage(FORM_DATA_KEY);
     return (
       savedData || {
         title: "",
-        category: "",
+        category: categories?.data?.[0]?.id
+          ? String(categories.data[0].id)
+          : "",
         instructor: "",
         level: CourseLevels.BEGINNER,
         price: 0,
+        discountPrice: 0,
         description: "",
         shortContent: "",
         skills: "",
         requirements: "",
       }
     );
-  }, []);
+  }, [categories?.data]);
 
   const {
     handleSubmit,
@@ -95,21 +119,22 @@ const CourseForm = ({ course }: { course?: Course }) => {
     watch,
     reset,
   } = useForm<ICourseForm>({
-    resolver: zodResolver(courseSchema),
+    resolver: zodResolver(getValidationSchema()),
     mode: "onChange",
     defaultValues: course
       ? {
           title: course.title,
-          category: course.category.title,
-          instructor: course.trainer.fname + " " + course.trainer.lname,
+          category: String(course.category.id),
+          instructor: course.trainer.fname,
           level: course.level,
           price: course.price,
+          discountPrice: course.discount_price || 0,
           description: course.content,
           shortContent: course.short_content,
           skills: course.learning_outcomes,
           requirements: course.requirements,
-          image: course.image,
-          video: course.preview_video,
+          image: null,
+          video: null,
         }
       : getSavedFormData(),
   });
@@ -141,14 +166,14 @@ const CourseForm = ({ course }: { course?: Course }) => {
   const handleFormSubmit = async (data: ICourseForm) => {
     try {
       // Format data to match API structure
-      const formattedData: CreateCoursePayload = {
-        category_id: "1", // You may need to map category name to ID
+      const formattedData: CoursePayload = {
+        category_id: data.category,
         // trainer_id: "1", // You may need to map instructor name to ID
         title: data.title,
         content: data.description,
         short_content: data.shortContent,
-        price: data.price.toString(),
-        discount_price: (data.price * 0.8).toString(),
+        price: String(data.price),
+        discount_price: String(data.discountPrice),
         level: data.level,
         image: data.image || null,
         preview_video: data.video || null,
@@ -156,17 +181,29 @@ const CourseForm = ({ course }: { course?: Course }) => {
         requirements: data.requirements,
       };
 
-      // Use React Query mutation to create course
-      const { status_code } = await createCourseMutation.mutateAsync(
-        formattedData
-      );
-      if (status_code === 201) {
-        navigate("/dashboard/courses");
+      if (course) {
+        // Update existing course
+        const { status_code } = await updateCourseMutation.mutateAsync({
+          id: course.id,
+          courseData: formattedData,
+        });
+        if (status_code === 200) {
+          navigate("/dashboard/courses");
+        }
+      } else {
+        // Create new course
+        const { status_code } = await createCourseMutation.mutateAsync(
+          formattedData
+        );
+        if (status_code === 201) {
+          navigate("/dashboard/courses");
+        }
       }
+
       // Clear draft data after successful submission
       clearDraftData();
     } catch (error) {
-      console.error("Error creating course:", error);
+      console.error("Error submitting course:", error);
       // Error handling is done in the mutation hook
     }
   };
@@ -198,7 +235,18 @@ const CourseForm = ({ course }: { course?: Course }) => {
     e?.stopPropagation();
 
     const fieldsToValidate = getFieldsForStep(currentStep);
-    const isValid = (await trigger(fieldsToValidate)) || course;
+    // When editing, exclude image and video from validation if they're not being changed
+    const filteredFields = course
+      ? fieldsToValidate.filter((field) => {
+          if (field === "image" && !showImageChangeForm && course.image)
+            return false;
+          if (field === "video" && !showVideoChangeForm && course.preview_video)
+            return false;
+          return true;
+        })
+      : fieldsToValidate;
+
+    const isValid = await trigger(filteredFields);
 
     if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
@@ -222,6 +270,7 @@ const CourseForm = ({ course }: { course?: Course }) => {
           "instructor",
           "level",
           "price",
+          "discountPrice",
         ];
       case 2:
         return ["description", "shortContent", "skills", "requirements"];
@@ -297,43 +346,127 @@ const CourseForm = ({ course }: { course?: Course }) => {
             <div className="space-y-6">
               {/* الصف الأول: الوسائط */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Course Image Section */}
                 <div>
-                  <FormFields
-                    name="image"
-                    label="صورة المادة التعليمية"
-                    type="file"
-                    placeholder="اختر صورة للمادة التعليمية"
-                    fileType="image"
-                    accept="image/*"
-                    maxSize={5}
-                    allowedTypes={[
-                      "image/jpeg",
-                      "image/png",
-                      "image/jpg",
-                      "image/webp",
-                    ]}
-                    control={control}
-                    errors={errors}
-                  />
+                  {course && course.image && !showImageChangeForm ? (
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium text-foreground">
+                        صورة المادة التعليمية
+                      </label>
+                      <div className="relative group">
+                        <img
+                          src={`${origin}${course.image}`}
+                          alt="صورة المادة التعليمية"
+                          className="w-full h-48 object-cover rounded-lg border transition-all group-hover:brightness-75"
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="secondary"
+                          className="absolute top-2 right-2 bg-white/90 hover:bg-white shadow-sm"
+                          onClick={() => setShowImageChangeForm(true)}
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          تغيير الصورة
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <FormFields
+                        name="image"
+                        label="صورة المادة التعليمية"
+                        type="file"
+                        placeholder="اختر صورة للمادة التعليمية"
+                        fileType="image"
+                        accept="image/*"
+                        maxSize={5}
+                        allowedTypes={[
+                          "image/jpeg",
+                          "image/png",
+                          "image/jpg",
+                          "image/webp",
+                        ]}
+                        control={control}
+                        errors={errors}
+                      />
+                      {course && showImageChangeForm && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setShowImageChangeForm(false)}
+                          className="mt-2"
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          إلغاء التغيير
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
+
+                {/* Course Video Section */}
                 <div>
-                  <FormFields
-                    name="video"
-                    label="فيديو تعريفي للمادة"
-                    type="file"
-                    placeholder="اختر فيديو تعريفي للمادة"
-                    fileType="video"
-                    accept="video/*"
-                    maxSize={100}
-                    allowedTypes={[
-                      "video/mp4",
-                      "video/avi",
-                      "video/mov",
-                      "video/wmv",
-                    ]}
-                    control={control}
-                    errors={errors}
-                  />
+                  {course && course.preview_video && !showVideoChangeForm ? (
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium text-foreground">
+                        فيديو تعريفي للمادة
+                      </label>
+                      <div className="relative group">
+                        <video
+                          src={`${origin}${course.preview_video}`}
+                          className="w-full h-48 object-cover rounded-lg border"
+                          controls
+                          preload="metadata"
+                        >
+                          المتصفح لا يدعم تشغيل الفيديو
+                        </video>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="secondary"
+                          className="absolute top-2 right-2 bg-white/90 hover:bg-white shadow-sm"
+                          onClick={() => setShowVideoChangeForm(true)}
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          تغيير الفيديو
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <FormFields
+                        name="video"
+                        label="فيديو تعريفي للمادة"
+                        type="file"
+                        placeholder="اختر فيديو تعريفي للمادة"
+                        fileType="video"
+                        accept="video/*"
+                        maxSize={100}
+                        allowedTypes={[
+                          "video/mp4",
+                          "video/avi",
+                          "video/mov",
+                          "video/wmv",
+                        ]}
+                        control={control}
+                        errors={errors}
+                      />
+                      {course && showVideoChangeForm && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setShowVideoChangeForm(false)}
+                          className="mt-2"
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          إلغاء التغيير
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -355,28 +488,10 @@ const CourseForm = ({ course }: { course?: Course }) => {
                     label="الفئة"
                     type="select"
                     placeholder="اختر فئة المادة"
-                    options={[
-                      {
-                        label: "برمجة",
-                        value: "برمجة",
-                      },
-                      {
-                        label: "تصميم",
-                        value: "تصميم",
-                      },
-                      {
-                        label: "تسويق",
-                        value: "تسويق",
-                      },
-                      {
-                        label: "أعمال",
-                        value: "أعمال",
-                      },
-                      {
-                        label: "تطوير شخصي",
-                        value: "تطوير شخصي",
-                      },
-                    ]}
+                    options={categories?.data.map((category) => ({
+                      label: category.title,
+                      value: String(category.id),
+                    }))}
                     control={control}
                     errors={errors}
                   />
@@ -384,7 +499,7 @@ const CourseForm = ({ course }: { course?: Course }) => {
               </div>
 
               {/* صف نوع المادة والمدرب والمستوى */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <FormFields
                     name="instructor"
@@ -428,6 +543,16 @@ const CourseForm = ({ course }: { course?: Course }) => {
                   <FormFields
                     name="price"
                     label="السعر (ريال سعودي)"
+                    type="number"
+                    placeholder="0"
+                    control={control}
+                    errors={errors}
+                  />
+                </div>
+                <div>
+                  <FormFields
+                    name="discountPrice"
+                    label="سعر الخصم (ريال سعودي)"
                     type="number"
                     placeholder="0"
                     control={control}

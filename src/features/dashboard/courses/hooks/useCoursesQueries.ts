@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { coursesApi, type CoursesListResponse } from "../services/coursesApi";
+import {
+  coursesApi,
+  type CategoriesListResponse,
+  type CoursesListResponse,
+} from "../services/coursesApi";
 import { queryKeys } from "@/lib/query-keys";
 
 // Hook for fetching courses by academy ID
@@ -19,6 +23,15 @@ export const useCourse = (id: string) => {
     queryKey: queryKeys.courses.detail(id),
     queryFn: () => coursesApi.getCourse(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
+export const useCategories = () => {
+  return useQuery<CategoriesListResponse>({
+    queryKey: queryKeys.categories.list(),
+    queryFn: () => coursesApi.getCategories(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });

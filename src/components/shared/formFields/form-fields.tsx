@@ -25,10 +25,6 @@ const FormFields = (props: Props) => {
   const { type } = props;
 
   const renderField = (): React.ReactNode => {
-    if (type === InputTypes.EMAIL || type === InputTypes.TEXT) {
-      return <TextField {...props} />;
-    }
-
     if (type === InputTypes.PASSWORD) {
       return <PasswordField {...props} />;
     }
@@ -61,7 +57,7 @@ const FormFields = (props: Props) => {
       return <OtpField {...props} />;
     }
 
-    return null;
+    return <TextField {...props} />;
   };
 
   return <>{renderField()}</>;

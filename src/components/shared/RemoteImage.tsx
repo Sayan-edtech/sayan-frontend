@@ -16,10 +16,10 @@ function RemoteImage({
   ...rest
 }: RemoteImageProps) {
   const url = import.meta.env.VITE_API_URL;
-  const domain = new URL(url).origin;
+  const origin = new URL(url).origin;
   return (
     <img
-      src={`${domain}${src}`}
+      src={`${origin}${src}`}
       alt={alt}
       loading={loading}
       className={`${cn("h-16 w-16 rounded-lg object-cover")} ${className}`}

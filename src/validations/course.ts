@@ -9,7 +9,7 @@ export const courseSchema = z.object({
 
   category: z.string().min(1, { message: "الفئة مطلوبة" }),
 
-  instructor: z.string().min(1, { message: "المدرب مطلوب" }),
+  instructor: z.string().optional(),
 
   level: z.enum(
     [CourseLevels.BEGINNER, CourseLevels.INTERMEDIATE, CourseLevels.ADVANCED],
@@ -18,6 +18,10 @@ export const courseSchema = z.object({
     }
   ),
   price: z.number().min(0, { message: "السعر يجب أن يكون 0 أو أكثر" }),
+
+  discountPrice: z
+    .number()
+    .min(0, { message: "سعر الخصم يجب أن يكون 0 أو أكثر" }),
 
   description: z
     .string()
