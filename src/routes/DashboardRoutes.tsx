@@ -15,6 +15,7 @@ import AddNewTrainer from "@/pages/dashboard/trainers/new";
 import { templateRoutes } from "./TemplateRoutes";
 import { DashboardLayout } from "@/features/dashboard/components/DashboardLayout";
 import { ProtectedRoute } from "@/components/shared/GuardRoute";
+import ManageCourse from "@/pages/dashboard/courses/mange";
 
 export const dashboardRoutes = (
   <Route
@@ -34,6 +35,8 @@ export const dashboardRoutes = (
     <Route path="trainers/new" element={<AddNewTrainer />} />
     <Route path="courses" element={<AcademyCourses />} />
     <Route path="courses/new" element={<AddNewCourse />} />
+    <Route path="courses/manage/:courseId" element={<ManageCourse />} />
+
     <Route path="digital-products" element={<DigitalProducts />} />
     <Route path="certificates" element={<div>الشهادات - قريباً</div>} />
     <Route path="favorites" element={<Favorites />} />

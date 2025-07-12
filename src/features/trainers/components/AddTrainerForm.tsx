@@ -95,22 +95,6 @@ const AddTrainerForm = ({
     }
   }, [clearDraftData, getSavedFormData, reset]);
 
-  useEffect(() => {
-    const savedData = getFromLocalStorage(FORM_DATA_KEY);
-    if (
-      savedData &&
-      Object.keys(savedData).some((key) => savedData[key] !== "")
-    ) {
-      toast.info("تم استعادة المسودة المحفوظة مسبقاً", {
-        duration: 5000,
-        action: {
-          label: "بدء من جديد",
-          onClick: () => handleClearDraft(),
-        },
-      });
-    }
-  }, [handleClearDraft]);
-
   const handleFormSubmit = async (data: ITrainerForm) => {
     try {
       console.log("Trainer Form Data:", data);

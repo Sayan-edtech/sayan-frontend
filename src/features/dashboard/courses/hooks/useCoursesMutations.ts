@@ -1,179 +1,152 @@
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
-// import { toast } from "sonner";
-// import {
-//   coursesApi,
-//   type Course,
-//   type CoursesListResponse,
-// } from "../services/coursesApi";
-// import { COURSES_QUERY_KEYS } from "../constants/queryKeys";
-// import type { ICourseForm } from "@/validations/course";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import {
+  coursesApi,
+  type CoursesListResponse,
+  type CreateCoursePayload,
+  type CreateCourseResponse,
+} from "../services/coursesApi";
+import { queryKeys } from "@/lib/query-keys";
+import type { Course } from "@/types/couse";
 
-// // Type for API error response
-// interface ApiError {
-//   response?: {
-//     data?: {
-//       message?: string;
-//     };
-//   };
-//   message?: string;
-// }
+// Type for API error response
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
 
-// // Hook for creating a new course
-// export const useCreateCourse = () => {
-//   const queryClient = useQueryClient();
+// Hook for creating a new course
+export const useCreateCourse = () => {
+  const queryClient = useQueryClient();
 
-//   return useMutation({
-//     mutationFn: (courseData: ICourseForm) =>
-//       coursesApi.createCourse(courseData),
-//     onSuccess: (data: Course) => {
-//       // Invalidate and refetch courses list
-//       queryClient.invalidateQueries({
-//         queryKey: [COURSES_QUERY_KEYS.COURSES_LIST],
-//       });
+  return useMutation({
+    mutationFn: (courseData: CreateCoursePayload) =>
+      coursesApi.createCourse(courseData),
+    onSuccess: (response: CreateCourseResponse) => {
+      const course = response.data;
 
-//       // Add the new course to the cache optimistically
-//       queryClient.setQueryData(
-//         [COURSES_QUERY_KEYS.COURSES_LIST],
-//         (oldData: CoursesListResponse | undefined) => {
-//           if (!oldData)
-//             return {
-//               courses: [data],
-//               total: 1,
-//               page: 1,
-//               limit: 10,
-//               totalPages: 1,
-//             };
-//           return {
-//             ...oldData,
-//             courses: [data, ...oldData.courses],
-//             total: oldData.total + 1,
-//           };
-//         }
-//       );
+      // Invalidate related queries to ensure freshness
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.courses.list(
+          JSON.stringify({ academy_id: course.academy_id })
+        ),
+      });
 
-//       toast.success("تم إنشاء المادة التعليمية بنجاح!");
-//     },
-//     onError: (error: ApiError) => {
-//       const errorMessage =
-//         error?.response?.data?.message ||
-//         "حدث خطأ أثناء إنشاء المادة التعليمية";
-//       toast.error(errorMessage);
-//       console.error("Error creating course:", error);
-//     },
-//   });
-// };
+      toast.success(response.message || "تم إنشاء المادة التعليمية بنجاح!");
+    },
+    onError: (error: ApiError) => {
+      const errorMessage =
+        error?.response?.data?.message ||
+        "حدث خطأ أثناء إنشاء المادة التعليمية";
+      toast.error(errorMessage);
+      console.error("Error creating course:", error);
+    },
+  });
+};
 
-// // Hook for updating an existing course
-// export const useUpdateCourse = () => {
-//   const queryClient = useQueryClient();
+// Hook for updating an existing course
+export const useUpdateCourse = () => {
+  const queryClient = useQueryClient();
 
-//   return useMutation({
-//     mutationFn: ({
-//       id,
-//       courseData,
-//     }: {
-//       id: string;
-//       courseData: Partial<ICourseForm>;
-//     }) => coursesApi.updateCourse(id, courseData),
-//     onSuccess: (data: Course, variables) => {
-//       // Invalidate courses list
-//       queryClient.invalidateQueries({
-//         queryKey: [COURSES_QUERY_KEYS.COURSES_LIST],
-//       });
+  return useMutation({
+    mutationFn: ({
+      id,
+      courseData,
+    }: {
+      id: string;
+      courseData: Partial<CreateCoursePayload>;
+    }) => coursesApi.updateCourse(id, courseData),
+    onSuccess: (
+      updatedCourse: Course,
+      variables: { id: string; courseData: Partial<CreateCoursePayload> }
+    ) => {
+      // 1. Update general courses cache
+      queryClient.setQueryData(
+        queryKeys.courses.lists(),
+        (oldData: CoursesListResponse | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            data: oldData.data.courses.map((course) =>
+              course.id === variables.id ? updatedCourse : course
+            ),
+          };
+        }
+      );
 
-//       // Update specific course in cache
-//       queryClient.setQueryData(
-//         [COURSES_QUERY_KEYS.COURSE_DETAIL, variables.id],
-//         data
-//       );
+      toast.success("تم تحديث المادة التعليمية بنجاح!");
+    },
+    onError: (error: ApiError) => {
+      const errorMessage =
+        error?.response?.data?.message ||
+        "حدث خطأ أثناء تحديث المادة التعليمية";
+      toast.error(errorMessage);
+      console.error("Error updating course:", error);
+    },
+  });
+};
 
-//       toast.success("تم تحديث المادة التعليمية بنجاح!");
-//     },
-//     onError: (error: ApiError) => {
-//       const errorMessage =
-//         error?.response?.data?.message ||
-//         "حدث خطأ أثناء تحديث المادة التعليمية";
-//       toast.error(errorMessage);
-//       console.error("Error updating course:", error);
-//     },
-//   });
-// };
+// Hook for deleting a course
+export const useDeleteCourse = () => {
+  const queryClient = useQueryClient();
 
-// // Hook for deleting a course
-// export const useDeleteCourse = () => {
-//   const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (course: Course) => coursesApi.deleteCourse(course.id),
+    onMutate: async (course: Course) => {
+      // Cancel any outgoing refetches to avoid optimistic update conflicts
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.courses.list(String(course.academy_id)),
+      });
 
-//   return useMutation({
-//     mutationFn: (courseId: string) => coursesApi.deleteCourse(courseId),
-//     onSuccess: (_, courseId: string) => {
-//       // Remove from courses list cache
-//       queryClient.setQueryData(
-//         [COURSES_QUERY_KEYS.COURSES_LIST],
-//         (oldData: CoursesListResponse | undefined) => {
-//           if (!oldData) return oldData;
-//           return {
-//             ...oldData,
-//             courses: oldData.courses.filter(
-//               (course: Course) => course.id !== courseId
-//             ),
-//             total: oldData.total - 1,
-//           };
-//         }
-//       );
+      // Get the previous data for rollback
+      const previousData = queryClient.getQueryData(
+        queryKeys.courses.list(String(course.academy_id))
+      );
 
-//       // Remove specific course from cache
-//       queryClient.removeQueries({
-//         queryKey: [COURSES_QUERY_KEYS.COURSE_DETAIL, courseId],
-//       });
+      // Optimistically remove the course from the cache
+      queryClient.setQueryData(
+        queryKeys.courses.list(String(course.academy_id)),
+        (oldData: CoursesListResponse | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              courses: oldData.data.courses.filter(
+                (existingCourse: Course) => existingCourse.id !== course.id
+              ),
+            },
+          };
+        }
+      );
 
-//       toast.success("تم حذف المادة التعليمية بنجاح!");
-//     },
-//     onError: (error: ApiError) => {
-//       const errorMessage =
-//         error?.response?.data?.message || "حدث خطأ أثناء حذف المادة التعليمية";
-//       toast.error(errorMessage);
-//       console.error("Error deleting course:", error);
-//     },
-//   });
-// };
+      return { previousData, course };
+    },
+    onSuccess: (_, course: Course) => {
+      // Invalidate the academy courses query to ensure freshness
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.courses.list(String(course.academy_id)),
+      });
 
-// // Hook for bulk operations
-// export const useBulkDeleteCourses = () => {
-//   const queryClient = useQueryClient();
+      toast.success("تم حذف المادة التعليمية بنجاح!");
+    },
+    onError: (error: ApiError, course: Course, context) => {
+      // Revert optimistic updates on error
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          queryKeys.courses.list(String(course.academy_id)),
+          context.previousData
+        );
+      }
 
-//   return useMutation({
-//     mutationFn: (courseIds: string[]) =>
-//       coursesApi.bulkDeleteCourses(courseIds),
-//     onSuccess: (_, courseIds: string[]) => {
-//       // Remove from courses list cache
-//       queryClient.setQueryData(
-//         [COURSES_QUERY_KEYS.COURSES_LIST],
-//         (oldData: CoursesListResponse | undefined) => {
-//           if (!oldData) return oldData;
-//           return {
-//             ...oldData,
-//             courses: oldData.courses.filter(
-//               (course: Course) => !courseIds.includes(course.id)
-//             ),
-//             total: oldData.total - courseIds.length,
-//           };
-//         }
-//       );
-
-//       // Remove specific courses from cache
-//       courseIds.forEach((id) => {
-//         queryClient.removeQueries({
-//           queryKey: [COURSES_QUERY_KEYS.COURSE_DETAIL, id],
-//         });
-//       });
-
-//       toast.success(`تم حذف ${courseIds.length} مادة تعليمية بنجاح!`);
-//     },
-//     onError: (error: ApiError) => {
-//       const errorMessage =
-//         error?.response?.data?.message || "حدث خطأ أثناء حذف المواد التعليمية";
-//       toast.error(errorMessage);
-//       console.error("Error bulk deleting courses:", error);
-//     },
-//   });
-// };
+      const errorMessage =
+        error?.response?.data?.message || "حدث خطأ أثناء حذف المادة التعليمية";
+      toast.error(errorMessage);
+      console.error("Error deleting course:", error);
+    },
+  });
+};

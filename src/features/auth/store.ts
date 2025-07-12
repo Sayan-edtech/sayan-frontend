@@ -235,11 +235,13 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       }));
 
       // Store in cookies
-      authCookies.setAuthData(
-        response.data.access_token,
-        response.data.refresh_token,
-        response.data.user_data
-      );
+      if (response.data.data) {
+        authCookies.setAuthData(
+          response.data.data?.access_token,
+          response.data.data?.refresh_token,
+          response.data.data?.user_data
+        );
+      }
 
       return response;
     } catch (error) {

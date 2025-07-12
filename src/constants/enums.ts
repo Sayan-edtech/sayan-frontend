@@ -111,3 +111,8 @@ export enum UserType {
   STUDENT = "student",
   ACADEMY = "academy",
 }
+export enum CourseLevels {
+  BEGINNER = "beginner",
+  INTERMEDIATE = "intermediate",
+  ADVANCED = "advanced",
+}

@@ -7,8 +7,11 @@ import { courseSchema, type ICourseForm } from "@/validations/course";
 import { toast } from "sonner";
 import { ArrowRight, Save, Trash2 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
-// import { useCreateCourse } from "../hooks/useCoursesMutations";
+import { useCreateCourse } from "../hooks/useCoursesMutations";
 import { useNavigate } from "react-router-dom";
+import type { CreateCoursePayload } from "../services/coursesApi";
+import { CourseLevels } from "@/constants/enums";
+import type { Course } from "@/types/couse";
 
 // Local storage key for persisting form data
 const FORM_DATA_KEY = "addCourseForm_draft";
@@ -53,9 +56,10 @@ const removeFromLocalStorage = (key: string) => {
   }
 };
 
-const AddCourseForm = () => {
+const CourseForm = ({ course }: { course?: Course }) => {
+  console.log("course", course);
   // React Query mutation for creating course
-  // const  = useCreateCourse();
+  const createCourseMutation = useCreateCourse();
   const navigate = useNavigate();
 
   // Get saved step from localStorage or default to 1
@@ -72,9 +76,8 @@ const AddCourseForm = () => {
       savedData || {
         title: "",
         category: "",
-        type: "",
         instructor: "",
-        level: "",
+        level: CourseLevels.BEGINNER,
         price: 0,
         description: "",
         shortContent: "",
@@ -94,7 +97,21 @@ const AddCourseForm = () => {
   } = useForm<ICourseForm>({
     resolver: zodResolver(courseSchema),
     mode: "onChange",
-    defaultValues: getSavedFormData(),
+    defaultValues: course
+      ? {
+          title: course.title,
+          category: course.category.title,
+          instructor: course.trainer.fname + " " + course.trainer.lname,
+          level: course.level,
+          price: course.price,
+          description: course.content,
+          shortContent: course.short_content,
+          skills: course.learning_outcomes,
+          requirements: course.requirements,
+          image: course.image,
+          video: course.preview_video,
+        }
+      : getSavedFormData(),
   });
 
   const formLoading = isSubmitting;
@@ -116,26 +133,6 @@ const AddCourseForm = () => {
     saveToLocalStorage(FORM_STEP_KEY, currentStep);
   }, [currentStep]);
 
-  // Check for saved draft on component mount
-  useEffect(() => {
-    const savedData = getFromLocalStorage(FORM_DATA_KEY);
-    if (
-      savedData &&
-      Object.keys(savedData).some(
-        (key) => savedData[key] !== "" && savedData[key] !== 0
-      )
-    ) {
-      toast.info("تم استعادة المسودة المحفوظة مسبقاً", {
-        duration: 5000,
-        action: {
-          label: "بدء من جديد",
-          onClick: handleClearDraft,
-        },
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const clearDraftData = useCallback(() => {
     removeFromLocalStorage(FORM_DATA_KEY);
     removeFromLocalStorage(FORM_STEP_KEY);
@@ -143,11 +140,29 @@ const AddCourseForm = () => {
 
   const handleFormSubmit = async (data: ICourseForm) => {
     try {
-      console.log("Course Form Data:", data);
+      // Format data to match API structure
+      const formattedData: CreateCoursePayload = {
+        category_id: "1", // You may need to map category name to ID
+        // trainer_id: "1", // You may need to map instructor name to ID
+        title: data.title,
+        content: data.description,
+        short_content: data.shortContent,
+        price: data.price.toString(),
+        discount_price: (data.price * 0.8).toString(),
+        level: data.level,
+        image: data.image || null,
+        preview_video: data.video || null,
+        learning_outcomes: data.skills,
+        requirements: data.requirements,
+      };
 
       // Use React Query mutation to create course
-      // await createCourseMutation.mutateAsync(data);
-
+      const { status_code } = await createCourseMutation.mutateAsync(
+        formattedData
+      );
+      if (status_code === 201) {
+        navigate("/dashboard/courses");
+      }
       // Clear draft data after successful submission
       clearDraftData();
     } catch (error) {
@@ -178,9 +193,12 @@ const AddCourseForm = () => {
     }
   };
 
-  const nextStep = async () => {
+  const nextStep = async (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+
     const fieldsToValidate = getFieldsForStep(currentStep);
-    const isValid = await trigger(fieldsToValidate);
+    const isValid = (await trigger(fieldsToValidate)) || course;
 
     if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
@@ -201,7 +219,6 @@ const AddCourseForm = () => {
           "video",
           "title",
           "category",
-          "type",
           "instructor",
           "level",
           "price",
@@ -339,11 +356,26 @@ const AddCourseForm = () => {
                     type="select"
                     placeholder="اختر فئة المادة"
                     options={[
-                      { label: "برمجة", value: "برمجة" },
-                      { label: "تصميم", value: "تصميم" },
-                      { label: "تسويق", value: "تسويق" },
-                      { label: "أعمال", value: "أعمال" },
-                      { label: "تطوير شخصي", value: "تطوير شخصي" },
+                      {
+                        label: "برمجة",
+                        value: "برمجة",
+                      },
+                      {
+                        label: "تصميم",
+                        value: "تصميم",
+                      },
+                      {
+                        label: "تسويق",
+                        value: "تسويق",
+                      },
+                      {
+                        label: "أعمال",
+                        value: "أعمال",
+                      },
+                      {
+                        label: "تطوير شخصي",
+                        value: "تطوير شخصي",
+                      },
                     ]}
                     control={control}
                     errors={errors}
@@ -359,14 +391,7 @@ const AddCourseForm = () => {
                     label="المدرب"
                     type="select"
                     placeholder="اختر المدرب"
-                    options={[
-                      { label: "أحمد محمد", value: "أحمد محمد" },
-                      { label: "سارة أحمد", value: "سارة أحمد" },
-                      { label: "محمد علي", value: "محمد علي" },
-                      { label: "د. خالد إبراهيم", value: "د. خالد إبراهيم" },
-                      { label: "عمر حسن", value: "عمر حسن" },
-                      { label: "ليلى كمال", value: "ليلى كمال" },
-                    ]}
+                    options={[]}
                     control={control}
                     errors={errors}
                   />
@@ -378,9 +403,18 @@ const AddCourseForm = () => {
                     type="select"
                     placeholder="اختر مستوى الطالب"
                     options={[
-                      { label: "مبتدئ", value: "مبتدئ" },
-                      { label: "متوسط", value: "متوسط" },
-                      { label: "متقدم", value: "متقدم" },
+                      {
+                        label: "مبتدئ",
+                        value: CourseLevels.BEGINNER,
+                      },
+                      {
+                        label: "متوسط",
+                        value: CourseLevels.INTERMEDIATE,
+                      },
+                      {
+                        label: "متقدم",
+                        value: CourseLevels.ADVANCED,
+                      },
                     ]}
                     control={control}
                     errors={errors}
@@ -494,7 +528,7 @@ const AddCourseForm = () => {
               {currentStep < totalSteps ? (
                 <Button
                   type="button"
-                  onClick={nextStep}
+                  onClick={(e) => nextStep(e)}
                   disabled={formLoading}
                   className="flex items-center gap-2"
                 >
@@ -512,7 +546,7 @@ const AddCourseForm = () => {
                   ) : (
                     <Save className="w-4 h-4" />
                   )}
-                  إنشاء المادة التعليمية
+                  {course ? "حفظ المادة التعليمية" : "إنشاء المادة التعليمية"}
                 </Button>
               )}
             </div>
@@ -523,4 +557,4 @@ const AddCourseForm = () => {
   );
 };
 
-export default AddCourseForm;
+export default CourseForm;

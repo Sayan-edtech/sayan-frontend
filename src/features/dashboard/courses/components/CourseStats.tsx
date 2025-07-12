@@ -1,17 +1,5 @@
+import type { Course } from "@/types/couse";
 import { BookOpen, Users, Star, TrendingUp, DollarSign } from "lucide-react";
-
-interface Course {
-  id: number;
-  title: string;
-  category: string;
-  type: string;
-  level: string;
-  instructor: string;
-  price: number;
-  image: string;
-  students?: number;
-  rating?: number;
-}
 
 interface CourseStatsProps {
   courses: Course[];
@@ -27,7 +15,7 @@ interface StatCardProps {
 
 function StatCard({ title, value, icon, change, changeType }: StatCardProps) {
   return (
-          <div className="bg-white rounded-lg border-0 shadow-sm p-6">
+    <div className="bg-white rounded-lg border-0 shadow-sm p-6">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600">{title}</p>

@@ -15,34 +15,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Filter, X, ChevronDown, Search } from "lucide-react";
+import { useMemo, useState } from "react";
 import type { Table as TanstackTable } from "@tanstack/react-table";
-import type { Course } from "@/pages/dashboard/courses";
+import type { Course } from "@/types/couse";
 
 interface CourseFiltersProps {
-  selectedCategory: string;
-  onCategoryChange: (category: string) => void;
-  selectedLevel: string;
-  onLevelChange: (level: string) => void;
-  selectedType: string;
-  onTypeChange: (type: string) => void;
-  minPrice: number;
-  onMinPriceChange: (price: number) => void;
-  onClearFilters: () => void;
   table: TanstackTable<Course> | null; // للتحكم في الأعمدة
+  courses: Course[];
 }
 
-function CourseFilters({
-  selectedCategory,
-  onCategoryChange,
-  selectedLevel,
-  onLevelChange,
-  selectedType,
-  onTypeChange,
-  minPrice,
-  onMinPriceChange,
-  onClearFilters,
-  table,
-}: CourseFiltersProps) {
+function CourseFilters({ table, courses }: CourseFiltersProps) {
+  const [selectedCategory, setSelectedCategory] = useState("الكل");
+  const [selectedLevel, setSelectedLevel] = useState("الكل");
+  const [selectedType, setSelectedType] = useState("الكل");
+  const [minPrice, setMinPrice] = useState(0);
+  const [searchValue, setSearchValue] = useState(
+    (table?.getColumn("title")?.getFilterValue() as string) ?? ""
+  );
   const categories = [
     "الكل",
     "تطوير التطبيقات",
@@ -70,7 +59,33 @@ function CourseFilters({
     selectedCategory !== "الكل" ||
     selectedLevel !== "الكل" ||
     selectedType !== "الكل" ||
-    minPrice !== 0;
+    minPrice !== 0 ||
+    searchValue !== "";
+
+  useMemo(() => {
+    return courses.filter((course) => {
+      // const matchesCategory =
+      //   selectedCategory === "الكل" || course.category_id === selectedCategory;
+      const matchesLevel =
+        selectedLevel === "الكل" || course.level === selectedLevel;
+      const matchesType =
+        selectedType === "الكل" || course.type === selectedType;
+      const matchesPrice =
+        minPrice === 0 ||
+        (minPrice === -1 && course.price === 0) ||
+        (minPrice > 0 && course.price >= minPrice);
+      return matchesLevel && matchesType && matchesPrice;
+    });
+  }, [courses, selectedLevel, selectedType, minPrice]);
+
+  const handleClearFilters = () => {
+    setSelectedCategory("الكل");
+    setSelectedLevel("الكل");
+    setSelectedType("الكل");
+    setMinPrice(0);
+    setSearchValue("");
+    table?.getColumn("title")?.setFilterValue("");
+  };
 
   return (
     <div className="bg-white rounded-lg border-0 shadow-sm p-4 space-y-4">
@@ -83,7 +98,7 @@ function CourseFilters({
           <Button
             variant="outline"
             size="sm"
-            onClick={onClearFilters}
+            onClick={handleClearFilters}
             className="text-red-600 border-red-200 hover:bg-red-50"
           >
             <X className="w-4 h-4 mr-1" />
@@ -98,18 +113,18 @@ function CourseFilters({
           <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
             placeholder="البحث في الدورات..."
-            value={
-              (table?.getColumn("title")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table?.getColumn("title")?.setFilterValue(event.target.value)
-            }
+            value={searchValue}
+            onChange={(event) => {
+              const value = event.target.value;
+              setSearchValue(value);
+              table?.getColumn("title")?.setFilterValue(value);
+            }}
             className="pr-10"
           />
         </div>
 
         {/* Category Filter */}
-        <Select value={selectedCategory} onValueChange={onCategoryChange}>
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
           <SelectTrigger>
             <SelectValue placeholder="التصنيف" />
           </SelectTrigger>
@@ -123,7 +138,7 @@ function CourseFilters({
         </Select>
 
         {/* Level Filter */}
-        <Select value={selectedLevel} onValueChange={onLevelChange}>
+        <Select value={selectedLevel} onValueChange={setSelectedLevel}>
           <SelectTrigger>
             <SelectValue placeholder="المستوى" />
           </SelectTrigger>
@@ -137,7 +152,7 @@ function CourseFilters({
         </Select>
 
         {/* Type Filter */}
-        <Select value={selectedType} onValueChange={onTypeChange}>
+        <Select value={selectedType} onValueChange={setSelectedType}>
           <SelectTrigger>
             <SelectValue placeholder="النوع" />
           </SelectTrigger>
@@ -153,7 +168,7 @@ function CourseFilters({
         {/* Price Filter */}
         <Select
           value={minPrice.toString()}
-          onValueChange={(value) => onMinPriceChange(Number(value))}
+          onValueChange={(value) => setMinPrice(Number(value))}
         >
           <SelectTrigger>
             <SelectValue placeholder="السعر" />
@@ -214,12 +229,25 @@ function CourseFilters({
             الفلاتر النشطة:
           </span>
 
+          {searchValue && (
+            <Badge variant="secondary" className="gap-1">
+              البحث: {searchValue}
+              <button
+                onClick={() => {
+                  setSearchValue("");
+                  table?.getColumn("title")?.setFilterValue("");
+                }}
+              >
+                <X className="w-3 h-3 cursor-pointer" />
+              </button>
+            </Badge>
+          )}
           {selectedCategory !== "الكل" && (
             <Badge variant="secondary" className="gap-1">
               التصنيف: {selectedCategory}
               <X
                 className="w-3 h-3 cursor-pointer"
-                onClick={() => onCategoryChange("الكل")}
+                onClick={() => setSelectedCategory("الكل")}
               />
             </Badge>
           )}
@@ -228,7 +256,7 @@ function CourseFilters({
               المستوى: {selectedLevel}
               <X
                 className="w-3 h-3 cursor-pointer"
-                onClick={() => onLevelChange("الكل")}
+                onClick={() => setSelectedLevel("الكل")}
               />
             </Badge>
           )}
@@ -237,7 +265,7 @@ function CourseFilters({
               النوع: {selectedType}
               <X
                 className="w-3 h-3 cursor-pointer"
-                onClick={() => onTypeChange("الكل")}
+                onClick={() => setSelectedType("الكل")}
               />
             </Badge>
           )}
@@ -246,7 +274,7 @@ function CourseFilters({
               السعر: {minPrice === -1 ? "مجاني" : `أكثر من ${minPrice} ر.س`}
               <X
                 className="w-3 h-3 cursor-pointer"
-                onClick={() => onMinPriceChange(0)}
+                onClick={() => setMinPrice(0)}
               />
             </Badge>
           )}

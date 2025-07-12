@@ -1,16 +1,25 @@
 import CourseForm from "@/features/dashboard/courses/components/CourseForm";
+import { useCourse } from "@/features/dashboard/courses/hooks/useCoursesQueries";
 import { Plus } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 
-function AddNewCourse() {
+function ManageCourse() {
+  const navigate = useNavigate();
+  const { courseId } = useParams();
+  const { data: course } = useCourse(courseId as string);
+  if (!course) {
+    navigate("/dashboard/courses");
+    return null;
+  }
   return (
     <div className="space-y-6">
       <Header />
-      <CourseForm />
+      <CourseForm course={course.data} />
     </div>
   );
 }
 
-export default AddNewCourse;
+export default ManageCourse;
 
 function Header() {
   return (

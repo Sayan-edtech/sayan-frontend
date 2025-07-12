@@ -1,67 +1,61 @@
 import axios from "@/lib/axios";
-import type { ICourseForm } from "@/validations/course";
+import type { Course } from "@/types/couse";
 
-// Types for API responses
-export interface Course {
-  id: string;
+// Types for API requests
+export interface CreateCoursePayload {
+  category_id: string;
+  trainer_id?: string;
   title: string;
-  category: string;
-  type: string;
-  instructor: string;
+  content: string;
+  short_content: string;
+  price: string;
+  discount_price: string;
+  type?: string;
   level: string;
-  price: number;
-  description: string;
-  shortContent: string;
-  skills: string;
+  featured?: boolean;
+  image: File | null;
+  discount_ends_at?: string;
+  preview_video: File | null;
+  learning_outcomes: string;
   requirements: string;
-  image?: File | string;
-  video?: File | string;
-  createdAt: string;
-  updatedAt: string;
-  studentsCount: number;
-  rating: number;
-  isPublished: boolean;
 }
 
+// Types for API responses
+
 export interface CoursesListResponse {
-  courses: Course[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+  status: string;
+  status_code: number;
+  message: string;
+  data: {
+    courses: Course[];
+  };
 }
 
 export interface CreateCourseResponse {
-  course: Course;
-  message: string;
+  status: string;
   status_code: number;
+  error_type: string | null;
+  message: string;
+  data: Course;
 }
 
 // API service for courses
 export const coursesApi = {
-  // Get all courses with pagination and filters
-  getCourses: async (params?: {
-    page?: number;
-    limit?: number;
-    category?: string;
-    level?: string;
-    instructor?: string;
-    search?: string;
-    sortBy?: string;
-    sortOrder?: "asc" | "desc";
-  }): Promise<CoursesListResponse> => {
-    const response = await axios.get("/courses", { params });
+  getCourses: async (): Promise<CoursesListResponse> => {
+    const response = await axios.get("/academy/courses");
     return response.data;
   },
 
   // Get single course by ID
-  getCourse: async (id: string): Promise<Course> => {
-    const response = await axios.get(`/courses/${id}`);
-    return response.data.course;
+  getCourse: async (id: string): Promise<CreateCourseResponse> => {
+    const response = await axios.get(`/academy/courses/${id}`);
+    return response.data;
   },
 
   // Create new course
-  createCourse: async (courseData: ICourseForm): Promise<Course> => {
+  createCourse: async (
+    courseData: CreateCoursePayload
+  ): Promise<CreateCourseResponse> => {
     // Create FormData for file uploads
     const formData = new FormData();
 
@@ -70,25 +64,32 @@ export const coursesApi = {
       if (value !== null && value !== undefined) {
         if (value instanceof File) {
           formData.append(key, value);
+        } else if (Array.isArray(value)) {
+          // Handle array fields like gallery
+          value.forEach((item, index) => {
+            if (item instanceof File) {
+              formData.append(`${key}[${index}]`, item);
+            }
+          });
         } else {
           formData.append(key, String(value));
         }
       }
     });
 
-    const response = await axios.post("/courses", formData, {
+    const response = await axios.post("/academy/courses", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
 
-    return response.data.course;
+    return response.data;
   },
 
   // Update existing course
   updateCourse: async (
     id: string,
-    courseData: Partial<ICourseForm>
+    courseData: Partial<CreateCoursePayload>
   ): Promise<Course> => {
     // Create FormData for file uploads if needed
     const formData = new FormData();
@@ -97,6 +98,13 @@ export const coursesApi = {
       if (value !== null && value !== undefined) {
         if (value instanceof File) {
           formData.append(key, value);
+        } else if (Array.isArray(value)) {
+          // Handle array fields like gallery
+          value.forEach((item, index) => {
+            if (item instanceof File) {
+              formData.append(`${key}[${index}]`, item);
+            }
+          });
         } else {
           formData.append(key, String(value));
         }
@@ -114,26 +122,7 @@ export const coursesApi = {
 
   // Delete course
   deleteCourse: async (id: string): Promise<void> => {
-    await axios.delete(`/courses/${id}`);
-  },
-
-  // Bulk delete courses
-  bulkDeleteCourses: async (courseIds: string[]): Promise<void> => {
-    await axios.post("/courses/bulk-delete", { courseIds });
-  },
-
-  // Get course categories
-  getCategories: async (): Promise<string[]> => {
-    const response = await axios.get("/courses/categories");
-    return response.data.categories;
-  },
-
-  // Get course instructors
-  getInstructors: async (): Promise<
-    Array<{ id: string; name: string; email: string }>
-  > => {
-    const response = await axios.get("/courses/instructors");
-    return response.data.instructors;
+    await axios.delete(`/courses/academy/courses/${id}`);
   },
 
   // Publish/Unpublish course
@@ -145,19 +134,5 @@ export const coursesApi = {
       isPublished,
     });
     return response.data.course;
-  },
-
-  // Get course analytics
-  getCourseAnalytics: async (
-    id: string
-  ): Promise<{
-    enrollments: number;
-    completions: number;
-    revenue: number;
-    rating: number;
-    reviews: number;
-  }> => {
-    const response = await axios.get(`/courses/${id}/analytics`);
-    return response.data.analytics;
   },
 };

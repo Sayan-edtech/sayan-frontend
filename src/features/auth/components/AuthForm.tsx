@@ -17,8 +17,6 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
   const navigate = useNavigate();
   const { getFormFields } = useFormFields({ slug });
   const { getValidationSchema } = useFormValidations({ slug });
-  const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
   const searchParams = useSearchParams();
   const { email: verifiedEmail } = Object.fromEntries(searchParams[0]);
   const { verification_token } = Object.fromEntries(searchParams[0]);
@@ -97,8 +95,6 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
             data.email as string
           );
           if (status_code === 200) {
-            setUserEmail(data.email as string);
-            setForgotPasswordSent(true);
             toast.success(message);
           }
         } else if (slug === Pages.RESET_PASSWORD) {
@@ -135,71 +131,6 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
   );
 
   const formLoading = isSubmitting || isLoading;
-
-  // Show forgot password confirmation UI
-  if (slug === Pages.FORGOT_PASSWORD && forgotPasswordSent) {
-    return (
-      <div className="space-y-6 text-center">
-        <div className="space-y-2">
-          <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-card-foreground">
-            تم إرسال البريد الإلكتروني
-          </h2>
-          <p className="text-muted-foreground">
-            تم إرسال رابط إعادة تعيين كلمة المرور إلى
-          </p>
-          <p className="text-primary font-medium">{userEmail}</p>
-        </div>
-
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-medium text-blue-900 mb-2">الخطوات التالية:</h3>
-          <ol className="text-sm text-blue-800 space-y-1 text-right">
-            <li>1. افحص صندوق الوارد في بريدك الإلكتروني</li>
-            <li>2. انقر على رابط إعادة تعيين كلمة المرور</li>
-            <li>3. أدخل كلمة المرور الجديدة</li>
-          </ol>
-        </div>
-
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            لم تستلم البريد الإلكتروني؟ تحقق من مجلد البريد المزعج
-          </p>
-
-          <div className="flex flex-col gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setForgotPasswordSent(false)}
-              className="w-full"
-            >
-              إعادة المحاولة
-            </Button>
-
-            <Link
-              to={`/${Routes.AUTH}/${Pages.SIGNIN}`}
-              className="text-primary hover:underline text-sm font-medium"
-            >
-              العودة إلى تسجيل الدخول
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

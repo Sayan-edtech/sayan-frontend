@@ -1,3 +1,4 @@
+import { CourseLevels } from "@/constants/enums";
 import * as z from "zod";
 
 export const courseSchema = z.object({
@@ -8,12 +9,14 @@ export const courseSchema = z.object({
 
   category: z.string().min(1, { message: "الفئة مطلوبة" }),
 
-  type: z.string().min(1, { message: "نوع المادة مطلوب" }),
-
   instructor: z.string().min(1, { message: "المدرب مطلوب" }),
 
-  level: z.string().min(1, { message: "مستوى الطالب مطلوب" }),
-
+  level: z.enum(
+    [CourseLevels.BEGINNER, CourseLevels.INTERMEDIATE, CourseLevels.ADVANCED],
+    {
+      message: "المستوى يجب أن يكون مبتدئ، متوسط أو متقدم",
+    }
+  ),
   price: z.number().min(0, { message: "السعر يجب أن يكون 0 أو أكثر" }),
 
   description: z
