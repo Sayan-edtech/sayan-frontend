@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import FormFields from "@/components/shared/formFields/form-fields";
 import { courseSchema, type ICourseForm } from "@/validations/course";
 import { toast } from "sonner";
-import { ArrowRight, Save, Trash2, Edit, X } from "lucide-react";
+import { ArrowRight, Trash2, Edit, X, Edit2, Plus } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { useCreateCourse, useUpdateCourse } from "../hooks/useCoursesMutations";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +14,9 @@ import { CourseLevels } from "@/constants/enums";
 import type { Course } from "@/types/couse";
 import { useCategories } from "../hooks/useCoursesQueries";
 import * as z from "zod";
+import CourseContent from "./couse-content";
+import { Loader } from "@/components/shared";
+import ProgressSteps from "./ProgressSteps";
 
 const url = import.meta.env.VITE_API_URL;
 const origin = new URL(url).origin;
@@ -75,7 +78,7 @@ const CourseForm = ({ course }: { course?: Course }) => {
     const savedStep = getFromLocalStorage(FORM_STEP_KEY);
     return savedStep || 1;
   });
-  const totalSteps = 2;
+  const totalSteps = 3;
 
   // Create conditional schema for editing vs creating
   const getValidationSchema = useCallback(() => {
@@ -279,68 +282,26 @@ const CourseForm = ({ course }: { course?: Course }) => {
     }
   };
 
-  const getStepTitle = () => {
-    switch (currentStep) {
-      case 1:
-        return "المعلومات الأساسية والوسائط";
-      case 2:
-        return "محتوى المادة";
-      default:
-        return "";
-    }
-  };
-
-  const getStepDescription = () => {
-    switch (currentStep) {
-      case 1:
-        return "أضف الوسائط والمعلومات الأساسية للمادة التعليمية";
-      case 2:
-        return "أضف محتوى المادة والمعلومات التفصيلية";
-      default:
-        return "";
-    }
-  };
-
   return (
-    <div className="space-y-8">
-      {/* Progress Steps */}
-      <div className="flex items-center justify-center mb-8">
-        {Array.from({ length: totalSteps }, (_, index) => (
-          <div key={index + 1} className="flex items-center">
-            <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
-                currentStep >= index + 1
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {index + 1}
-            </div>
-            {index < totalSteps - 1 && (
-              <div
-                className={`w-16 h-1 mx-2 ${
-                  currentStep > index + 1 ? "bg-primary" : "bg-muted"
-                }`}
-              />
+    <div className="space-y-4">
+      <div className="flex flex-col sm:space-y-0 sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border-0">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4">
+          <div className="flex items-center gap-2 text-gray-600">
+            {course ? (
+              <Edit2 className="w-5 h-5 text-blue-600" />
+            ) : (
+              <Plus className="w-5 h-5 text-blue-600" />
             )}
+            <span className="font-medium text-sm lg:text-base">
+              {course ? "تعديل المادة التعليمية" : "إنشاء مادة تعليمية جديدة"}
+            </span>
           </div>
-        ))}
-      </div>
-
-      {/* Step Title */}
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold text-foreground">{getStepTitle()}</h2>
-        <p className="text-muted-foreground">{getStepDescription()}</p>
-
-        {/* Draft indicator */}
-        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span>يتم حفظ البيانات تلقائياً</span>
         </div>
+        {/* Progress Steps */}
+        <ProgressSteps currentStep={currentStep} totalSteps={totalSteps} />
       </div>
-
       {/* Form */}
-      <Card className="p-8 border-0 shadow-sm">
+      <Card className="p-4 border-0 shadow-sm">
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
           {currentStep === 1 ? (
             <div className="space-y-6">
@@ -611,6 +572,8 @@ const CourseForm = ({ course }: { course?: Course }) => {
                 </div>
               </div>
             </div>
+          ) : currentStep === 3 ? (
+            <CourseContent />
           ) : null}
 
           {/* Form Actions */}
@@ -661,18 +624,18 @@ const CourseForm = ({ course }: { course?: Course }) => {
                   <ArrowRight className="w-4 h-4 rotate-180" />
                 </Button>
               ) : (
-                <Button
-                  type="submit"
-                  disabled={formLoading}
-                  className="flex items-center gap-2"
-                >
-                  {formLoading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4" />
-                  )}
-                  {course ? "حفظ المادة التعليمية" : "إنشاء المادة التعليمية"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="submit"
+                    disabled={formLoading}
+                    variant={course ? "outline" : "default"}
+                    className="flex items-center gap-2"
+                  >
+                    {course ? "حفظ الدورة" : "إنشاء الدورة"}
+                    {formLoading && <Loader />}
+                  </Button>
+                  <Button type="button">نشر الدورة</Button>
+                </div>
               )}
             </div>
           </div>

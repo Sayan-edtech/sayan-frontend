@@ -25,7 +25,7 @@ function AcademyCourses() {
       </div>
     );
   }
-
+  console.log("courses?.data.courses", courses?.data.courses);
   return (
     !isPending &&
     courses && (

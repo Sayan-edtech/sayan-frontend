@@ -26,7 +26,7 @@ import {
 import type { Table as TanstackTable } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import RemoteImage from "@/components/shared/RemoteImage";
-import type { Course } from "@/types/couse";
+import type { Category, Course } from "@/types/couse";
 import DeleteCourse from "./DeleteCourse";
 import { Edit } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -63,11 +63,14 @@ const columns: ColumnDef<Course>[] = [
   {
     accessorKey: "category",
     header: "الفئة",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="border-blue-200 text-blue-800">
-        {row.getValue("category")}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      const category = row.getValue("category") as Category;
+      return (
+        <Badge variant="outline" className="border-blue-200 text-blue-800">
+          {category.title}
+        </Badge>
+      );
+    },
   },
   {
     accessorKey: "type",
@@ -211,7 +214,7 @@ function CourseTable({ courses, onTableReady }: CourseTableProps) {
                   variant="secondary"
                   className="bg-purple-100 text-purple-800 text-xs"
                 >
-                  {row.getValue("category")}
+                  {(row.getValue("category") as Category).title}
                 </Badge>
                 <Badge
                   variant="outline"
