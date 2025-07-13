@@ -13,11 +13,18 @@ import { useDeleteCourse } from "../hooks/useCoursesMutations";
 import { Trash2 } from "lucide-react";
 import { Loader } from "@/components/shared";
 import type { Course } from "@/types/couse";
+import { useEffect, useState } from "react";
 
 export default function DeleteCourse({ course }: { course: Course }) {
-  const { mutateAsync, isPending } = useDeleteCourse();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { mutateAsync, isPending, isSuccess } = useDeleteCourse();
+  useEffect(() => {
+    if (isSuccess) {
+      setMenuOpen(false); // Close the dialog on successful deletion
+    }
+  }, [isSuccess]);
   return (
-    <Dialog>
+    <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600">
           <Trash2 className="h-4 w-4" />
