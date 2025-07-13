@@ -23,10 +23,6 @@ export const userKeys = {
 
 // General query key factory patterns
 export const queryKeys = {
-  auth: authKeys,
-  user: userKeys,
-
-  // Add other feature query keys here as the app grows
   courses: {
     all: ["courses"] as const,
     lists: () => [...queryKeys.courses.all, "list"] as const,
@@ -48,11 +44,5 @@ export const queryKeys = {
       unfavorite: (courseId: string) =>
         [...queryKeys.courses.all, "unfavorite", courseId] as const,
     },
-  },
-  categories: {
-    all: ["categories"] as const,
-    list: () => [...queryKeys.categories.all, "list"] as const,
-    detail: (id: string) =>
-      [...queryKeys.categories.all, "detail", id] as const,
   },
 };

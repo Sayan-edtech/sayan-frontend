@@ -3,12 +3,12 @@ import AuthLinks from "./auth-links";
 import MobileMenu from "./mobile-menu";
 import { Link } from "react-router-dom";
 import ShoppingCart from "./shopping-cart";
-import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks";
 import { UserMenu } from "../dashboard/UserMenu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/features/auth/hooks/useAuthStore";
 
 export default function Header() {
-  const { data: user, isLoading } = useCurrentUserProfile();
+  const { user, isLoading } = useAuth();
 
   return (
     <header className="py-8 fixed left-0 w-full top-0 z-50">

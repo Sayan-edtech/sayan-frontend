@@ -4,10 +4,11 @@ import { Badge } from "../ui/badge";
 import { Check, ShoppingCart, Star } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { Button } from "../ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 function CourseCard({ course, href }: { course: Course; href?: string }) {
   const { addToCart, isInCart } = useCart();
-  const courseInCart = isInCart(course.id);
+  const courseInCart = isInCart(Number(course.id));
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation when clicking the button
@@ -52,34 +53,45 @@ function CourseCard({ course, href }: { course: Course; href?: string }) {
               <div className="flex items-center gap-1 text-yellow-500">
                 <Star className="fill-current w-4 h-4" />
                 <span className="text-sm font-medium">
-                  {course.rating.toFixed(1)}
+                  {course.ratings_count.toFixed(1)}
                 </span>
               </div>
             </div>
             <p className="text-sm text-muted-foreground line-clamp-2 mt-6 truncate">
-              {course.description}
+              {course.content}
             </p>
           </div>
 
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <img
-                src={course.instructor.image}
-                alt={course.instructor.name}
+                src={course.trainer.avatar || "/"}
+                alt={course.trainer.fname}
                 loading="lazy"
                 className="w-8 h-8 rounded-full object-cover"
               />
               <span className="text-sm font-medium">
-                {course.instructor.name}
+                {course.trainer.fname}
               </span>
-            </div>
+            </div> */}
+            <Avatar className="w-8 h-8">
+              {course.trainer?.avatar && (
+                <AvatarImage
+                  src={course.trainer.avatar}
+                  alt={course.trainer.fname}
+                />
+              )}
+              <AvatarFallback className="bg-primary text-white">
+                {course.trainer?.fname?.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
             <div className="flex flex-col gap-1 items-center">
               <strong className="text-foreground text-lg">
                 {course.price === 0 ? "مجاناً" : `${course.price} ريال`}
               </strong>
-              {course.insteadOf && (
+              {course.discount_price && (
                 <strong className="text-sm text-[#33333394] line-through decoration-[#FF4747]">
-                  {course.insteadOf} ريال
+                  {course.discount_price} ريال
                 </strong>
               )}
             </div>
