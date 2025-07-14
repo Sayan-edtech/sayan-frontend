@@ -3,10 +3,10 @@ import { coursesApi, type CoursesListResponse } from "../services/coursesApi";
 import { queryKeys } from "@/lib/query-keys";
 
 export const usePublicCourses = ({ filters = {} }) => {
-  // Convert filters object to query string
+  // Convert filters object to query string without encoding commas
   const filtersString = Object.entries(filters)
     .filter(([, value]) => value !== undefined && value !== "")
-    .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
+    .map(([key, value]) => `${key}=${String(value)}`)
     .join("&");
 
   return useQuery<CoursesListResponse>({
@@ -16,3 +16,4 @@ export const usePublicCourses = ({ filters = {} }) => {
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };
+

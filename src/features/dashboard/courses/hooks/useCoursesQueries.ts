@@ -30,7 +30,7 @@ export const useCourse = (id: string) => {
 
 export const useCategories = () => {
   return useQuery<CategoriesListResponse>({
-    queryKey: queryKeys.categories.list(),
+    queryKey: queryKeys.categories.lists(),
     queryFn: () => coursesApi.getCategories(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes

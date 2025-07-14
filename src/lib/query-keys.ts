@@ -45,4 +45,22 @@ export const queryKeys = {
         [...queryKeys.courses.all, "unfavorite", courseId] as const,
     },
   },
+
+  categories: {
+    all: ["categories"] as const,
+    lists: () => [...queryKeys.categories.all, "list"] as const,
+    list: (filters: string) =>
+      [...queryKeys.categories.lists(), filters] as const,
+    details: () => [...queryKeys.categories.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.categories.details(), id] as const,
+
+    // Mutation keys for category operations
+    mutations: {
+      create: () => [...queryKeys.categories.all, "create"] as const,
+      update: (id: string) =>
+        [...queryKeys.categories.all, "update", id] as const,
+      delete: (id: string) =>
+        [...queryKeys.categories.all, "delete", id] as const,
+    },
+  },
 };

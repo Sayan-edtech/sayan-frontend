@@ -2,19 +2,122 @@ import CourseCard from "@/components/shared/CourseCard";
 import Searchbar from "@/components/shared/searchbar";
 import { usePublicCourses } from "../hooks/useCoursesQueries";
 import type { Course } from "@/types/couse";
-
-const filters = {
-  price: ["مجاني", "مدفوع"],
-  type: ["تطوير الويب", "تصميم", "تسويق رقمي", "ذكاء اصطناعي"],
-  category: ["برمجة", "تصميم", "أعمال", "تسويق"],
-};
+import { useCategories } from "@/features/dashboard/courses/hooks/useCoursesQueries";
+import { useState } from "react";
 
 export default function Courses() {
-  const { data: courses, isPending } = usePublicCourses({});
-  if (isPending) {
-    return <div className="text-center">جارٍ تحميل الدورات...</div>;
+  const [
+    selectedCategories,
+    setSelectedCategories,
+  ] = useState<string[]>([]);
+  const [
+    selectedPrices,
+    setSelectedPrices,
+  ] = useState<string[]>([]);
+  const [
+    selectedTypes,
+    setSelectedTypes,
+  ] = useState<string[]>([]);
+
+  // Build filters object
+  const filters: Record<
+    string,
+    string
+  > = {};
+  if (selectedCategories.length > 0) {
+    filters.category =
+      selectedCategories.join(",");
   }
-  console.log("courses", courses);
+  if (selectedPrices.length > 0) {
+    filters.price =
+      selectedPrices.join(",");
+  }
+  if (selectedTypes.length > 0) {
+    filters.type =
+      selectedTypes.join(",");
+  }
+
+  const { data: courses, isPending } =
+    usePublicCourses({
+      filters,
+    });
+  const { data: categories } =
+    useCategories();
+
+  const handleCategoryChange = (
+    categoryId: string,
+    checked: boolean
+  ) => {
+    setSelectedCategories((prev) =>
+      checked
+        ? [...prev, categoryId]
+        : prev.filter(
+            (id) => id !== categoryId
+          )
+    );
+  };
+
+  const handlePriceChange = (
+    priceValue: string,
+    checked: boolean
+  ) => {
+    setSelectedPrices((prev) =>
+      checked
+        ? [...prev, priceValue]
+        : prev.filter(
+            (value) =>
+              value !== priceValue
+          )
+    );
+  };
+
+  const handleTypeChange = (
+    typeValue: string,
+    checked: boolean
+  ) => {
+    setSelectedTypes((prev) =>
+      checked
+        ? [...prev, typeValue]
+        : prev.filter(
+            (value) =>
+              value !== typeValue
+          )
+    );
+  };
+  if (isPending) {
+    return (
+      <div className="text-center">
+        جارٍ تحميل الدورات...
+      </div>
+    );
+  }
+
+  const staticFilters = {
+    price: [
+      {
+        title: "مجاني",
+        value: "free",
+      },
+      {
+        title: "مدفوع",
+        value: "paid",
+      },
+    ],
+    type: [
+      {
+        title: "حضوري",
+        value: "attend",
+      },
+      {
+        title: "مباشر",
+        value: "live",
+      },
+      {
+        title: "تفاعلي",
+        value: "recorded",
+      },
+    ],
+  };
   return (
     <section
       style={{
@@ -33,42 +136,138 @@ export default function Courses() {
         </div>
 
         {/* Content */}
-        <div className="grid lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-4 gap-6">
           {/* Sidebar */}
-          <aside className="bg-card rounded-[20px] p-6 lg:col-span-1 space-y-6">
+          <aside className="bg-card rounded-[20px] p-6 md:col-span-1 space-y-6">
             {/* Category Filter */}
             <div className="space-y-4">
               <h3 className="font-semibold text-lg text-card-foreground">
                 التصنيف
               </h3>
               <div className="space-y-2">
-                {filters.category.map((category) => (
-                  <label key={category} className="flex items-center gap-2">
-                    <input type="checkbox" className="rounded" />
-                    <span className="text-sm">{category}</span>
-                  </label>
-                ))}
+                {categories?.data?.map(
+                  (category) => (
+                    <label
+                      key={category.id}
+                      className="flex items-center gap-2"
+                    >
+                      <input
+                        type="checkbox"
+                        className="rounded"
+                        checked={selectedCategories.includes(
+                          String(
+                            category.id
+                          )
+                        )}
+                        onChange={(e) =>
+                          handleCategoryChange(
+                            String(
+                              category.id
+                            ),
+                            e.target
+                              .checked
+                          )
+                        }
+                      />
+                      <span className="text-sm">
+                        {category.title}
+                      </span>
+                    </label>
+                  )
+                )}
+              </div>
+              <h3 className="font-semibold text-lg text-card-foreground">
+                السعر
+              </h3>
+              <div className="space-y-2">
+                {staticFilters.price.map(
+                  (price) => (
+                    <label
+                      key={price.value}
+                      className="flex items-center gap-2"
+                    >
+                      <input
+                        type="checkbox"
+                        className="rounded"
+                        checked={selectedPrices.includes(
+                          price.value
+                        )}
+                        onChange={(e) =>
+                          handlePriceChange(
+                            price.value,
+                            e.target
+                              .checked
+                          )
+                        }
+                      />
+                      <span className="text-sm">
+                        {price.title}
+                      </span>
+                    </label>
+                  )
+                )}
+              </div>
+              <h3 className="font-semibold text-lg text-card-foreground">
+                النوع
+              </h3>
+              <div className="space-y-2">
+                {staticFilters.type.map(
+                  (type) => (
+                    <label
+                      key={type.value}
+                      className="flex items-center gap-2"
+                    >
+                      <input
+                        type="checkbox"
+                        className="rounded"
+                        checked={selectedTypes.includes(
+                          type.value
+                        )}
+                        onChange={(e) =>
+                          handleTypeChange(
+                            type.value,
+                            e.target
+                              .checked
+                          )
+                        }
+                      />
+                      <span className="text-sm">
+                        {type.title}
+                      </span>
+                    </label>
+                  )
+                )}
               </div>
             </div>
           </aside>
           {!isPending && courses && (
-            <CoursesList courses={courses?.data.courses} />
+            <CoursesList
+              courses={
+                courses?.data.courses
+              }
+            />
           )}
         </div>
       </div>
     </section>
   );
 }
-function CoursesList({ courses }: { courses: Course[] }) {
+function CoursesList({
+  courses,
+}: {
+  courses: Course[];
+}) {
   return (
-    <div className="lg:col-span-3">
+    <div className="md:col-span-3">
       <ul className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {courses.map((course) => (
           <li
             key={course.id}
             className="bg-card hover:shadow-sm transition-colors duration-200 rounded-[20px] p-4"
           >
-            <CourseCard course={course} />
+            <CourseCard
+              course={course}
+            />
           </li>
         ))}
       </ul>

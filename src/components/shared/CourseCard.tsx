@@ -5,6 +5,7 @@ import { Check, ShoppingCart, Star } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import RemoteImage from "./RemoteImage";
 
 function CourseCard({ course, href }: { course: Course; href?: string }) {
   const { addToCart, isInCart } = useCart();
@@ -24,7 +25,7 @@ function CourseCard({ course, href }: { course: Course; href?: string }) {
       >
         {/* Course Image */}
         <div className="aspect-video relative">
-          <img
+          <RemoteImage
             src={course.image}
             alt={course.title}
             loading="lazy"
@@ -63,17 +64,6 @@ function CourseCard({ course, href }: { course: Course; href?: string }) {
           </div>
 
           <div className="flex justify-between items-center h-16">
-            {/* <div className="flex items-center gap-2">
-              <img
-                src={course.trainer.avatar || "/"}
-                alt={course.trainer.fname}
-                loading="lazy"
-                className="w-8 h-8 rounded-full object-cover"
-              />
-              <span className="text-sm font-medium">
-                {course.trainer.fname}
-              </span>
-            </div> */}
             <Avatar className="w-8 h-8">
               {course.trainer?.avatar && (
                 <AvatarImage
