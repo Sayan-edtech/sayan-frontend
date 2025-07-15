@@ -40,14 +40,14 @@ function StatCard({ title, value, icon, change, changeType }: StatCardProps) {
 function CourseStats({ courses }: CourseStatsProps) {
   const totalCourses = courses.length;
   const totalStudents = courses.reduce(
-    (sum, course) => sum + (course.students || 0),
+    (sum, course) => sum + (course.students_count || 0),
     0
   );
-  const averageRating =
-    courses.reduce((sum, course) => sum + (course.rating || 0), 0) /
-    courses.length;
+  const averageRating = courses.length > 0 
+    ? courses.reduce((sum, course) => sum + (course.avg_rating || 0), 0) / courses.length
+    : 0;
   const totalRevenue = courses.reduce(
-    (sum, course) => sum + course.price * (course.students || 0),
+    (sum, course) => sum + (course.price || 0) * (course.students_count || 0),
     0
   );
 

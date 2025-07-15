@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Controller } from "react-hook-form";
-import OtpInput from "react-otp-input";
 import { Label } from "@/components/ui/label";
 import type { Control, FieldErrors } from "react-hook-form";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
@@ -18,6 +17,61 @@ interface OtpFieldProps {
   numInputs?: number;
   autoFocus?: boolean;
 }
+
+// Simple OTP Input Component
+const SimpleOtpInput: React.FC<{
+  value: string;
+  onChange: (value: string) => void;
+  numInputs: number;
+  autoFocus: boolean;
+  disabled: boolean;
+}> = ({ value, onChange, numInputs, autoFocus, disabled }) => {
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  
+  const handleChange = (index: number, newValue: string) => {
+    if (newValue.length > 1) {
+      newValue = newValue.slice(-1);
+    }
+    
+    const newOtp = value.split('');
+    newOtp[index] = newValue;
+    const updatedOtp = newOtp.join('');
+    
+    onChange(updatedOtp);
+    
+    // Move to next input if value is entered
+    if (newValue && index < numInputs - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+  
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !value[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+  
+  return (
+    <div className="flex gap-2 justify-center">
+      {Array.from({ length: numInputs }).map((_, index) => (
+        <input
+          key={index}
+          ref={(el) => {
+            inputRefs.current[index] = el;
+          }}
+          type="text"
+          maxLength={1}
+          value={value[index] || ''}
+          onChange={(e) => handleChange(index, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(index, e)}
+          disabled={disabled}
+          autoFocus={autoFocus && index === 0}
+          className="w-12 h-12 text-center border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg font-semibold"
+        />
+      ))}
+    </div>
+  );
+};
 
 const OtpField: React.FC<OtpFieldProps> = ({
   name,
@@ -44,9 +98,9 @@ const OtpField: React.FC<OtpFieldProps> = ({
         name={name}
         control={control}
         render={({ field: { onChange, value } }) => (
-          <OtpInput
+          <SimpleOtpInput
             value={value || ""}
-            onChange={async (otp) => {
+            onChange={async (otp: string) => {
               onChange(otp);
 
               // Only send request when all inputs are filled with valid numbers
@@ -68,40 +122,8 @@ const OtpField: React.FC<OtpFieldProps> = ({
               }
             }}
             numInputs={numInputs}
-            shouldAutoFocus
-            inputType="number"
-            renderInput={(props) => (
-              <input
-                {...props}
-                disabled={disabled}
-                autoFocus={autoFocus}
-                className={`
-                  w-12 h-12 text-center text-lg font-semibold
-                  border-2 rounded-lg
-                  focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
-                  transition-colors duration-200
-                  [&::-webkit-outer-spin-button]:appearance-none
-                  [&::-webkit-inner-spin-button]:appearance-none
-                  [-moz-appearance:textfield]
-                  ${
-                    error
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 hover:border-gray-400"
-                  }
-                  ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
-                `}
-                style={{
-                  WebkitAppearance: "none",
-                  MozAppearance: "textfield",
-                }}
-              />
-            )}
-            containerStyle={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "8px",
-              direction: "ltr",
-            }}
+            autoFocus={autoFocus}
+            disabled={disabled}
           />
         )}
       />

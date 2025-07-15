@@ -29,7 +29,7 @@ function CourseCard({ course, href }: { course: Course; href?: string }) {
             src={course.image}
             alt={course.title}
             loading="lazy"
-            className="w-full h-[180px] object-cover rounded-[20px]"
+            className="w-full h-[180px] object-contain bg-gray-50 rounded-[20px]"
           />
         </div>
 
@@ -54,7 +54,7 @@ function CourseCard({ course, href }: { course: Course; href?: string }) {
               <div className="flex items-center gap-1 text-yellow-500">
                 <Star className="fill-current w-4 h-4" />
                 <span className="text-sm font-medium">
-                  {course.ratings_count.toFixed(1)}
+                  {course.ratings_count ? course.ratings_count.toFixed(1) : '0.0'}
                 </span>
               </div>
             </div>
@@ -77,7 +77,7 @@ function CourseCard({ course, href }: { course: Course; href?: string }) {
             </Avatar>
             <div className="flex flex-col gap-1 items-center">
               <strong className="text-foreground text-lg">
-                {course.price === 0 ? "مجاناً" : `${course.price} ريال`}
+                {!course.price || course.price === 0 ? "مجاناً" : `${course.price} ريال`}
               </strong>
               {course.discount_price && (
                 <strong className="text-sm text-[#33333394] line-through decoration-[#FF4747]">
@@ -89,7 +89,7 @@ function CourseCard({ course, href }: { course: Course; href?: string }) {
         </div>
       </Link>
       {/* Add to Cart Button */}
-      {course.price === 0 ? (
+      {!course.price || course.price === 0 ? (
         <Button variant="secondary" className="w-full">
           مشاهدة الدورة
         </Button>

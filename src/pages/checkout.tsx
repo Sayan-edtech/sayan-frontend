@@ -76,19 +76,19 @@ function CheckoutPage() {
                     <img
                       src={item.course.image}
                       alt={item.course.title}
-                      className="w-16 h-16 object-cover rounded-md"
+                      className="w-16 h-16 object-contain bg-gray-50 rounded-md"
                     />
                     <div className="flex-1">
                       <h4 className="font-medium line-clamp-2">
                         {item.course.title}
                       </h4>
                       <p className="text-sm text-muted-foreground">
-                        المحاضر: {item.course.instructor.name}
+                        المحاضر: {item.course.trainer ? `${item.course.trainer.fname} ${item.course.trainer.lname}` : 'غير محدد'}
                       </p>
                       <div className="flex justify-between items-center mt-2">
                         <span className="text-sm">الكمية: {item.quantity}</span>
                         <span className="font-semibold">
-                          {formatPrice(item.course.price * item.quantity)}
+                          {formatPrice((item.course.price || 0) * item.quantity)}
                         </span>
                       </div>
                     </div>

@@ -128,9 +128,9 @@ const CourseForm = ({ course }: { course?: Course }) => {
       ? {
           title: course.title,
           category: String(course.category.id),
-          instructor: course.trainer.fname,
+          instructor: course.trainer ? course.trainer.fname : '',
           level: course.level,
-          price: course.price,
+          price: course.price || 0,
           discountPrice: course.discount_price || 0,
           description: course.content,
           shortContent: course.short_content,
@@ -314,17 +314,18 @@ const CourseForm = ({ course }: { course?: Course }) => {
                       <label className="text-sm font-medium text-foreground">
                         صورة المادة التعليمية
                       </label>
-                      <div className="relative group">
+                      <div className="relative group overflow-hidden rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all duration-300">
                         <img
                           src={`${origin}${course.image}`}
                           alt="صورة المادة التعليمية"
-                          className="w-full h-48 object-cover rounded-lg border transition-all group-hover:brightness-75"
+                          className="w-full h-64 object-contain bg-gray-50 transition-transform duration-300 group-hover:scale-105"
                         />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
                         <Button
                           type="button"
                           size="sm"
                           variant="secondary"
-                          className="absolute top-2 right-2 bg-white/90 hover:bg-white shadow-sm"
+                          className="absolute top-3 right-3 bg-white/95 hover:bg-white shadow-lg backdrop-blur-sm border border-gray-200"
                           onClick={() => setShowImageChangeForm(true)}
                         >
                           <Edit className="w-4 h-4 mr-1" />
@@ -374,20 +375,22 @@ const CourseForm = ({ course }: { course?: Course }) => {
                       <label className="text-sm font-medium text-foreground">
                         فيديو تعريفي للمادة
                       </label>
-                      <div className="relative group">
+                      <div className="relative group overflow-hidden rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all duration-300">
                         <video
                           src={`${origin}${course.preview_video}`}
-                          className="w-full h-48 object-cover rounded-lg border"
+                          className="w-full h-64 object-contain bg-gray-50 rounded-lg"
                           controls
                           preload="metadata"
+                          poster=""
                         >
                           المتصفح لا يدعم تشغيل الفيديو
                         </video>
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300 pointer-events-none" />
                         <Button
                           type="button"
                           size="sm"
                           variant="secondary"
-                          className="absolute top-2 right-2 bg-white/90 hover:bg-white shadow-sm"
+                          className="absolute top-3 right-3 bg-white/95 hover:bg-white shadow-lg backdrop-blur-sm border border-gray-200"
                           onClick={() => setShowVideoChangeForm(true)}
                         >
                           <Edit className="w-4 h-4 mr-1" />
@@ -631,7 +634,7 @@ const CourseForm = ({ course }: { course?: Course }) => {
                     variant={course ? "outline" : "default"}
                     className="flex items-center gap-2"
                   >
-                    {course ? "حفظ الدورة" : "إنشاء الدورة"}
+                    {course ? "حفظ الدورة كمسودة" : "إنشاء الدورة"}
                     {formLoading && <Loader />}
                   </Button>
                   <Button type="button">نشر الدورة</Button>

@@ -87,14 +87,14 @@ function ShoppingCart() {
                     <img
                       src={item.course.image}
                       alt={item.course.title}
-                      className="w-16 h-16 object-cover rounded-md flex-shrink-0"
+                      className="w-16 h-16 object-contain bg-gray-50 rounded-md flex-shrink-0"
                     />
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-sm line-clamp-2 mb-1">
                         {item.course.title}
                       </h4>
                       <p className="text-xs text-muted-foreground mb-2">
-                        المحاضر: {item.course.instructor.name}
+                        المحاضر: {item.course.trainer ? `${item.course.trainer.fname} ${item.course.trainer.lname}` : 'غير محدد'}
                       </p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ function ShoppingCart() {
                             className="h-6 w-6"
                             onClick={() =>
                               handleQuantityChange(
-                                item.course.id,
+                                Number(item.course.id),
                                 item.quantity - 1
                               )
                             }
@@ -120,7 +120,7 @@ function ShoppingCart() {
                             className="h-6 w-6"
                             onClick={() =>
                               handleQuantityChange(
-                                item.course.id,
+                                Number(item.course.id),
                                 item.quantity + 1
                               )
                             }
@@ -130,13 +130,13 @@ function ShoppingCart() {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-sm">
-                            {formatCurrency(item.course.price * item.quantity)}
+                            {formatCurrency((item.course.price || 0) * item.quantity)}
                           </span>
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 text-destructive hover:text-destructive"
-                            onClick={() => removeItem(item.course.id)}
+                            onClick={() => removeItem(Number(item.course.id))}
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>
