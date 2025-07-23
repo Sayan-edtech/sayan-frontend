@@ -2,47 +2,31 @@ import { useState } from "react";
 import Header from "./Header";
 import LessonPreview from "./LessonPreview";
 import LessonSidebar from "./LessonSidebar";
-import LessonDetailsSidebar from "./LessonDetailsSidebar";
+import type { Lesson, Section } from "@/types/couse";
+import { useSections } from "../../hooks/useSectionsQueries";
+import { useParams } from "react-router-dom";
+import Manage from "./Manage";
 
+export type SelectedItem = {
+  lesson?: Lesson;
+  section?: Section;
+};
 function CourseContent() {
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-
-  const handleItemSelect = (item: any) => {
-    setSelectedItem(item);
-  };
-
-  const handleEdit = (id: number, data: any) => {
-    console.log('Edit item:', id, data);
-    // Handle edit logic here
-  };
-
-  const handleDelete = (id: number) => {
-    console.log('Delete item:', id);
-    // Handle delete logic here
-  };
-
-  const handlePublishToggle = (id: number, isPublished: boolean) => {
-    console.log('Toggle publish:', id, isPublished);
-    // Handle publish toggle logic here
-  };
-
+  const { courseId } = useParams();
+  const { data: sections } = useSections(courseId as string);
+  const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
   return (
     <div className="space-y-6">
-      <Header selectedLesson={selectedItem} />
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-1">
-          <LessonSidebar onItemSelect={handleItemSelect} />
-        </div>
-        <div className="lg:col-span-2">
-          <LessonPreview selectedLesson={selectedItem} />
-        </div>
-        <div className="lg:col-span-1">
-          <LessonDetailsSidebar
-            selectedItem={selectedItem}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onPublishToggle={handlePublishToggle}
-          />
+      <Header selectedItem={selectedItem} />
+      <div className="flex gap-4">
+        <LessonSidebar
+          setSelectedItem={setSelectedItem}
+          selectedItem={selectedItem}
+          sections={sections?.data.items || []}
+        />
+        <div className="flex-1 space-y-6 flex">
+          <LessonPreview selectedItem={selectedItem} />
+          <Manage selectedItem={selectedItem} />
         </div>
       </div>
     </div>

@@ -16,4 +16,3 @@ export const usePublicCourses = ({ filters = {} }) => {
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };
-

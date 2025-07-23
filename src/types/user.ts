@@ -29,7 +29,12 @@ export type User = {
   academy_memberships?: AcademyMembership[];
 };
 
-export type AuthResponse = {
+type UserWithTokens = {
+  user_data: User;
+  access_token: string;
+  refresh_token: string;
+};
+export type AuthResponse = UserWithTokens & {
   status_code: number;
   message: string;
   data: {

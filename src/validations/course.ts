@@ -99,3 +99,23 @@ export const courseSchema = z.object({
 });
 
 export type ICourseForm = z.infer<typeof courseSchema>;
+export const sectionSchema = z.object({
+  title: z
+    .string()
+    .min(1, { message: "عنوان الفصل مطلوب" })
+    .max(100, { message: "عنوان الفصل يجب أن يكون أقل من 100 حرف" }),
+});
+
+export type SectionFormData = z.infer<typeof sectionSchema>;
+
+export const lessonSchema = z.object({
+  title: z
+    .string()
+    .min(1, { message: "عنوان الدرس مطلوب" })
+    .max(100, { message: "عنوان الدرس يجب أن يكون أقل من 100 حرف" }),
+  type: z.enum(["video", "text", "exam", "tool"], {
+    message: "نوع الدرس مطلوب ويجب أن يكون فيديو، نص، امتحان أو أداة",
+  }),
+});
+
+export type LessonFormData = z.infer<typeof lessonSchema>;

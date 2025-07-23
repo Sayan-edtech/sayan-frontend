@@ -46,6 +46,22 @@ export const queryKeys = {
     },
   },
 
+  tools: {
+    all: ["tools"] as const,
+    lists: () => [...queryKeys.tools.all, "list"] as const,
+    list: (filters: string) => [...queryKeys.tools.lists(), filters] as const,
+    details: () => [...queryKeys.tools.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.tools.details(), id] as const,
+    bySection: (sectionId: string) =>
+      [...queryKeys.tools.all, "section", sectionId] as const,
+
+    // Mutation keys for tool operations
+    mutations: {
+      create: () => [...queryKeys.tools.all, "create"] as const,
+      update: (id: string) => [...queryKeys.tools.all, "update", id] as const,
+      delete: (id: string) => [...queryKeys.tools.all, "delete", id] as const,
+    },
+  },
   categories: {
     all: ["categories"] as const,
     lists: () => [...queryKeys.categories.all, "list"] as const,
@@ -62,5 +78,48 @@ export const queryKeys = {
       delete: (id: string) =>
         [...queryKeys.categories.all, "delete", id] as const,
     },
+  },
+
+  sections: {
+    all: ["sections"] as const,
+    lists: () => [...queryKeys.sections.all, "list"] as const,
+    list: (filters: string) =>
+      [...queryKeys.sections.lists(), filters] as const,
+    details: () => [...queryKeys.sections.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.sections.details(), id] as const,
+    byCourse: (courseId: string) =>
+      [...queryKeys.sections.all, "course", courseId] as const,
+
+    // Mutation keys for section operations
+    mutations: {
+      create: () => [...queryKeys.sections.all, "create"] as const,
+      update: (id: string) =>
+        [...queryKeys.sections.all, "update", id] as const,
+      delete: (id: string) =>
+        [...queryKeys.sections.all, "delete", id] as const,
+    },
+  },
+
+  lessons: {
+    all: ["lessons"] as const,
+    lists: () => [...queryKeys.lessons.all, "list"] as const,
+    list: (filters: string) => [...queryKeys.lessons.lists(), filters] as const,
+    details: () => [...queryKeys.lessons.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.lessons.details(), id] as const,
+    bySection: (sectionId: string) =>
+      [...queryKeys.lessons.all, "section", sectionId] as const,
+    byCourse: (courseId: string) =>
+      [...queryKeys.lessons.all, "course", courseId] as const,
+
+    // Mutation keys for lesson operations
+    mutations: {
+      create: () => [...queryKeys.lessons.all, "create"] as const,
+      update: (id: string) => [...queryKeys.lessons.all, "update", id] as const,
+      delete: (id: string) => [...queryKeys.lessons.all, "delete", id] as const,
+      reorder: (sectionId: string) =>
+        [...queryKeys.lessons.all, "reorder", sectionId] as const,
+    },
+    video: (lessonId: string) =>
+      [...queryKeys.lessons.all, "video", lessonId] as const,
   },
 };

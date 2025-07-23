@@ -20,7 +20,7 @@ interface AuthState {
   // Actions
   setUser: (user: User | null) => void;
   setLoading: (loading: boolean) => void;
-  login: (credentials: LoginRequest) => Promise<void>;
+  login: (credentials: LoginRequest) => Promise<AuthResponse>;
   signup: (userData: SignupRequest) => Promise<AuthResponse>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -77,20 +77,21 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     set(() => ({ isLoading: true }));
 
     try {
-      const response = await authService.login(credentials);
+      const data = await authService.login(credentials);
 
       set(() => ({
-        user: response.data.user_data,
+        user: data.user_data,
         isAuthenticated: true,
         isLoading: false,
       }));
 
       // Store in cookies
       authCookies.setAuthData(
-        response.data.access_token,
-        response.data.refresh_token,
-        response.data.user_data
+        data.access_token,
+        data.refresh_token,
+        data.user_data
       );
+      return data;
     } catch (error) {
       set(() => ({ isLoading: false }));
       throw error;

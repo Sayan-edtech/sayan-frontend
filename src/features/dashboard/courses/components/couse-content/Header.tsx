@@ -1,12 +1,11 @@
+import type { SelectedItem } from ".";
+
 interface HeaderProps {
-  selectedLesson?: any;
+  selectedItem: SelectedItem | null;
 }
 
-const Header = ({ selectedLesson }: HeaderProps) => {
+const Header = ({ selectedItem }: HeaderProps) => {
   const getTitle = () => {
-    if (selectedLesson) {
-      return selectedLesson.title;
-    }
     return "درس HTML الأساسي";
   };
 
@@ -24,11 +23,17 @@ const Header = ({ selectedLesson }: HeaderProps) => {
         <div className="flex items-center gap-3">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           <div className="flex items-center gap-3 text-gray-600">
-            <span className="text-lg font-semibold text-gray-800">{getCourseTitle()}</span>
-            <span className="text-gray-400 text-lg">{'>'}</span>
-            <span className="text-lg font-semibold text-gray-800">{getSectionTitle()}</span>
-            <span className="text-gray-400 text-lg">{'>'}</span>
-            <span className="text-lg font-semibold text-blue-600">{getTitle()}</span>
+            <span className="text-lg font-semibold text-gray-800">
+              {getCourseTitle()}
+            </span>
+            <span className="text-gray-400 text-lg">{">"}</span>
+            <span className="text-lg font-semibold text-gray-800">
+              {getSectionTitle()}
+            </span>
+            <span className="text-gray-400 text-lg">{">"}</span>
+            <span className="text-lg font-semibold text-blue-600">
+              {getTitle()}
+            </span>
           </div>
         </div>
       </div>

@@ -51,3 +51,56 @@ export interface Course {
   discount_price: number | null;
   discount_ends_at: string | null; // or Date if parsed
 }
+
+export interface Section {
+  title: string;
+  description: string | null;
+  order_number: number;
+  is_published: boolean;
+  id: number;
+  course_id: string;
+  lessons_count: number;
+  total_duration_seconds: number;
+  is_accessible: boolean;
+  created_at: string;
+  updated_at: string;
+  lessons: Lesson[];
+
+  statistics: {
+    total_lessons: number;
+    video_lessons: number;
+    text_lessons: number;
+    exam_lessons: number;
+    free_preview_lessons: number;
+    tool_lessons: number;
+    total_duration_hours: number;
+    total_duration_minutes: number;
+    total_size_mb: number;
+  };
+}
+
+export interface Lesson {
+  id: string;
+  section_id: string;
+  title: string;
+  type: "video" | "exam" | "tool";
+  content?: string;
+  video_id?: string;
+  duration?: number;
+  order: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+  direct_video_url?: string;
+}
+export interface Tool {
+  id: string;
+  title: string;
+  description: string;
+  tool_type: string;
+  color: string;
+  image: string;
+  content: string;
+  order_number: number;
+  created_at: string;
+}

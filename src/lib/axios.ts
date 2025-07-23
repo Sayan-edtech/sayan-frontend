@@ -50,14 +50,13 @@ api.interceptors.response.use(
             }
           );
 
-          const { access_token, refresh_token: newRefreshToken } =
-            response.data;
+          const { data } = response.data;
 
           // Update tokens in cookies
-          authCookies.setTokens(access_token, newRefreshToken);
+          authCookies.setTokens(data.access_token, data.newRefreshToken);
 
           // Update the original request with new token
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+          originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
 
           // Retry the original request
           return api(originalRequest);

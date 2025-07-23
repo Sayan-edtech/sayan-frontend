@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Edit, 
-  Trash2, 
-  Play, 
-  FileText, 
+import {
+  Edit,
+  Trash2,
+  Play,
+  FileText,
   Settings,
   Eye,
   Upload,
@@ -14,7 +14,7 @@ import {
   Code,
   CreditCard,
   Plus,
-  X
+  X,
 } from "lucide-react";
 import {
   Dialog,
@@ -29,13 +29,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  useDeleteSection,
+  useUpdateSection,
+  type SectionUpdatePayload,
+} from "../../hooks/useSectionsMutations";
+import { Loader } from "@/components/shared";
 
 // Simple Toggle Component
-function Toggle({ 
-  checked, 
-  onCheckedChange 
-}: { 
-  checked: boolean; 
+function Toggle({
+  checked,
+  onCheckedChange,
+}: {
+  checked: boolean;
   onCheckedChange: (checked: boolean) => void;
 }) {
   return (
@@ -46,79 +52,72 @@ function Toggle({
       onClick={() => onCheckedChange(!checked)}
       className={`
         relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-        ${checked ? 'bg-blue-600' : 'bg-gray-200'}
+        ${checked ? "bg-blue-600" : "bg-gray-200"}
       `}
     >
       <span
         className={`
           inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-          ${checked ? 'translate-x-6' : 'translate-x-1'}
+          ${checked ? "translate-x-6" : "translate-x-1"}
         `}
       />
     </button>
   );
 }
 
-interface LessonDetailsSidebarProps {
-  selectedItem: {
-    id: number;
-    title: string;
-    type: 'lesson' | 'section';
-    duration?: string;
-    description?: string;
-    isPublished?: boolean;
-    videoUrl?: string;
-    lessonType?: string;
-    toolType?: string;
-    content?: string;
-    questions?: any[];
-    cards?: any[];
-    resources?: Array<{
-      id: number;
-      name: string;
-      type: string;
-      size: string;
-      url: string;
-    }>;
-  } | null;
-  onEdit: (id: number, data: any) => void;
-  onDelete: (id: number) => void;
-  onPublishToggle: (id: number, isPublished: boolean) => void;
-}
+function LessonDetailsSidebar({
+  selectedSection,
+}: {
+  selectedSection: Seleced;
+}) {
+  const { mutateAsync: deleteSection, isPending: isDeleteSectionPending } =
+    useDeleteSection();
+  const { mutateAsync: updateSection, isPending: isUpdateSectionPending } =
+    useUpdateSection();
+  const [sectionData, setSectionData] = useState<SectionUpdatePayload>({});
 
-function LessonDetailsSidebar({ 
-  selectedItem, 
-  onEdit, 
-  onDelete, 
-  onPublishToggle 
-}: LessonDetailsSidebarProps) {
-  
+  useEffect(() => {
+    setSectionData((prev) => ({
+      ...prev,
+      title: selectedSection?.title || "",
+    }));
+  }, [selectedSection?.title]);
   // Handle video upload with file size validation
   const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    
+
     // Check file size (512MB = 512 * 1024 * 1024 bytes)
     const maxSize = 512 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert('حجم الملف يتجاوز الحد الأقصى المسموح (512 ميجا)');
-      event.target.value = '';
+      alert("حجم الملف يتجاوز الحد الأقصى المسموح (512 ميجا)");
+      event.target.value = "";
       return;
     }
-    
+
     // Check file type
-    if (!file.type.startsWith('video/')) {
-      alert('يرجى اختيار ملف فيديو صالح');
-      event.target.value = '';
+    if (!file.type.startsWith("video/")) {
+      alert("يرجى اختيار ملف فيديو صالح");
+      event.target.value = "";
       return;
     }
-    
+
     // Handle file upload logic here
-    console.log('Uploading video file:', file);
+    console.log("Uploading video file:", file);
     // You can add your upload logic here
   };
-
-  if (!selectedItem) {
+  const onPublishToggle: (id: number, isPublished: boolean) => void = () => {};
+  const onEdit: (id: numer, data: any) => void = () => {};
+  const onDelete = async () => {
+    try {
+      if (selectedSection && selectedSection.type === "section") {
+        await deleteSection(String(selectedSection.id));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  if (!selectedSection) {
     return (
       <Card className="p-6 shadow-sm border-0 h-fit">
         <div className="text-center text-gray-500 py-8">
@@ -130,26 +129,26 @@ function LessonDetailsSidebar({
     );
   }
 
-  const isLesson = selectedItem.type === 'lesson';
+  const isLesson = selectedSection.type === "lesson";
 
   // دالة لتحديد الأيقونة المناسبة
   const getIcon = () => {
     if (!isLesson) return null;
-    
+
     const iconClass = "w-4 h-4 text-blue-400";
-    
-    switch (selectedItem.lessonType) {
-      case 'video':
+
+    switch (selectedSection.lessonType) {
+      case "video":
         return <Play className={iconClass} />;
-      case 'quiz':
+      case "quiz":
         return <FileQuestion className={iconClass} />;
-      case 'text':
+      case "text":
         return <FileText className={iconClass} />;
-      case 'interactive':
-        if (selectedItem.toolType === 'flashcards') {
+      case "interactive":
+        if (selectedSection.toolType === "flashcards") {
           return <CreditCard className={iconClass} />;
         }
-        if (selectedItem.toolType === 'html-editor') {
+        if (selectedSection.toolType === "html-editor") {
           return <Code className={iconClass} />;
         }
         return <Code className={iconClass} />;
@@ -160,38 +159,47 @@ function LessonDetailsSidebar({
 
   // دالة لتحديد النص المناسب للمدة/العدد
   const getDurationText = () => {
-    if (!selectedItem.duration) return null;
-    
-    switch (selectedItem.lessonType) {
-      case 'quiz':
-        return `${selectedItem.questions?.length || 0} سؤال`;
-      case 'interactive':
-        if (selectedItem.toolType === 'flashcards') {
-          return `${selectedItem.cards?.length || 0} بطاقة`;
+    if (!selectedSection.duration) return null;
+
+    switch (selectedSection.lessonType) {
+      case "quiz":
+        return `${selectedSection.questions?.length || 0} سؤال`;
+      case "interactive":
+        if (selectedSection.toolType === "flashcards") {
+          return `${selectedSection.cards?.length || 0} بطاقة`;
         }
-        return selectedItem.duration;
+        return selectedSection.duration;
       default:
-        return selectedItem.duration;
+        return selectedSection.duration;
     }
   };
 
   // للاختبارات - واجهة مخصصة
-  if (isLesson && selectedItem.lessonType === 'quiz') {
+  if (isLesson && selectedSection.lessonType === "quiz") {
     return (
       <Card className="p-6 shadow-sm border-0 h-fit">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center gap-2 mb-4">
             <FileQuestion className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-800">{selectedItem.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {selectedSection.title}
+            </h3>
           </div>
 
           {/* Edit Title */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">عنوان الاختبار</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              عنوان الاختبار
+            </Label>
             <Input
-              value={selectedItem.title}
-              onChange={(e) => onEdit(selectedItem.id, { ...selectedItem, title: e.target.value })}
+              value={selectedSection.title}
+              onChange={(e) =>
+                onEdit(selectedSection.id, {
+                  ...selectedSection,
+                  title: e.target.value,
+                })
+              }
               placeholder="أدخل عنوان الاختبار"
               className="border-gray-200 focus:border-blue-500"
             />
@@ -201,25 +209,33 @@ function LessonDetailsSidebar({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-sm font-medium text-gray-700">الأسئلة</Label>
+                <Label className="text-sm font-medium text-gray-700">
+                  الأسئلة
+                </Label>
                 <p className="text-xs text-gray-500">
-                  {selectedItem.questions?.length || 0} سؤال
+                  {selectedSection.questions?.length || 0} سؤال
                 </p>
               </div>
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 className="bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={(e) => {
                   e.preventDefault();
                   // Add new question logic
                   const newQuestion = {
                     id: Date.now(),
-                    question: '',
-                    options: ['', '', '', ''],
-                    correctAnswer: 0
+                    question: "",
+                    options: ["", "", "", ""],
+                    correctAnswer: 0,
                   };
-                  const updatedQuestions = [...(selectedItem.questions || []), newQuestion];
-                  onEdit(selectedItem.id, { ...selectedItem, questions: updatedQuestions });
+                  const updatedQuestions = [
+                    ...(selectedSection.questions || []),
+                    newQuestion,
+                  ];
+                  onEdit(selectedSection.id, {
+                    ...selectedSection,
+                    questions: updatedQuestions,
+                  });
                 }}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -229,42 +245,61 @@ function LessonDetailsSidebar({
 
             {/* Questions List */}
             <div className="space-y-3">
-              {selectedItem.questions?.map((question: any, index: number) => (
-                <QuestionEditor
-                  key={question.id}
-                  question={question}
-                  index={index}
-                  onUpdate={(updatedQuestion: any) => {
-                    const updatedQuestions = (selectedItem.questions || []).map((q: any) => 
-                      q.id === question.id ? updatedQuestion : q
-                    );
-                    onEdit(selectedItem.id, { ...selectedItem, questions: updatedQuestions });
-                  }}
-                  onDelete={() => {
-                    const updatedQuestions = (selectedItem.questions || []).filter((q: any) => q.id !== question.id);
-                    onEdit(selectedItem.id, { ...selectedItem, questions: updatedQuestions });
-                  }}
-                />
-              ))}
-              
-              {(!selectedItem.questions || selectedItem.questions.length === 0) && (
+              {selectedSection.questions?.map(
+                (question: any, index: number) => (
+                  <QuestionEditor
+                    key={question.id}
+                    question={question}
+                    index={index}
+                    onUpdate={(updatedQuestion: any) => {
+                      const updatedQuestions = (
+                        selectedSection.questions || []
+                      ).map((q: any) =>
+                        q.id === question.id ? updatedQuestion : q
+                      );
+                      onEdit(selectedSection.id, {
+                        ...selectedSection,
+                        questions: updatedQuestions,
+                      });
+                    }}
+                    onDelete={() => {
+                      const updatedQuestions = (
+                        selectedSection.questions || []
+                      ).filter((q: any) => q.id !== question.id);
+                      onEdit(selectedSection.id, {
+                        ...selectedSection,
+                        questions: updatedQuestions,
+                      });
+                    }}
+                  />
+                )
+              )}
+
+              {(!selectedSection.questions ||
+                selectedSection.questions.length === 0) && (
                 <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
                   <FileQuestion className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                   <p className="text-lg font-medium mb-2">لا توجد أسئلة بعد</p>
                   <p className="text-sm mb-4">ابدأ بإنشاء سؤالك الأول</p>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                     onClick={(e) => {
                       e.preventDefault();
                       const newQuestion = {
                         id: Date.now(),
-                        question: '',
-                        options: ['', '', '', ''],
-                        correctAnswer: 0
+                        question: "",
+                        options: ["", "", "", ""],
+                        correctAnswer: 0,
                       };
-                      const updatedQuestions = [...(selectedItem.questions || []), newQuestion];
-                      onEdit(selectedItem.id, { ...selectedItem, questions: updatedQuestions });
+                      const updatedQuestions = [
+                        ...(selectedSection.questions || []),
+                        newQuestion,
+                      ];
+                      onEdit(selectedSection.id, {
+                        ...selectedSection,
+                        questions: updatedQuestions,
+                      });
                     }}
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -278,18 +313,19 @@ function LessonDetailsSidebar({
           {/* Action Buttons */}
           <div className="pt-4 border-t">
             <div className="flex gap-3">
-              <Button 
+              <Button
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={(e) => {
                   e.preventDefault();
-                  console.log('Saving quiz:', selectedItem);
+                  console.log("Saving quiz:", selectedSection);
                 }}
               >
                 حفظ التغييرات
               </Button>
-              
+
               <DeleteItemDialog
-                item={selectedItem}
+                isPending={isDeleteSectionPending}
+                item={selectedSection}
                 onDelete={onDelete}
               />
             </div>
@@ -300,22 +336,35 @@ function LessonDetailsSidebar({
   }
 
   // للبطاقات التفاعلية - واجهة مخصصة
-  if (isLesson && selectedItem.lessonType === 'interactive' && selectedItem.toolType === 'flashcards') {
+  if (
+    isLesson &&
+    selectedSection.lessonType === "interactive" &&
+    selectedSection.toolType === "flashcards"
+  ) {
     return (
       <Card className="p-6 shadow-sm border-0 h-fit">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center gap-2 mb-4">
             <CreditCard className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-800">{selectedItem.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {selectedSection.title}
+            </h3>
           </div>
 
           {/* Edit Title */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">عنوان الدرس</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              عنوان الدرس
+            </Label>
             <Input
-              value={selectedItem.title}
-              onChange={(e) => onEdit(selectedItem.id, { ...selectedItem, title: e.target.value })}
+              value={selectedSection.title}
+              onChange={(e) =>
+                onEdit(selectedSection.id, {
+                  ...selectedSection,
+                  title: e.target.value,
+                })
+              }
               placeholder="أدخل عنوان الدرس"
               className="border-gray-200 focus:border-blue-500"
             />
@@ -325,26 +374,34 @@ function LessonDetailsSidebar({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-sm font-medium text-gray-700">البطاقات التفاعلية</Label>
+                <Label className="text-sm font-medium text-gray-700">
+                  البطاقات التفاعلية
+                </Label>
                 <p className="text-xs text-gray-500">
-                  {selectedItem.cards?.length || 0} بطاقة
+                  {selectedSection.cards?.length || 0} بطاقة
                 </p>
               </div>
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 className="bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={(e) => {
                   e.preventDefault();
                   // Add new card logic
                   const newCard = {
                     id: Date.now(),
-                    title: '',
-                    content: '',
-                    color: '#3B82F6',
-                    image: null
+                    title: "",
+                    content: "",
+                    color: "#3B82F6",
+                    image: null,
                   };
-                  const updatedCards = [...(selectedItem.cards || []), newCard];
-                  onEdit(selectedItem.id, { ...selectedItem, cards: updatedCards });
+                  const updatedCards = [
+                    ...(selectedSection.cards || []),
+                    newCard,
+                  ];
+                  onEdit(selectedSection.id, {
+                    ...selectedSection,
+                    cards: updatedCards,
+                  });
                 }}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -354,43 +411,58 @@ function LessonDetailsSidebar({
 
             {/* Cards List */}
             <div className="space-y-3">
-              {selectedItem.cards?.map((card: any, index: number) => (
+              {selectedSection.cards?.map((card: any, index: number) => (
                 <FlashcardEditor
                   key={card.id}
                   card={card}
                   index={index}
                   onUpdate={(updatedCard: any) => {
-                    const updatedCards = (selectedItem.cards || []).map((c: any) => 
-                      c.id === card.id ? updatedCard : c
+                    const updatedCards = (selectedSection.cards || []).map(
+                      (c: any) => (c.id === card.id ? updatedCard : c)
                     );
-                    onEdit(selectedItem.id, { ...selectedItem, cards: updatedCards });
+                    onEdit(selectedSection.id, {
+                      ...selectedSection,
+                      cards: updatedCards,
+                    });
                   }}
                   onDelete={() => {
-                    const updatedCards = (selectedItem.cards || []).filter((c: any) => c.id !== card.id);
-                    onEdit(selectedItem.id, { ...selectedItem, cards: updatedCards });
+                    const updatedCards = (selectedSection.cards || []).filter(
+                      (c: any) => c.id !== card.id
+                    );
+                    onEdit(selectedSection.id, {
+                      ...selectedSection,
+                      cards: updatedCards,
+                    });
                   }}
                 />
               ))}
-              
-              {(!selectedItem.cards || selectedItem.cards.length === 0) && (
+
+              {(!selectedSection.cards ||
+                selectedSection.cards.length === 0) && (
                 <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
                   <CreditCard className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                   <p className="text-lg font-medium mb-2">لا توجد بطاقات بعد</p>
                   <p className="text-sm mb-4">ابدأ بإنشاء بطاقتك الأولى</p>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                     onClick={(e) => {
                       e.preventDefault();
                       const newCard = {
                         id: Date.now(),
-                        title: '',
-                        content: '',
-                        color: '#3B82F6',
-                        image: null
+                        title: "",
+                        content: "",
+                        color: "#3B82F6",
+                        image: null,
                       };
-                      const updatedCards = [...(selectedItem.cards || []), newCard];
-                      onEdit(selectedItem.id, { ...selectedItem, cards: updatedCards });
+                      const updatedCards = [
+                        ...(selectedSection.cards || []),
+                        newCard,
+                      ];
+                      onEdit(selectedSection.id, {
+                        ...selectedSection,
+                        cards: updatedCards,
+                      });
                     }}
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -404,18 +476,19 @@ function LessonDetailsSidebar({
           {/* Action Buttons */}
           <div className="pt-4 border-t">
             <div className="flex gap-3">
-              <Button 
+              <Button
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={(e) => {
                   e.preventDefault();
-                  console.log('Saving flashcard lesson:', selectedItem);
+                  console.log("Saving flashcard lesson:", selectedSection);
                 }}
               >
                 حفظ التغييرات
               </Button>
-              
+
               <DeleteItemDialog
-                item={selectedItem}
+                isPending={isDeleteSectionPending}
+                item={selectedSection}
                 onDelete={onDelete}
               />
             </div>
@@ -426,22 +499,35 @@ function LessonDetailsSidebar({
   }
 
   // لمحرر HTML التفاعلي - واجهة مخصصة
-  if (isLesson && selectedItem.lessonType === 'interactive' && selectedItem.toolType === 'html-editor') {
+  if (
+    isLesson &&
+    selectedSection.lessonType === "interactive" &&
+    selectedSection.toolType === "html-editor"
+  ) {
     return (
       <Card className="p-6 shadow-sm border-0 h-fit">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center gap-2 mb-4">
             <Code className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-800">{selectedItem.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {selectedSection.title}
+            </h3>
           </div>
 
           {/* Edit Title */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">عنوان الدرس</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              عنوان الدرس
+            </Label>
             <Input
-              value={selectedItem.title}
-              onChange={(e) => onEdit(selectedItem.id, { ...selectedItem, title: e.target.value })}
+              value={selectedSection.title}
+              onChange={(e) =>
+                onEdit(selectedSection.id, {
+                  ...selectedSection,
+                  title: e.target.value,
+                })
+              }
               placeholder="أدخل عنوان الدرس"
               className="border-gray-200 focus:border-blue-500"
             />
@@ -449,10 +535,17 @@ function LessonDetailsSidebar({
 
           {/* Edit Content */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">محتوى الدرس النصي</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              محتوى الدرس النصي
+            </Label>
             <Textarea
-              value={selectedItem.content || ''}
-              onChange={(e) => onEdit(selectedItem.id, { ...selectedItem, content: e.target.value })}
+              value={selectedSection.content || ""}
+              onChange={(e) =>
+                onEdit(selectedSection.id, {
+                  ...selectedSection,
+                  content: e.target.value,
+                })
+              }
               placeholder="أدخل محتوى الدرس النصي..."
               className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 min-h-[200px] resize-none"
               rows={8}
@@ -462,18 +555,19 @@ function LessonDetailsSidebar({
           {/* Action Buttons */}
           <div className="pt-4 border-t">
             <div className="flex gap-3">
-              <Button 
+              <Button
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={(e) => {
                   e.preventDefault();
-                  console.log('Saving HTML editor lesson:', selectedItem);
+                  console.log("Saving HTML editor lesson:", selectedSection);
                 }}
               >
                 حفظ التغييرات
               </Button>
-              
+
               <DeleteItemDialog
-                item={selectedItem}
+                isPending={isDeleteSectionPending}
+                item={selectedSection}
                 onDelete={onDelete}
               />
             </div>
@@ -491,15 +585,24 @@ function LessonDetailsSidebar({
           {/* Header */}
           <div className="flex items-center gap-2 mb-4">
             <FileText className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-800">{selectedItem.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {sectionData.title}
+            </h3>
           </div>
 
           {/* Edit Title */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">اسم الفصل</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              اسم الفصل
+            </Label>
             <Input
-              value={selectedItem.title}
-              onChange={(e) => onEdit(selectedItem.id, { ...selectedItem, title: e.target.value })}
+              value={sectionData.title}
+              onChange={(e) =>
+                setSectionData((prev) => ({
+                  ...prev,
+                  title: e.target.value,
+                }))
+              }
               placeholder="أدخل اسم الفصل"
               className="border-gray-200 focus:border-blue-500"
             />
@@ -508,18 +611,24 @@ function LessonDetailsSidebar({
           {/* Action Buttons */}
           <div className="pt-4 border-t">
             <div className="flex gap-3">
-              <Button 
+              <Button
+                type="button"
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log('Saving section:', selectedItem);
-                }}
+                onClick={async () =>
+                  updateSection({
+                    id: String(selectedSection.id),
+                    sectionData,
+                  })
+                }
+                disabled={isUpdateSectionPending || isDeleteSectionPending}
               >
                 حفظ التغييرات
+                {isUpdateSectionPending && <Loader />}
               </Button>
-              
+
               <DeleteItemDialog
-                item={selectedItem}
+                isPending={isDeleteSectionPending || isUpdateSectionPending}
+                item={selectedSection}
                 onDelete={onDelete}
               />
             </div>
@@ -530,22 +639,31 @@ function LessonDetailsSidebar({
   }
 
   // للدروس النصية (مقالات) - واجهة مخصصة
-  if (isLesson && selectedItem.lessonType === 'text') {
+  if (isLesson && selectedSection.lessonType === "text") {
     return (
       <Card className="p-6 shadow-sm border-0 h-fit">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center gap-2 mb-4">
             <FileText className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-800">{selectedItem.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {sectionData.title}
+            </h3>
           </div>
 
           {/* Edit Title */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">عنوان المقال</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              عنوان المقال
+            </Label>
             <Input
-              value={selectedItem.title}
-              onChange={(e) => onEdit(selectedItem.id, { ...selectedItem, title: e.target.value })}
+              value={selectedSection.title}
+              onChange={(e) =>
+                onEdit(selectedSection.id, {
+                  ...selectedSection,
+                  title: e.target.value,
+                })
+              }
               placeholder="أدخل عنوان المقال"
               className="border-gray-200 focus:border-blue-500"
             />
@@ -553,10 +671,17 @@ function LessonDetailsSidebar({
 
           {/* Edit Content */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">محتوى المقال</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              محتوى المقال
+            </Label>
             <Textarea
-              value={selectedItem.content || ''}
-              onChange={(e) => onEdit(selectedItem.id, { ...selectedItem, content: e.target.value })}
+              value={selectedSection.content || ""}
+              onChange={(e) =>
+                onEdit(selectedSection.id, {
+                  ...selectedSection,
+                  content: e.target.value,
+                })
+              }
               placeholder="أدخل محتوى المقال..."
               className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 min-h-[200px] resize-none"
               rows={8}
@@ -566,18 +691,13 @@ function LessonDetailsSidebar({
           {/* Action Buttons */}
           <div className="pt-4 border-t">
             <div className="flex gap-3">
-              <Button 
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log('Saving text lesson:', selectedItem);
-                }}
-              >
+              <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
                 حفظ التغييرات
               </Button>
-              
+
               <DeleteItemDialog
-                item={selectedItem}
+                isPending={isDeleteSectionPending}
+                item={selectedSection}
                 onDelete={onDelete}
               />
             </div>
@@ -588,22 +708,31 @@ function LessonDetailsSidebar({
   }
 
   // للدروس المرئية - واجهة مبسطة
-  if (isLesson && selectedItem.lessonType === 'video') {
+  if (isLesson && selectedSection.lessonType === "video") {
     return (
       <Card className="p-6 shadow-sm border-0 h-fit">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center gap-2 mb-4">
             <Play className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-800">{selectedItem.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {selectedSection.title}
+            </h3>
           </div>
 
           {/* Edit Title */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">عنوان الدرس</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              عنوان الدرس
+            </Label>
             <Input
-              value={selectedItem.title}
-              onChange={(e) => onEdit(selectedItem.id, { ...selectedItem, title: e.target.value })}
+              value={selectedSection.title}
+              onChange={(e) =>
+                onEdit(selectedSection.id, {
+                  ...selectedSection,
+                  title: e.target.value,
+                })
+              }
               placeholder="أدخل عنوان الدرس"
               className="border-gray-200 focus:border-blue-500"
             />
@@ -612,11 +741,11 @@ function LessonDetailsSidebar({
           {/* Video Upload/Edit */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-700">الفيديو</Label>
-            {selectedItem.videoUrl ? (
+            {selectedSection.videoUrl ? (
               <div className="space-y-3">
                 <div className="relative">
                   <video
-                    src={selectedItem.videoUrl}
+                    src={selectedSection.videoUrl}
                     className="w-full h-40 object-cover rounded-lg"
                     controls={false}
                     poster="/api/placeholder/400/200"
@@ -626,10 +755,12 @@ function LessonDetailsSidebar({
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
-                    onClick={() => document.getElementById('video-upload')?.click()}
+                    onClick={() =>
+                      document.getElementById("video-upload")?.click()
+                    }
                   >
                     <Upload className="w-4 h-4 mr-2" />
                     تغيير الفيديو
@@ -639,7 +770,7 @@ function LessonDetailsSidebar({
                     type="file"
                     accept="video/*"
                     onChange={handleVideoUpload}
-                    style={{ display: 'none' }}
+                    style={{ display: "none" }}
                   />
                   <p className="text-xs text-gray-500 text-center">
                     الحد الأقصى للملف: 512 ميجا
@@ -649,10 +780,14 @@ function LessonDetailsSidebar({
             ) : (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600 mb-3">لا يوجد فيديو مرفوع</p>
-                <Button 
+                <p className="text-sm text-gray-600 mb-3">
+                  لا يوجد فيديو مرفوع
+                </p>
+                <Button
                   variant="outline"
-                  onClick={() => document.getElementById('video-upload')?.click()}
+                  onClick={() =>
+                    document.getElementById("video-upload")?.click()
+                  }
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   رفع فيديو
@@ -662,7 +797,7 @@ function LessonDetailsSidebar({
                   type="file"
                   accept="video/*"
                   onChange={handleVideoUpload}
-                  style={{ display: 'none' }}
+                  style={{ display: "none" }}
                 />
                 <p className="text-xs text-gray-500 mt-2">
                   الحد الأقصى للملف: 512 ميجا
@@ -674,18 +809,19 @@ function LessonDetailsSidebar({
           {/* Action Buttons */}
           <div className="pt-4 border-t">
             <div className="flex gap-3">
-              <Button 
+              <Button
                 className="flex-1 bg-blue-600 hover:bg-blue-700"
                 onClick={() => {
                   // Handle save logic here
-                  console.log('Saving lesson:', selectedItem);
+                  console.log("Saving lesson:", selectedSection);
                 }}
               >
                 حفظ التغييرات
               </Button>
-              
+
               <DeleteItemDialog
-                item={selectedItem}
+                isPending={isDeleteSectionPending}
+                item={selectedSection}
                 onDelete={onDelete}
               />
             </div>
@@ -703,14 +839,16 @@ function LessonDetailsSidebar({
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <Badge variant={selectedItem.isPublished ? "default" : "secondary"}>
-                {selectedItem.isPublished ? "منشور" : "مسودة"}
+              <Badge
+                variant={selectedSection.isPublished ? "default" : "secondary"}
+              >
+                {selectedSection.isPublished ? "منشور" : "مسودة"}
               </Badge>
             </div>
             <h3 className="text-lg font-semibold text-gray-800 mb-1">
-              {selectedItem.title}
+              {selectedSection.title}
             </h3>
-            {selectedItem.duration && (
+            {selectedSection.duration && (
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 {getIcon()}
                 <span>{getDurationText()}</span>
@@ -720,22 +858,22 @@ function LessonDetailsSidebar({
         </div>
 
         {/* Description */}
-        {selectedItem.description && (
+        {selectedSection.description && (
           <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-700">الوصف</Label>
             <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-              {selectedItem.description}
+              {selectedSection.description}
             </p>
           </div>
         )}
 
         {/* Video Preview (for lessons) */}
-        {isLesson && selectedItem.videoUrl && (
+        {isLesson && selectedSection.videoUrl && (
           <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-700">الفيديو</Label>
             <div className="relative">
               <video
-                src={selectedItem.videoUrl}
+                src={selectedSection.videoUrl}
                 className="w-full h-32 object-cover rounded-lg border"
                 controls={false}
                 poster="/api/placeholder/400/200"
@@ -754,24 +892,24 @@ function LessonDetailsSidebar({
             <div>
               <p className="font-medium text-sm">حالة النشر</p>
               <p className="text-xs text-gray-600">
-                {selectedItem.isPublished ? "مرئي للطلاب" : "مخفي عن الطلاب"}
+                {selectedSection.isPublished ? "مرئي للطلاب" : "مخفي عن الطلاب"}
               </p>
             </div>
           </div>
           <Toggle
-            checked={selectedItem.isPublished || false}
-            onCheckedChange={(checked: boolean) => onPublishToggle(selectedItem.id, checked)}
+            checked={selectedSection.isPublished || false}
+            onCheckedChange={(checked: boolean) =>
+              onPublishToggle(selectedSection.id, checked)
+            }
           />
         </div>
 
         {/* Action Buttons */}
         <div className="flex gap-2">
-          <EditItemDialog
-            item={selectedItem}
-            onEdit={onEdit}
-          />
+          <EditItemDialog item={selectedSection} />
           <DeleteItemDialog
-            item={selectedItem}
+            isPending={isDeleteSectionPending}
+            item={selectedSection}
             onDelete={onDelete}
           />
         </div>
@@ -794,25 +932,10 @@ function LessonDetailsSidebar({
   );
 }
 
-function EditItemDialog({ 
-  item, 
-  onEdit 
-}: { 
-  item: any; 
-  onEdit: (id: number, data: any) => void;
-}) {
+function EditItemDialog({ item }: { item: any }) {
   const [title, setTitle] = useState(item.title);
   const [duration, setDuration] = useState(item.duration || "");
   const [description, setDescription] = useState(item.description || "");
-
-  const handleEdit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onEdit(item.id, {
-      title,
-      duration,
-      description,
-    });
-  };
 
   return (
     <Dialog>
@@ -823,70 +946,78 @@ function EditItemDialog({
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] border-0 shadow-xl">
-        <form onSubmit={handleEdit}>
-          <DialogHeader>
-            <DialogTitle className="text-gray-800">
-              تعديل {item.type === 'lesson' ? 'الدرس' : 'الفصل'}
-            </DialogTitle>
-            <DialogDescription className="text-gray-600">
-              يمكنك تعديل تفاصيل {item.type === 'lesson' ? 'الدرس' : 'الفصل'} هنا.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-3">
-              <Label htmlFor="edit-title" className="text-gray-700">العنوان</Label>
-              <Input
-                id="edit-title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="أدخل العنوان"
-                className="border-gray-200 focus:border-blue-500"
-              />
-            </div>
-            {item.type === 'lesson' && (
-              <div className="grid gap-3">
-                <Label htmlFor="edit-duration" className="text-gray-700">المدة</Label>
-                <Input
-                  id="edit-duration"
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  placeholder="مثال: 10:30"
-                  className="border-gray-200 focus:border-blue-500"
-                />
-              </div>
-            )}
-            <div className="grid gap-3">
-              <Label htmlFor="edit-description" className="text-gray-700">الوصف</Label>
-              <Textarea
-                id="edit-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="أدخل الوصف..."
-                className="border-gray-200 focus:border-blue-500"
-                rows={3}
-              />
-            </div>
+        <DialogHeader>
+          <DialogTitle className="text-gray-800">
+            تعديل {item.type === "lesson" ? "الدرس" : "الفصل"}
+          </DialogTitle>
+          <DialogDescription className="text-gray-600">
+            يمكنك تعديل تفاصيل {item.type === "lesson" ? "الدرس" : "الفصل"} هنا.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-3">
+            <Label htmlFor="edit-title" className="text-gray-700">
+              العنوان
+            </Label>
+            <Input
+              id="edit-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="أدخل العنوان"
+              className="border-gray-200 focus:border-blue-500"
+            />
           </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline" className="border-gray-200">إلغاء</Button>
-            </DialogClose>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-              حفظ التغييرات
+          {item.type === "lesson" && (
+            <div className="grid gap-3">
+              <Label htmlFor="edit-duration" className="text-gray-700">
+                المدة
+              </Label>
+              <Input
+                id="edit-duration"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                placeholder="مثال: 10:30"
+                className="border-gray-200 focus:border-blue-500"
+              />
+            </div>
+          )}
+          <div className="grid gap-3">
+            <Label htmlFor="edit-description" className="text-gray-700">
+              الوصف
+            </Label>
+            <Textarea
+              id="edit-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="أدخل الوصف..."
+              className="border-gray-200 focus:border-blue-500"
+              rows={3}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline" className="border-gray-200">
+              إلغاء
             </Button>
-          </DialogFooter>
-        </form>
+          </DialogClose>
+          <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+            حفظ التغييرات
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
 
-function DeleteItemDialog({ 
-  item, 
-  onDelete 
-}: { 
-  item: any; 
+function DeleteItemDialog({
+  item,
+  onDelete,
+  isPending,
+}: {
+  item: any;
   onDelete: (id: number) => void;
+  isPending: boolean;
 }) {
   const handleDelete = () => {
     onDelete(item.id);
@@ -897,26 +1028,34 @@ function DeleteItemDialog({
       <DialogTrigger asChild>
         <Button variant="destructive" className="flex-1">
           <Trash2 className="w-4 h-4 mr-2" />
-          حذف {item.type === 'lesson' ? 'الدرس' : 'الفصل'}
+          حذف {item.type === "lesson" ? "الدرس" : "الفصل"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] border-0 shadow-xl">
         <DialogHeader>
           <DialogTitle className="text-gray-800">
-            حذف {item.type === 'lesson' ? 'الدرس' : 'الفصل'}
+            حذف {item.type === "lesson" ? "الدرس" : "الفصل"}
           </DialogTitle>
           <DialogDescription className="text-gray-600">
-            هل أنت متأكد من أنك تريد حذف {item.type === 'lesson' ? 'درس' : 'فصل'} "{item.title}"؟ 
-            لا يمكن التراجع عن هذا الإجراء.
+            هل أنت متأكد من أنك تريد حذف{" "}
+            {item.type === "lesson" ? "درس" : "فصل"} "{item.title}"؟ لا يمكن
+            التراجع عن هذا الإجراء.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline" className="border-gray-200">إلغاء</Button>
+            <Button variant="outline" className="border-gray-200">
+              إلغاء
+            </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button variant="destructive" onClick={handleDelete}>
-              حذف {item.type === 'lesson' ? 'الدرس' : 'الفصل'}
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+            >
+              حذف {item.type === "lesson" ? "الدرس" : "الفصل"}
+              {isPending && <Loader />}
             </Button>
           </DialogClose>
         </DialogFooter>
@@ -926,16 +1065,16 @@ function DeleteItemDialog({
 }
 
 // مكون تحرير الأسئلة
-function QuestionEditor({ 
-  question, 
-  index, 
-  onUpdate, 
-  onDelete 
-}: { 
-  question: any; 
-  index: number; 
-  onUpdate: (question: any) => void; 
-  onDelete: () => void; 
+function QuestionEditor({
+  question,
+  index,
+  onUpdate,
+  onDelete,
+}: {
+  question: any;
+  index: number;
+  onUpdate: (question: any) => void;
+  onDelete: () => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [tempQuestion, setTempQuestion] = useState(question);
@@ -966,7 +1105,7 @@ function QuestionEditor({
       <div className="p-3">
         {/* Header - Simple and clean */}
         <div className="flex items-center justify-between mb-2">
-          <div 
+          <div
             className="flex items-center gap-3 cursor-pointer flex-1"
             onClick={(e) => {
               e.preventDefault();
@@ -976,9 +1115,13 @@ function QuestionEditor({
             <div className="w-3 h-3 rounded-full bg-green-500 border border-gray-300" />
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-800 text-sm">السؤال {index + 1}</span>
+                <span className="font-medium text-gray-800 text-sm">
+                  السؤال {index + 1}
+                </span>
                 {question.question && (
-                  <span className="text-sm text-gray-600">- {question.question.substring(0, 50)}...</span>
+                  <span className="text-sm text-gray-600">
+                    - {question.question.substring(0, 50)}...
+                  </span>
                 )}
               </div>
               {!isExpanded && question.question && (
@@ -1007,10 +1150,14 @@ function QuestionEditor({
           <div className="space-y-3 mt-3 border-t pt-3">
             {/* Question */}
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-gray-700">نص السؤال</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                نص السؤال
+              </Label>
               <Textarea
-                value={tempQuestion.question || ''}
-                onChange={(e) => setTempQuestion({ ...tempQuestion, question: e.target.value })}
+                value={tempQuestion.question || ""}
+                onChange={(e) =>
+                  setTempQuestion({ ...tempQuestion, question: e.target.value })
+                }
                 placeholder="أدخل نص السؤال"
                 className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 min-h-[50px] resize-none"
                 rows={2}
@@ -1019,25 +1166,36 @@ function QuestionEditor({
 
             {/* Options */}
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-gray-700">الخيارات</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                الخيارات
+              </Label>
               <div className="space-y-2">
-                {tempQuestion.options?.map((option: string, optionIndex: number) => (
-                  <div key={optionIndex} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name={`question-${question.id}`}
-                      checked={tempQuestion.correctAnswer === optionIndex}
-                      onChange={() => setTempQuestion({ ...tempQuestion, correctAnswer: optionIndex })}
-                      className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                    />
-                    <Input
-                      value={option}
-                      onChange={(e) => updateOption(optionIndex, e.target.value)}
-                      placeholder={`الخيار ${optionIndex + 1}`}
-                      className="flex-1 border-gray-200 focus:border-blue-500 focus:ring-blue-500 h-8"
-                    />
-                  </div>
-                ))}
+                {tempQuestion.options?.map(
+                  (option: string, optionIndex: number) => (
+                    <div key={optionIndex} className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name={`question-${question.id}`}
+                        checked={tempQuestion.correctAnswer === optionIndex}
+                        onChange={() =>
+                          setTempQuestion({
+                            ...tempQuestion,
+                            correctAnswer: optionIndex,
+                          })
+                        }
+                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      />
+                      <Input
+                        value={option}
+                        onChange={(e) =>
+                          updateOption(optionIndex, e.target.value)
+                        }
+                        placeholder={`الخيار ${optionIndex + 1}`}
+                        className="flex-1 border-gray-200 focus:border-blue-500 focus:ring-blue-500 h-8"
+                      />
+                    </div>
+                  )
+                )}
               </div>
             </div>
 
@@ -1071,16 +1229,16 @@ function QuestionEditor({
 }
 
 // مكون تحرير البطاقات التفاعلية
-function FlashcardEditor({ 
-  card, 
-  index, 
-  onUpdate, 
-  onDelete 
-}: { 
-  card: any; 
-  index: number; 
-  onUpdate: (card: any) => void; 
-  onDelete: () => void; 
+function FlashcardEditor({
+  card,
+  index,
+  onUpdate,
+  onDelete,
+}: {
+  card: any;
+  index: number;
+  onUpdate: (card: any) => void;
+  onDelete: () => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [tempCard, setTempCard] = useState(card);
@@ -1103,22 +1261,22 @@ function FlashcardEditor({
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    
+
     // Check file size (5MB limit for images)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert('حجم الصورة يتجاوز الحد الأقصى المسموح (5 ميجا)');
-      event.target.value = '';
+      alert("حجم الصورة يتجاوز الحد الأقصى المسموح (5 ميجا)");
+      event.target.value = "";
       return;
     }
-    
+
     // Check file type
-    if (!file.type.startsWith('image/')) {
-      alert('يرجى اختيار صورة صالحة');
-      event.target.value = '';
+    if (!file.type.startsWith("image/")) {
+      alert("يرجى اختيار صورة صالحة");
+      event.target.value = "";
       return;
     }
-    
+
     // Create object URL for preview
     const imageUrl = URL.createObjectURL(file);
     setTempCard({ ...tempCard, image: imageUrl });
@@ -1129,20 +1287,22 @@ function FlashcardEditor({
       <div className="p-3">
         {/* Header - Simple and clean */}
         <div className="flex items-center justify-between mb-2">
-          <div 
+          <div
             className="flex items-center gap-3 cursor-pointer flex-1"
             onClick={(e) => {
               e.preventDefault();
               setIsExpanded(!isExpanded);
             }}
           >
-            <div 
+            <div
               className="w-3 h-3 rounded-full border border-gray-300"
-              style={{ backgroundColor: card.color || '#3B82F6' }}
+              style={{ backgroundColor: card.color || "#3B82F6" }}
             />
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-800 text-sm">البطاقة {index + 1}</span>
+                <span className="font-medium text-gray-800 text-sm">
+                  البطاقة {index + 1}
+                </span>
                 {card.title && (
                   <span className="text-sm text-gray-600">- {card.title}</span>
                 )}
@@ -1168,16 +1328,19 @@ function FlashcardEditor({
           </Button>
         </div>
 
-
         {/* Expanded editor */}
         {isExpanded && (
           <div className="space-y-3 mt-3 border-t pt-3">
             {/* Title */}
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-gray-700">عنوان البطاقة</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                عنوان البطاقة
+              </Label>
               <Input
-                value={tempCard.title || ''}
-                onChange={(e) => setTempCard({ ...tempCard, title: e.target.value })}
+                value={tempCard.title || ""}
+                onChange={(e) =>
+                  setTempCard({ ...tempCard, title: e.target.value })
+                }
                 placeholder="أدخل عنوان البطاقة"
                 className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 h-8"
               />
@@ -1185,10 +1348,14 @@ function FlashcardEditor({
 
             {/* Content */}
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-gray-700">المحتوى</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                المحتوى
+              </Label>
               <Textarea
-                value={tempCard.content || ''}
-                onChange={(e) => setTempCard({ ...tempCard, content: e.target.value })}
+                value={tempCard.content || ""}
+                onChange={(e) =>
+                  setTempCard({ ...tempCard, content: e.target.value })
+                }
                 placeholder="أدخل محتوى البطاقة"
                 className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 min-h-[50px] resize-none"
                 rows={2}
@@ -1197,12 +1364,16 @@ function FlashcardEditor({
 
             {/* Color Selection */}
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-gray-700">لون البطاقة</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                لون البطاقة
+              </Label>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
-                  value={tempCard.color || '#3B82F6'}
-                  onChange={(e) => setTempCard({ ...tempCard, color: e.target.value })}
+                  value={tempCard.color || "#3B82F6"}
+                  onChange={(e) =>
+                    setTempCard({ ...tempCard, color: e.target.value })
+                  }
                   className="w-8 h-8 border-2 border-gray-300 rounded cursor-pointer"
                 />
                 <span className="text-sm text-gray-600">اختر لون البطاقة</span>
@@ -1211,13 +1382,15 @@ function FlashcardEditor({
 
             {/* Image Upload */}
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-gray-700">الصورة</Label>
+              <Label className="text-sm font-medium text-gray-700">
+                الصورة
+              </Label>
               {tempCard.image ? (
                 <div className="space-y-2">
                   <div className="relative">
-                    <img 
-                      src={tempCard.image} 
-                      alt="Card preview" 
+                    <img
+                      src={tempCard.image}
+                      alt="Card preview"
                       className="w-full h-20 object-cover rounded border"
                     />
                   </div>
@@ -1227,7 +1400,9 @@ function FlashcardEditor({
                       size="sm"
                       onClick={(e) => {
                         e.preventDefault();
-                        document.getElementById(`image-upload-${card.id}`)?.click();
+                        document
+                          .getElementById(`image-upload-${card.id}`)
+                          ?.click();
                       }}
                       className="flex-1 text-blue-600 border-blue-600 hover:bg-blue-50 h-8 text-xs"
                     >
@@ -1256,7 +1431,9 @@ function FlashcardEditor({
                     size="sm"
                     onClick={(e) => {
                       e.preventDefault();
-                      document.getElementById(`image-upload-${card.id}`)?.click();
+                      document
+                        .getElementById(`image-upload-${card.id}`)
+                        ?.click();
                     }}
                     className="text-blue-600 border-blue-600 hover:bg-blue-50 h-8 text-xs"
                   >
@@ -1273,7 +1450,7 @@ function FlashcardEditor({
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
               />
             </div>
 
