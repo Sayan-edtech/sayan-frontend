@@ -1,12 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import type { Lesson } from "@/types/couse";
-import { Label } from "@radix-ui/react-dropdown-menu";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useState } from "react";
-import { FileQuestion, Plus } from "lucide-react";
+import { FileQuestion, Plus, Trash2 } from "lucide-react";
 
-function Exam({ lesson }: { lesson: Lesson }) {
+function Exam({ lesson }: { lesson: any }) {
   type Question =
     | {
         id: number;
@@ -24,8 +35,7 @@ function Exam({ lesson }: { lesson: Lesson }) {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [newQuestionType, setNewQuestionType] = useState<"mcq" | "qa">("mcq");
-  // Optionally, you can initialize with lesson.questions if available
-  // const [questions, setQuestions] = useState<any[]>(lesson.questions || []);
+  const [examTitle, setExamTitle] = useState(lesson?.title || "");
 
   const handleAddQuestion = () => {
     if (newQuestionType === "mcq") {
@@ -48,223 +58,257 @@ function Exam({ lesson }: { lesson: Lesson }) {
     }
   };
 
+  const handleDeleteQuestion = (questionId: number) => {
+    setQuestions(questions.filter((q) => q.id !== questionId));
+  };
+
+  const updateQuestion = (questionId: number, updates: Partial<Question>) => {
+    const updated = questions.map((q) =>
+      q.id === questionId ? { ...q, ...updates } : q
+    );
+    setQuestions(updated);
+  };
+
+  const updateMCQOption = (
+    questionId: number,
+    optionIndex: number,
+    value: string
+  ) => {
+    const question = questions.find((q) => q.id === questionId);
+    if (question && question.type === "mcq") {
+      const newOptions = [...question.options];
+      newOptions[optionIndex] = value;
+      updateQuestion(questionId, { options: newOptions });
+    }
+  };
+
+  const mcqQuestions = questions.filter((q) => q.type === "mcq");
+  const qaQuestions = questions.filter((q) => q.type === "qa");
+
   return (
     <Card className="p-6 shadow-sm border-0 h-fit">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-2 mb-4">
           <FileQuestion className="w-5 h-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-800">
-            {lesson.title}
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-800">إنشاء اختبار</h3>
         </div>
 
         {/* Edit Title */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-gray-700">
             عنوان الاختبار
-          </Label>
+          </label>
           <Input
-            value={lesson?.title}
-            onChange={() => {}}
+            value={examTitle}
+            onChange={(e) => setExamTitle(e.target.value)}
             placeholder="أدخل عنوان الاختبار"
             className="border-gray-200 focus:border-blue-500"
           />
         </div>
 
-        {/* Questions Section */}
-        <div className="space-y-4">
-          {/* Question type selector as dropdown */}
-          <div className="flex items-center gap-4 mb-2">
+        {/* Question Controls */}
+        <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-gray-700">
               نوع السؤال:
             </span>
-            <select
-              className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <Select
               value={newQuestionType}
-              onChange={(e) =>
-                setNewQuestionType(e.target.value as "mcq" | "qa")
-              }
+              onValueChange={(value: "mcq" | "qa") => setNewQuestionType(value)}
             >
-              <option value="mcq">اختيار من متعدد</option>
-              <option value="qa">سؤال وجواب</option>
-            </select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="اختر نوع السؤال" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="mcq">اختيار من متعدد</SelectItem>
+                <SelectItem value="qa">سؤال وجواب</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          {/* Show only questions of selected type */}
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                {newQuestionType === "mcq"
-                  ? "أسئلة اختيار من متعدد"
-                  : "أسئلة سؤال وجواب"}
-              </Label>
-              <p className="text-xs text-gray-500">
-                {questions.filter((q) => q.type === newQuestionType).length}{" "}
-                سؤال
+          <Button
+            type="button"
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={handleAddQuestion}
+          >
+            <Plus className="w-4 h-4 ml-1" />
+            إضافة سؤال
+          </Button>
+        </div>
+
+        {/* Questions Summary */}
+        {questions.length > 0 && (
+          <div className="flex gap-4 text-sm text-gray-600">
+            <span>إجمالي الأسئلة: {questions.length}</span>
+            <span>اختيار من متعدد: {mcqQuestions.length}</span>
+            <span>سؤال وجواب: {qaQuestions.length}</span>
+          </div>
+        )}
+
+        {/* All Questions Display */}
+        <div className="space-y-6">
+          {questions.length === 0 ? (
+            <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+              <FileQuestion className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+              <p className="text-sm">لا توجد أسئلة في الاختبار</p>
+              <p className="text-xs text-gray-400 mt-1">
+                اضغط على "إضافة سؤال" لبدء إنشاء الاختبار
               </p>
             </div>
-            <Button
-              type="button"
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={handleAddQuestion}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              إضافة سؤال
-            </Button>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              <h4 className="text-md font-medium text-gray-800">
+                أسئلة الاختبار ({questions.length})
+              </h4>
 
-          {/* Questions List (filtered by type) */}
-          <div className="space-y-3">
-            {questions.filter((q) => q.type === newQuestionType).length ===
-            0 ? (
-              <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                <FileQuestion className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <p className="text-lg font-medium mb-2">لا توجد أسئلة بعد</p>
-                <p className="text-sm mb-4">ابدأ بإنشاء سؤالك الأول</p>
-                <Button
-                  type="button"
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={handleAddQuestion}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  إنشاء سؤال جديد
-                </Button>
-              </div>
-            ) : (
-              questions
-                .map((question, index) => ({ question, index }))
-                .filter(({ question }) => question.type === newQuestionType)
-                .map(({ question, index }) => (
-                  <div
+              <Accordion type="single" collapsible className="w-full">
+                {questions.map((question, globalIndex) => (
+                  <AccordionItem
                     key={question.id}
-                    className="p-4 bg-gray-50 rounded-lg border"
+                    value={`question-${question.id}`}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium">سؤال {index + 1}</span>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="destructive"
-                        className="text-xs px-2 py-1"
-                        onClick={() => {
-                          setQuestions(
-                            questions.filter((q) => q.id !== question.id)
-                          );
-                        }}
-                      >
-                        حذف
-                      </Button>
-                    </div>
-                    <Input
-                      value={question.question}
-                      onChange={(e) => {
-                        const updated = [...questions];
-                        const idx = questions.findIndex(
-                          (q) => q.id === question.id
-                        );
-                        updated[idx] = {
-                          ...question,
-                          question: e.target.value,
-                        };
-                        setQuestions(updated);
-                      }}
-                      placeholder="نص السؤال"
-                      className="mb-2"
-                    />
-                    {/* MCQ Options */}
-                    {question.type === "mcq" && (
-                      <>
-                        <div className="grid grid-cols-2 gap-2 mb-2">
-                          {question.options.map((option, optIdx) => (
-                            <div key={optIdx} className="flex flex-col">
-                              <span className="text-xs text-gray-500 mb-1">
-                                الخيار {optIdx + 1}
-                              </span>
-                              <Input
-                                value={option}
-                                onChange={(e) => {
-                                  const updated = [...questions];
-                                  const idx = questions.findIndex(
-                                    (q) => q.id === question.id
-                                  );
-                                  if (question.type === "mcq") {
-                                    const newOptions = [...question.options];
-                                    newOptions[optIdx] = e.target.value;
-                                    updated[idx] = {
-                                      ...question,
-                                      options: newOptions,
-                                    };
-                                    setQuestions(updated);
-                                  }
-                                }}
-                                placeholder={`اكتب الخيار هنا`}
-                              />
-                            </div>
-                          ))}
+                    <AccordionTrigger className="hover:no-underline">
+                      <div className="flex items-center justify-between w-full mr-4">
+                        <div className="flex items-center gap-3">
+                          <span className="font-medium text-gray-800">
+                            السؤال {globalIndex + 1}
+                          </span>
+                          <span
+                            className={`px-2 py-1 text-xs rounded-full ${
+                              question.type === "mcq"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-green-100 text-green-700"
+                            }`}
+                          >
+                            {question.type === "mcq"
+                              ? "اختيار من متعدد"
+                              : "سؤال وجواب"}
+                          </span>
+                          {question.question && (
+                            <span className="text-sm text-gray-500 truncate max-w-xs">
+                              {question.question.substring(0, 50)}
+                              {question.question.length > 50 ? "..." : ""}
+                            </span>
+                          )}
                         </div>
-                        {/* Correct answer selector */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs">الإجابة الصحيحة:</span>
-                          {question.options.map((_, optIdx) => (
-                            <label
-                              key={optIdx}
-                              className="flex items-center gap-1"
-                            >
-                              <input
-                                type="radio"
-                                name={`correct-${question.id}`}
-                                checked={question.correctAnswer === optIdx}
-                                onChange={() => {
-                                  const updated = [...questions];
-                                  const idx = questions.findIndex(
-                                    (q) => q.id === question.id
-                                  );
-                                  if (question.type === "mcq") {
-                                    updated[idx] = {
-                                      ...question,
-                                      correctAnswer: optIdx,
-                                    };
-                                    setQuestions(updated);
-                                  }
-                                }}
-                              />
-                              <span className="text-xs">{optIdx + 1}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                    {/* Q&A Answer */}
-                    {question.type === "qa" && (
-                      <div className="mb-2">
-                        <span className="text-xs text-gray-500 mb-1 block">
-                          الإجابة
-                        </span>
-                        <Input
-                          value={question.answer}
-                          onChange={(e) => {
-                            const updated = [...questions];
-                            const idx = questions.findIndex(
-                              (q) => q.id === question.id
-                            );
-                            if (question.type === "qa") {
-                              updated[idx] = {
-                                ...question,
-                                answer: e.target.value,
-                              };
-                              setQuestions(updated);
-                            }
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="destructive"
+                          className="text-xs px-2 py-1 ml-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteQuestion(question.id);
                           }}
-                          placeholder="اكتب الإجابة هنا"
-                        />
+                        >
+                          <Trash2 className="w-3 h-3 ml-1" />
+                          حذف
+                        </Button>
                       </div>
-                    )}
-                  </div>
-                ))
-            )}
-          </div>
+                    </AccordionTrigger>
+
+                    <AccordionContent className="pb-4">
+                      <div className="space-y-4 pt-2">
+                        {/* Question Input */}
+                        <div>
+                          <label className="text-sm font-medium text-gray-700 mb-2 block">
+                            نص السؤال
+                          </label>
+                          <Input
+                            value={question.question}
+                            onChange={(e) =>
+                              updateQuestion(question.id, {
+                                question: e.target.value,
+                              })
+                            }
+                            placeholder="اكتب نص السؤال هنا..."
+                            className="w-full"
+                          />
+                        </div>
+
+                        {/* MCQ Options */}
+                        {question.type === "mcq" && (
+                          <div className="space-y-3">
+                            <label className="text-sm font-medium text-gray-700">
+                              الخيارات
+                            </label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {question.options.map((option, optIdx) => (
+                                <div key={optIdx} className="space-y-1">
+                                  <label className="text-xs text-gray-500">
+                                    الخيار {optIdx + 1}
+                                  </label>
+                                  <Input
+                                    value={option}
+                                    onChange={(e) =>
+                                      updateMCQOption(
+                                        question.id,
+                                        optIdx,
+                                        e.target.value
+                                      )
+                                    }
+                                    placeholder={`الخيار ${optIdx + 1}`}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Correct Answer Selection */}
+                            <div className="flex items-center gap-2">
+                              <label className="text-sm font-medium text-gray-700">
+                                الإجابة الصحيحة:
+                              </label>
+                              <Select
+                                value={question.correctAnswer.toString()}
+                                onValueChange={(value) =>
+                                  updateQuestion(question.id, {
+                                    correctAnswer: Number(value),
+                                  })
+                                }
+                              >
+                                <SelectTrigger className="w-[150px]">
+                                  <SelectValue placeholder="اختر الإجابة" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {question.options.map((_, optIdx) => (
+                                    <SelectItem
+                                      key={optIdx}
+                                      value={optIdx.toString()}
+                                    >
+                                      الخيار {optIdx + 1}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Q&A Answer */}
+                        {question.type === "qa" && (
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">
+                              الإجابة المتوقعة
+                            </label>
+                            <Input
+                              value={question.answer}
+                              onChange={(e) =>
+                                updateQuestion(question.id, {
+                                  answer: e.target.value,
+                                })
+                              }
+                              placeholder="اكتب الإجابة المتوقعة هنا..."
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -273,9 +317,24 @@ function Exam({ lesson }: { lesson: Lesson }) {
             <Button
               type="button"
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={() => {}}
+              onClick={() => {
+                console.log("Saving exam:", { title: examTitle, questions });
+                // Add your save logic here
+              }}
+              disabled={questions.length === 0 || !examTitle.trim()}
             >
-              حفظ التغييرات
+              حفظ الاختبار ({questions.length} سؤال)
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setQuestions([]);
+                setExamTitle("");
+              }}
+              disabled={questions.length === 0}
+            >
+              مسح الكل
             </Button>
           </div>
         </div>

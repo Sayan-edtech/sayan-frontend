@@ -6,10 +6,10 @@ import Tool from "./Tool";
 function ManageLesson({ lesson }: { lesson: Lesson }) {
   let content;
   switch (lesson.type) {
-    case "video":
+    case "exam":
       content = <UploadVideoLesson lesson={lesson} />;
       break;
-    case "exam":
+    case "video":
       content = <Exam lesson={lesson} />;
       break;
     case "tool":

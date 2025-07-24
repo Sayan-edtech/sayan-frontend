@@ -26,7 +26,21 @@ function CourseContent() {
         />
         <div className="flex-1 space-y-6 flex">
           <LessonPreview selectedItem={selectedItem} />
-          <Manage selectedItem={selectedItem} />
+          <Manage
+            selectedItem={{
+              lesson: {
+                title: "test",
+                id: "",
+                section_id: "",
+                type: "video",
+                order: 0,
+                is_published: false,
+                created_at: "",
+                updated_at: "",
+              },
+              section: selectedItem?.section,
+            }}
+          />
         </div>
       </div>
     </div>

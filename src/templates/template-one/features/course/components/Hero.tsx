@@ -218,7 +218,9 @@ function CourseNavigationContent({
               <div className="border rounded-2xl overflow-hidden bg-card">
                 <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-lg text-gray-800">المقدمة (3 دروس)</h3>
+                    <h3 className="font-bold text-lg text-gray-800">
+                      المقدمة (3 دروس)
+                    </h3>
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <span>5:30</span>
                     </div>
@@ -228,27 +230,42 @@ function CourseNavigationContent({
                   <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                        <img src="/assets/icons/play.svg" className="w-4 h-4 text-white" />
+                        <img
+                          src="/assets/icons/play.svg"
+                          className="w-4 h-4 text-white"
+                        />
                       </div>
-                      <span className="font-medium text-gray-800">مرحباً بك في الدورة</span>
+                      <span className="font-medium text-gray-800">
+                        مرحباً بك في الدورة
+                      </span>
                     </div>
                     <span className="text-sm text-gray-600">5:30</span>
                   </div>
                   <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                        <img src="/assets/icons/play.svg" className="w-4 h-4 text-gray-600" />
+                        <img
+                          src="/assets/icons/play.svg"
+                          className="w-4 h-4 text-gray-600"
+                        />
                       </div>
-                      <span className="font-medium text-gray-800">ما ستتعلمه في هذه ...</span>
+                      <span className="font-medium text-gray-800">
+                        ما ستتعلمه في هذه ...
+                      </span>
                     </div>
                     <span className="text-sm text-gray-600">8:15</span>
                   </div>
                   <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                        <img src="/assets/icons/play.svg" className="w-4 h-4 text-white" />
+                        <img
+                          src="/assets/icons/play.svg"
+                          className="w-4 h-4 text-white"
+                        />
                       </div>
-                      <span className="font-medium text-gray-800">إعداد بيئة العمل</span>
+                      <span className="font-medium text-gray-800">
+                        إعداد بيئة العمل
+                      </span>
                     </div>
                     <span className="text-sm text-gray-600">12:45</span>
                   </div>
@@ -259,7 +276,9 @@ function CourseNavigationContent({
               <div className="border rounded-2xl overflow-hidden bg-card">
                 <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 border-b">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-lg text-gray-800">الأساسيات (2 دروس)</h3>
+                    <h3 className="font-bold text-lg text-gray-800">
+                      الأساسيات (2 دروس)
+                    </h3>
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <span>25:30</span>
                     </div>
@@ -269,18 +288,28 @@ function CourseNavigationContent({
                   <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                        <img src="/assets/icons/play.svg" className="w-4 h-4 text-gray-600" />
+                        <img
+                          src="/assets/icons/play.svg"
+                          className="w-4 h-4 text-gray-600"
+                        />
                       </div>
-                      <span className="font-medium text-gray-800">المفاهيم الأساسية</span>
+                      <span className="font-medium text-gray-800">
+                        المفاهيم الأساسية
+                      </span>
                     </div>
                     <span className="text-sm text-gray-600">15:20</span>
                   </div>
                   <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                        <img src="/assets/icons/play.svg" className="w-4 h-4 text-gray-600" />
+                        <img
+                          src="/assets/icons/play.svg"
+                          className="w-4 h-4 text-gray-600"
+                        />
                       </div>
-                      <span className="font-medium text-gray-800">التطبيقات المقدمة</span>
+                      <span className="font-medium text-gray-800">
+                        التطبيقات المقدمة
+                      </span>
                     </div>
                     <span className="text-sm text-gray-600">10:10</span>
                   </div>
@@ -290,7 +319,14 @@ function CourseNavigationContent({
               {/* Add New Section Button */}
               <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-blue-400 transition-colors cursor-pointer">
                 <div className="flex items-center justify-center gap-2 text-blue-600 font-medium">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                   </svg>
@@ -303,12 +339,14 @@ function CourseNavigationContent({
       case "learning":
         return (
           <ul className="space-y-4">
-            {courseData.learning_outcomes?.split('\n').map((point: string, index: number) => (
-              <li key={index} className="flex items-center gap-2">
-                <img src="/assets/icons/learn.svg" className="w-4 h-4" />
-                <span>{point}</span>
-              </li>
-            ))}
+            {courseData.learning_outcomes
+              ?.split("\n")
+              .map((point: string, index: number) => (
+                <li key={index} className="flex items-center gap-2">
+                  <img src="/assets/icons/learn.svg" className="w-4 h-4" />
+                  <span>{point}</span>
+                </li>
+              ))}
           </ul>
         );
       case "experience":
@@ -326,7 +364,9 @@ function CourseNavigationContent({
                   <CourseRating rating={5} />
                 </div>
               </div>
-              <p className="text-muted-foreground">دورة ممتازة، استفدت كثيراً من المحتوى المقدم. الشرح واضح ومفصل.</p>
+              <p className="text-muted-foreground">
+                دورة ممتازة، استفدت كثيراً من المحتوى المقدم. الشرح واضح ومفصل.
+              </p>
             </div>
             <div className="bg-card p-4 rounded-lg">
               <div className="flex items-center gap-4 mb-4">
@@ -340,7 +380,10 @@ function CourseNavigationContent({
                   <CourseRating rating={4} />
                 </div>
               </div>
-              <p className="text-muted-foreground">محتوى جيد جداً، لكن أتمنى لو كان هناك المزيد من التطبيقات العملية.</p>
+              <p className="text-muted-foreground">
+                محتوى جيد جداً، لكن أتمنى لو كان هناك المزيد من التطبيقات
+                العملية.
+              </p>
             </div>
           </div>
         );
