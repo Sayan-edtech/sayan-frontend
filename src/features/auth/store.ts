@@ -105,16 +105,16 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       const response = await authService.signup(userData);
 
       set(() => ({
-        user: response.data.user_data,
+        user: response.user_data,
         isAuthenticated: true,
         isLoading: false,
       }));
 
       // Store in cookies
       authCookies.setAuthData(
-        response.data.access_token,
-        response.data.refresh_token,
-        response.data.user_data
+        response.access_token,
+        response.refresh_token,
+        response.user_data
       );
       return response;
     } catch (error) {

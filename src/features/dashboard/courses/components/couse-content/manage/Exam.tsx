@@ -74,38 +74,34 @@ function Exam({ lesson }: { lesson: Lesson }) {
 
         {/* Questions Section */}
         <div className="space-y-4">
-          {/* Question type selector */}
-          <div className="flex items-center gap-6 mb-2">
+          {/* Question type selector as dropdown */}
+          <div className="flex items-center gap-4 mb-2">
             <span className="text-sm font-medium text-gray-700">
               نوع السؤال:
             </span>
-            <label className="flex items-center gap-1 cursor-pointer">
-              <input
-                type="radio"
-                name="question-type"
-                value="mcq"
-                checked={newQuestionType === "mcq"}
-                onChange={() => setNewQuestionType("mcq")}
-              />
-              <span className="text-xs">اختيار من متعدد</span>
-            </label>
-            <label className="flex items-center gap-1 cursor-pointer">
-              <input
-                type="radio"
-                name="question-type"
-                value="qa"
-                checked={newQuestionType === "qa"}
-                onChange={() => setNewQuestionType("qa")}
-              />
-              <span className="text-xs">سؤال وجواب</span>
-            </label>
+            <select
+              className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={newQuestionType}
+              onChange={(e) =>
+                setNewQuestionType(e.target.value as "mcq" | "qa")
+              }
+            >
+              <option value="mcq">اختيار من متعدد</option>
+              <option value="qa">سؤال وجواب</option>
+            </select>
           </div>
+          {/* Show only questions of selected type */}
           <div className="flex items-center justify-between">
             <div>
               <Label className="text-sm font-medium text-gray-700">
-                الأسئلة
+                {newQuestionType === "mcq"
+                  ? "أسئلة اختيار من متعدد"
+                  : "أسئلة سؤال وجواب"}
               </Label>
-              <p className="text-xs text-gray-500">{questions.length} سؤال</p>
+              <p className="text-xs text-gray-500">
+                {questions.filter((q) => q.type === newQuestionType).length}{" "}
+                سؤال
+              </p>
             </div>
             <Button
               type="button"
@@ -118,9 +114,10 @@ function Exam({ lesson }: { lesson: Lesson }) {
             </Button>
           </div>
 
-          {/* Questions List */}
+          {/* Questions List (filtered by type) */}
           <div className="space-y-3">
-            {questions.length === 0 ? (
+            {questions.filter((q) => q.type === newQuestionType).length ===
+            0 ? (
               <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
                 <FileQuestion className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                 <p className="text-lg font-medium mb-2">لا توجد أسئلة بعد</p>
@@ -136,121 +133,136 @@ function Exam({ lesson }: { lesson: Lesson }) {
                 </Button>
               </div>
             ) : (
-              questions.map((question, index) => (
-                <div
-                  key={question.id}
-                  className="p-4 bg-gray-50 rounded-lg border"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">سؤال {index + 1}</span>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="destructive"
-                      className="text-xs px-2 py-1"
-                      onClick={() => {
-                        setQuestions(
-                          questions.filter((q) => q.id !== question.id)
-                        );
-                      }}
-                    >
-                      حذف
-                    </Button>
-                  </div>
-                  <Input
-                    value={question.question}
-                    onChange={(e) => {
-                      const updated = [...questions];
-                      updated[index] = {
-                        ...question,
-                        question: e.target.value,
-                      };
-                      setQuestions(updated);
-                    }}
-                    placeholder="نص السؤال"
-                    className="mb-2"
-                  />
-                  {/* MCQ Options */}
-                  {question.type === "mcq" && (
-                    <>
-                      <div className="grid grid-cols-2 gap-2 mb-2">
-                        {question.options.map((option, optIdx) => (
-                          <div key={optIdx} className="flex flex-col">
-                            <span className="text-xs text-gray-500 mb-1">
-                              الخيار {optIdx + 1}
-                            </span>
-                            <Input
-                              value={option}
-                              onChange={(e) => {
-                                const updated = [...questions];
-                                if (question.type === "mcq") {
-                                  const newOptions = [...question.options];
-                                  newOptions[optIdx] = e.target.value;
-                                  updated[index] = {
-                                    ...question,
-                                    options: newOptions,
-                                  };
-                                  setQuestions(updated);
-                                }
-                              }}
-                              placeholder={`اكتب الخيار هنا`}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      {/* Correct answer selector */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs">الإجابة الصحيحة:</span>
-                        {question.options.map((_, optIdx) => (
-                          <label
-                            key={optIdx}
-                            className="flex items-center gap-1"
-                          >
-                            <input
-                              type="radio"
-                              name={`correct-${question.id}`}
-                              checked={question.correctAnswer === optIdx}
-                              onChange={() => {
-                                const updated = [...questions];
-                                if (question.type === "mcq") {
-                                  updated[index] = {
-                                    ...question,
-                                    correctAnswer: optIdx,
-                                  };
-                                  setQuestions(updated);
-                                }
-                              }}
-                            />
-                            <span className="text-xs">{optIdx + 1}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                  {/* Q&A Answer */}
-                  {question.type === "qa" && (
-                    <div className="mb-2">
-                      <span className="text-xs text-gray-500 mb-1 block">
-                        الإجابة
-                      </span>
-                      <Input
-                        value={question.answer}
-                        onChange={(e) => {
-                          const updated = [...questions];
-                          if (question.type === "qa") {
-                            updated[index] = {
-                              ...question,
-                              answer: e.target.value,
-                            };
-                            setQuestions(updated);
-                          }
+              questions
+                .map((question, index) => ({ question, index }))
+                .filter(({ question }) => question.type === newQuestionType)
+                .map(({ question, index }) => (
+                  <div
+                    key={question.id}
+                    className="p-4 bg-gray-50 rounded-lg border"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium">سؤال {index + 1}</span>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="destructive"
+                        className="text-xs px-2 py-1"
+                        onClick={() => {
+                          setQuestions(
+                            questions.filter((q) => q.id !== question.id)
+                          );
                         }}
-                        placeholder="اكتب الإجابة هنا"
-                      />
+                      >
+                        حذف
+                      </Button>
                     </div>
-                  )}
-                </div>
-              ))
+                    <Input
+                      value={question.question}
+                      onChange={(e) => {
+                        const updated = [...questions];
+                        const idx = questions.findIndex(
+                          (q) => q.id === question.id
+                        );
+                        updated[idx] = {
+                          ...question,
+                          question: e.target.value,
+                        };
+                        setQuestions(updated);
+                      }}
+                      placeholder="نص السؤال"
+                      className="mb-2"
+                    />
+                    {/* MCQ Options */}
+                    {question.type === "mcq" && (
+                      <>
+                        <div className="grid grid-cols-2 gap-2 mb-2">
+                          {question.options.map((option, optIdx) => (
+                            <div key={optIdx} className="flex flex-col">
+                              <span className="text-xs text-gray-500 mb-1">
+                                الخيار {optIdx + 1}
+                              </span>
+                              <Input
+                                value={option}
+                                onChange={(e) => {
+                                  const updated = [...questions];
+                                  const idx = questions.findIndex(
+                                    (q) => q.id === question.id
+                                  );
+                                  if (question.type === "mcq") {
+                                    const newOptions = [...question.options];
+                                    newOptions[optIdx] = e.target.value;
+                                    updated[idx] = {
+                                      ...question,
+                                      options: newOptions,
+                                    };
+                                    setQuestions(updated);
+                                  }
+                                }}
+                                placeholder={`اكتب الخيار هنا`}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        {/* Correct answer selector */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs">الإجابة الصحيحة:</span>
+                          {question.options.map((_, optIdx) => (
+                            <label
+                              key={optIdx}
+                              className="flex items-center gap-1"
+                            >
+                              <input
+                                type="radio"
+                                name={`correct-${question.id}`}
+                                checked={question.correctAnswer === optIdx}
+                                onChange={() => {
+                                  const updated = [...questions];
+                                  const idx = questions.findIndex(
+                                    (q) => q.id === question.id
+                                  );
+                                  if (question.type === "mcq") {
+                                    updated[idx] = {
+                                      ...question,
+                                      correctAnswer: optIdx,
+                                    };
+                                    setQuestions(updated);
+                                  }
+                                }}
+                              />
+                              <span className="text-xs">{optIdx + 1}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                    {/* Q&A Answer */}
+                    {question.type === "qa" && (
+                      <div className="mb-2">
+                        <span className="text-xs text-gray-500 mb-1 block">
+                          الإجابة
+                        </span>
+                        <Input
+                          value={question.answer}
+                          onChange={(e) => {
+                            const updated = [...questions];
+                            const idx = questions.findIndex(
+                              (q) => q.id === question.id
+                            );
+                            if (question.type === "qa") {
+                              updated[idx] = {
+                                ...question,
+                                answer: e.target.value,
+                              };
+                              setQuestions(updated);
+                            }
+                          }}
+                          placeholder="اكتب الإجابة هنا"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))
             )}
           </div>
         </div>
