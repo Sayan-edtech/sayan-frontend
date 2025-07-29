@@ -5,7 +5,7 @@ import LessonSidebar from "./LessonSidebar";
 import type { Lesson, Section } from "@/types/couse";
 import { useSections } from "../../hooks/useSectionsQueries";
 import { useParams } from "react-router-dom";
-import Manage from "./Manage";
+import Manage from "./manage";
 
 export type SelectedItem = {
   lesson?: Lesson;
@@ -14,7 +14,10 @@ export type SelectedItem = {
 function CourseContent() {
   const { courseId } = useParams();
   const { data: sections } = useSections(courseId as string);
-  const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<SelectedItem | null>({
+    lesson: sections?.data.items[0]?.lessons[0],
+    section: sections?.data.items[0],
+  });
   return (
     <div className="space-y-6">
       <Header selectedItem={selectedItem} />
@@ -26,21 +29,7 @@ function CourseContent() {
         />
         <div className="flex-1 space-y-6 flex">
           <LessonPreview selectedItem={selectedItem} />
-          <Manage
-            selectedItem={{
-              lesson: {
-                title: "test",
-                id: "",
-                section_id: "",
-                type: "video",
-                order: 0,
-                is_published: false,
-                created_at: "",
-                updated_at: "",
-              },
-              section: selectedItem?.section,
-            }}
-          />
+          <Manage selectedItem={selectedItem} />
         </div>
       </div>
     </div>

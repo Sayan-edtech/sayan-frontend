@@ -16,8 +16,9 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { FileQuestion, Plus, Trash2 } from "lucide-react";
+import type { Lesson } from "@/types/couse";
 
-function Exam({ lesson }: { lesson: any }) {
+function Exam({ lesson }: { lesson: Lesson }) {
   type Question =
     | {
         id: number;
@@ -63,9 +64,22 @@ function Exam({ lesson }: { lesson: any }) {
   };
 
   const updateQuestion = (questionId: number, updates: Partial<Question>) => {
-    const updated = questions.map((q) =>
-      q.id === questionId ? { ...q, ...updates } : q
-    );
+    const updated = questions.map((q) => {
+      if (q.id !== questionId) return q;
+      if (q.type === "mcq" && updates.type !== "qa") {
+        return {
+          ...q,
+          ...(updates as Partial<Extract<Question, { type: "mcq" }>>),
+        };
+      }
+      if (q.type === "qa" && updates.type !== "mcq") {
+        return {
+          ...q,
+          ...(updates as Partial<Extract<Question, { type: "qa" }>>),
+        };
+      }
+      return q;
+    });
     setQuestions(updated);
   };
 

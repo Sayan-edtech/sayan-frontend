@@ -300,11 +300,6 @@ function AddLesson({ sectionId }: { sectionId: number }) {
           <DialogDescription>
             {step === 1 && "أدخل اسم الدرس واختر نوعه"}
             {step === 2 && "اختر نوع الأداة التفاعلية"}
-            {isPending && (
-              <span className="text-blue-600 font-medium">
-                جاري إنشاء الدرس، يرجى الانتظار...
-              </span>
-            )}
           </DialogDescription>
         </DialogHeader>
 

@@ -6,6 +6,7 @@ type RemoteImageProps = {
   alt?: string;
   loading?: "lazy" | "eager";
   onError?: () => void;
+  prefix?: string;
 } & React.ImgHTMLAttributes<HTMLImageElement>;
 
 function RemoteImage({
@@ -13,13 +14,14 @@ function RemoteImage({
   src,
   alt = "Image",
   loading = "lazy",
+  prefix = "static",
   ...rest
 }: RemoteImageProps) {
   const url = import.meta.env.VITE_API_URL;
   const origin = new URL(url).origin;
   return (
     <img
-      src={`${origin}${src}`}
+      src={prefix ? `${origin}/${prefix}/${src}` : `${origin}${src}`}
       alt={alt}
       loading={loading}
       className={`${cn("h-16 w-16 rounded-lg object-cover")} ${className}`}

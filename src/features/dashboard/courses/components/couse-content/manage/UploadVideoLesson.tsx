@@ -52,17 +52,16 @@ function UploadVideoLesson({ lesson }: { lesson: Lesson }) {
       type: lesson.type,
     },
   });
-
   const onSubmit = async (data: SectionFormData) => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("type", lesson.type);
     try {
-      await updateLessonMutation.mutateAsync({
+      const { status_code } = await updateLessonMutation.mutateAsync({
         lessonId: String(lesson.id),
         data: formData,
       });
-      if (videoLesson) {
+      if (status_code === 200 && videoLesson) {
         const videoData = new FormData();
         videoData.append("video_file", videoLesson);
         await uploadVideoLesson.mutateAsync({
@@ -130,13 +129,10 @@ function UploadVideoLesson({ lesson }: { lesson: Lesson }) {
               <div className="relative">
                 <video
                   src={videoPreviewUrl}
-                  className="w-80 h-80 object-cover rounded-lg"
+                  className="w-full h-80 object-cover rounded-lg"
                   controls
                   poster="/api/placeholder/400/200"
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg pointer-events-none">
-                  <Play className="w-8 h-8 text-white" />
-                </div>
               </div>
               <div className="space-y-3">
                 <Button

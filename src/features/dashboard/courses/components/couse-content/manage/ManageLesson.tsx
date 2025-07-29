@@ -1,15 +1,16 @@
 import type { Lesson } from "@/types/couse";
-import UploadVideoLesson from "./UploadVideoLesson";
-import Exam from "./exam";
-import Tool from "./Tool";
+import UploadVideoLesson from "../manage/UploadVideoLesson";
+import Exam from "../manage/Exam";
+import Tool from "../manage/Tool";
 
 function ManageLesson({ lesson }: { lesson: Lesson }) {
+  console.log("lesson", lesson);
   let content;
   switch (lesson.type) {
-    case "exam":
+    case "video":
       content = <UploadVideoLesson lesson={lesson} />;
       break;
-    case "video":
+    case "exam":
       content = <Exam lesson={lesson} />;
       break;
     case "tool":

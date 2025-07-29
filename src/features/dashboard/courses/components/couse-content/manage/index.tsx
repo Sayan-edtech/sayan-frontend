@@ -1,6 +1,6 @@
 import type { SelectedItem } from "..";
-import ManageLesson from "./ManageLesson";
-import ManageSection from "./ManageSection";
+import ManageLesson from "../manage/ManageLesson";
+import ManageSection from "../manage/ManageSection";
 
 function Manage({ selectedItem }: { selectedItem: SelectedItem | null }) {
   return (

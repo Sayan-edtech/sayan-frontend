@@ -122,4 +122,14 @@ export const queryKeys = {
     video: (lessonId: string) =>
       [...queryKeys.lessons.all, "video", lessonId] as const,
   },
+  academy: {
+    all: ["academy"] as const,
+    lists: () => [...queryKeys.academy.all, "list"] as const,
+    list: (filters: string) => [...queryKeys.academy.lists(), filters] as const,
+    details: () => [...queryKeys.academy.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.academy.details(), id] as const,
+    mainSettings: () => [...queryKeys.academy.all, "main-settings"] as const,
+    mainSettingsDetail: (subdomain: string) =>
+      [...queryKeys.academy.mainSettings(), subdomain] as const,
+  },
 };

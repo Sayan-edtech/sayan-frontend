@@ -84,6 +84,7 @@ export interface Lesson {
   section_id: string;
   title: string;
   type: "video" | "exam" | "tool";
+  toolType?: "colored_card" | "timeline" | "text";
   content?: string;
   video_id?: string;
   duration?: number;
