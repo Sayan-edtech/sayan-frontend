@@ -19,24 +19,19 @@ export const authService = {
   async signup(userData: SignupRequest): Promise<AuthResponse> {
     const formData = new FormData();
 
-    // Append text fields
-    formData.append("fname", userData.fname);
-    formData.append("lname", userData.lname);
-    formData.append("email", userData.email);
-    formData.append("phone_number", userData.phone_number);
-    formData.append("password", userData.password);
-    formData.append("user_type", userData.user_type);
-
-    // Append file if exists
-    if (userData.profile_picture) {
-      formData.append("profile_picture", userData.profile_picture);
-    }
+    // Append all fields that exist and have truthy values
+    Object.entries(userData).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        formData.append(key, value);
+      }
+    });
 
     const response = await api.post<AuthResponse>("/auth/register", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
+
     return response.data;
   },
   // Forgot password

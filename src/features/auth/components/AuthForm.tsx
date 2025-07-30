@@ -12,8 +12,11 @@ import { UserType } from "@/constants/enums";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
 import useFormFields from "../hooks/useFormFields";
 import useFormValidations from "../hooks/useFormValidations";
+import SiginWithGoogle from "@/components/shared/sigin-with-google";
 
-const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
+const AuthForm: React.FC<{
+  slug: string;
+}> = ({ slug }) => {
   const navigate = useNavigate();
   const { getFormFields } = useFormFields({ slug });
   const { getValidationSchema } = useFormValidations({ slug });
@@ -39,6 +42,8 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
   const {
     handleSubmit,
     control,
+    getValues,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(getValidationSchema()),
@@ -70,6 +75,7 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
             user_type: data.user_type as UserType,
             profile_picture: data.profile_picture as File,
           });
+          console.log("status_code", status_code);
           if (status_code === 201) {
             toast.success(message);
             navigate(
@@ -131,21 +137,45 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
   );
 
   const formLoading = isSubmitting || isLoading;
-
+  const shouldShowGoogleButton = slug === Pages.SIGNUP || slug === Pages.SIGNIN;
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      {getFormFields().map((field: IFormField) => (
-        <div key={field.name} className="mb-4">
-          <FormFields {...field} control={control} errors={errors} />
-        </div>
-      ))}
+    <>
+      {shouldShowGoogleButton && (
+        <>
+          <SiginWithGoogle
+            userType={getValues("user_type")}
+            setError={setError}
+          >
+            {slug === Pages.SIGNUP
+              ? "إنشاء حساب باستخدام"
+              : "تسجيل الدخول باستخدام"}
+          </SiginWithGoogle>
 
-      {slug === Pages.SIGNIN && (
-        <ForgotPassword control={control} errors={errors} />
+          <div className="relative flex items-center">
+            <div className="flex-grow border-t border-border"></div>
+            <span className="text-muted-foreground text-sm px-4">أو</span>
+            <div className="flex-grow border-t border-border"></div>
+          </div>
+        </>
       )}
-      <SubmitButton slug={slug} disabled={formLoading} loading={formLoading} />
-      <NavigationLink slug={slug} verifiedEmail={verifiedEmail} />
-    </form>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {getFormFields().map((field: IFormField) => (
+          <div key={field.name} className="mb-4">
+            <FormFields {...field} control={control} errors={errors} />
+          </div>
+        ))}
+
+        {slug === Pages.SIGNIN && (
+          <ForgotPassword control={control} errors={errors} />
+        )}
+        <SubmitButton
+          slug={slug}
+          disabled={formLoading}
+          loading={formLoading}
+        />
+        <NavigationLink slug={slug} verifiedEmail={verifiedEmail} />
+      </form>
+    </>
   );
 };
 

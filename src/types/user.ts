@@ -55,17 +55,20 @@ export type TokenRefreshResponse = {
 };
 
 export type LoginRequest = {
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
+  google_token?: string;
+  user_type?: UserType;
 };
 
 export type SignupRequest = {
-  fname: string;
-  lname: string;
-  email: string;
-  phone_number: string;
-  password: string;
-  confirm_password: string;
+  fname?: string;
+  lname?: string;
+  email?: string;
+  phone_number?: string;
+  password?: string;
+  confirm_password?: string;
   user_type: UserType;
   profile_picture?: File;
+  google_token?: string;
 };
