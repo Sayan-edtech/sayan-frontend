@@ -132,4 +132,54 @@ export const queryKeys = {
     mainSettingsDetail: (subdomain: string) =>
       [...queryKeys.academy.mainSettings(), subdomain] as const,
   },
+
+  faqs: {
+    all: ["faqs"] as const,
+    lists: () => [...queryKeys.faqs.all, "list"] as const,
+    list: (filters: string) => [...queryKeys.faqs.lists(), filters] as const,
+    details: () => [...queryKeys.faqs.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.faqs.details(), id] as const,
+
+    // Mutation keys for FAQ operations
+    mutations: {
+      create: () => [...queryKeys.faqs.all, "create"] as const,
+      update: (id: string) => [...queryKeys.faqs.all, "update", id] as const,
+      delete: (id: string) => [...queryKeys.faqs.all, "delete", id] as const,
+    },
+  },
+
+  opinions: {
+    all: ["opinions"] as const,
+    lists: () => [...queryKeys.opinions.all, "list"] as const,
+    list: (skip: number, limit: number) => [...queryKeys.opinions.lists(), `skip-${skip}-limit-${limit}`] as const,
+    details: () => [...queryKeys.opinions.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.opinions.details(), id] as const,
+
+    // Mutation keys for Opinion operations
+    mutations: {
+      create: () => [...queryKeys.opinions.all, "create"] as const,
+      update: (id: string) => [...queryKeys.opinions.all, "update", id] as const,
+      delete: (id: string) => [...queryKeys.opinions.all, "delete", id] as const,
+    },
+  },
+
+  sliders: {
+    all: ["sliders"] as const,
+    lists: () => [...queryKeys.sliders.all, "list"] as const,
+    details: () => [...queryKeys.sliders.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.sliders.details(), id] as const,
+
+    // Mutation keys for Slider operations
+    mutations: {
+      create: () => [...queryKeys.sliders.all, "create"] as const,
+      update: (id: string) => [...queryKeys.sliders.all, "update", id] as const,
+      delete: (id: string) => [...queryKeys.sliders.all, "delete", id] as const,
+    },
+  },
+
+  transactions: {
+    all: ["transactions"] as const,
+    lists: () => [...queryKeys.transactions.all, "list"] as const,
+    list: (skip: number, limit: number) => [...queryKeys.transactions.lists(), `skip-${skip}-limit-${limit}`] as const,
+  },
 };

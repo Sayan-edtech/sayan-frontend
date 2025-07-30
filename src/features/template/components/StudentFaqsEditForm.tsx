@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,33 +10,47 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, CheckCircle } from "lucide-react";
-import { useCreateFAQ } from "../hooks/useFAQsMutations";
+import { CheckCircle } from "lucide-react";
+import { useUpdateFAQ } from "../hooks/useFAQsMutations";
+import type { FAQ } from "@/types/faq";
 
-const StudentFaqsForm = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface StudentFaqsEditFormProps {
+  faq: FAQ | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const StudentFaqsEditForm = ({ faq, open, onOpenChange }: StudentFaqsEditFormProps) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
-  
-  const createFAQMutation = useCreateFAQ();
+
+  const updateFAQMutation = useUpdateFAQ();
+
+  // تحميل البيانات عند فتح الفورم
+  useEffect(() => {
+    if (faq && open) {
+      setQuestion(faq.question || "");
+      setAnswer(faq.answer || "");
+    }
+  }, [faq, open]);
 
   const handleSubmit = async () => {
-    if (question.trim() && answer.trim()) {
+    if (question.trim() && answer.trim() && faq) {
       try {
-        await createFAQMutation.mutateAsync({
-          question: question.trim(),
-          answer: answer.trim(),
+        await updateFAQMutation.mutateAsync({
+          id: faq.id,
+          data: {
+            question: question.trim(),
+            answer: answer.trim(),
+          },
         });
         
-        // Reset form and close dialog
-        setQuestion("");
-        setAnswer("");
-        setIsOpen(false);
+        // إغلاق النافذة بعد النجاح
+        onOpenChange(false);
       } catch (error) {
         // Error handling is done in the mutation hook
-        console.error("Error creating FAQ:", error);
+        console.error("Error updating FAQ:", error);
       }
     }
   };
@@ -46,28 +60,27 @@ const StudentFaqsForm = () => {
     setAnswer("");
   };
 
+  const handleClose = () => {
+    resetForm();
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          إضافة سؤال جديد
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]" dir="rtl">
         <DialogHeader>
-          <DialogTitle className="text-right">إضافة سؤال شائع جديد</DialogTitle>
+          <DialogTitle className="text-right">تعديل السؤال الشائع</DialogTitle>
           <DialogDescription className="text-right">
-            أضف سؤالاً جديداً مع إجابته ليظهر في قائمة الأسئلة الشائعة
+            قم بتعديل السؤال والإجابة حسب الحاجة
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="question" className="text-sm font-medium text-card-foreground">
+            <Label htmlFor="edit-question" className="text-sm font-medium text-card-foreground">
               السؤال
             </Label>
             <Input
-              id="question"
+              id="edit-question"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="اكتب السؤال هنا..."
@@ -76,11 +89,11 @@ const StudentFaqsForm = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="answer" className="text-sm font-medium text-card-foreground">
+            <Label htmlFor="edit-answer" className="text-sm font-medium text-card-foreground">
               الإجابة
             </Label>
             <Textarea
-              id="answer"
+              id="edit-answer"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="اكتب الإجابة هنا..."
@@ -94,10 +107,7 @@ const StudentFaqsForm = () => {
           <Button
             type="button"
             variant="outline"
-            onClick={() => {
-              resetForm();
-              setIsOpen(false);
-            }}
+            onClick={handleClose}
             className="flex-1 shadow-sm"
           >
             إلغاء
@@ -105,11 +115,11 @@ const StudentFaqsForm = () => {
           <Button
             type="button"
             onClick={handleSubmit}
-            disabled={!question.trim() || !answer.trim() || createFAQMutation.isPending}
+            disabled={!question.trim() || !answer.trim() || updateFAQMutation.isPending}
             className="flex-1 gap-2"
           >
             <CheckCircle className="w-4 h-4" />
-            {createFAQMutation.isPending ? "جاري الحفظ..." : "إضافة السؤال"}
+            {updateFAQMutation.isPending ? "جاري التحديث..." : "تحديث السؤال"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -117,4 +127,4 @@ const StudentFaqsForm = () => {
   );
 };
 
-export default StudentFaqsForm;
+export default StudentFaqsEditForm; 

@@ -3,6 +3,7 @@ import { Wallet, TrendingUp} from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useState, useMemo } from "react";
 import WithdrawalModal from "@/components/shared/dashboard/WithdrawalModal";
+import { useTransactions } from "@/features/template/hooks/useTransactionsQueries";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -303,44 +304,53 @@ function Header() {
 export default WalletPage;
 
 function FinancialTransactions() {
-  const transactions = [
-    {
-      date: "١٤٤٦/١٢/٢٢هـ",
-      type: "إضافة رصيد",
-      typeColor: "green",
-      product: "-",
-      student: "-",
-      change: "+1.0",
-      after: "81,000,019.8"
-    },
-    {
-      date: "١٤٤٦/١٢/٢٠هـ",
-      type: "بيع دورة",
-      typeColor: "blue",
-      product: "دورة البرمجة المتقدمة",
-      student: "أحمد محمد",
-      change: "+18.9",
-      after: "81,000,018.9"
-    },
-    {
-      date: "١٤٤٦/١٢/١٨هـ",
-      type: "بيع دورة",
-      typeColor: "blue",
-      product: "دورة تصميم الجرافيك",
-      student: "فاطمة علي",
-      change: "+50",
-      after: "81,000,000"
-    },
-    {
-      date: "١٤٤٦/١٢/١٥هـ",
-      type: "عمولة شراكة",
-      typeColor: "purple",
-      product: "برنامج الشراكة",
-      student: "سارة أحمد",
-      change: "+150",
-      after: "80,999,950"
-    }
-  ];
+  const { data: transactionsResponse, isLoading, error } = useTransactions(0, 10);
+  
+  // Type mapping for transaction types
+  const getTypeInfo = (type: string) => {
+    const typeMap = {
+      withdrawal: { label: "سحب", color: "red" },
+      commission: { label: "عمولة", color: "purple" },
+      refund: { label: "استرداد", color: "orange" },
+      payment: { label: "دفع", color: "blue" },
+    };
+    return typeMap[type as keyof typeof typeMap] || { label: type, color: "gray" };
+  };
+
+  // Format date to Arabic
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ar-SA', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      calendar: 'islamic'
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <Card className="p-6 bg-white border-gray-100 shadow-sm">
+        <h3 className="text-xl font-semibold text-gray-900 mb-6">سجل المعاملات المالية</h3>
+        <div className="flex justify-center py-10">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-6 bg-white border-gray-100 shadow-sm">
+        <h3 className="text-xl font-semibold text-gray-900 mb-6">سجل المعاملات المالية</h3>
+        <div className="text-center py-10 text-red-500">
+          حدث خطأ أثناء جلب البيانات
+        </div>
+      </Card>
+    );
+  }
+
+  const transactions = transactionsResponse?.data || [];
 
   return (
     <Card className="p-6 bg-white border-gray-100 shadow-sm">
@@ -349,32 +359,57 @@ function FinancialTransactions() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50/50">
             <tr className="text-right text-gray-700">
+              <th className="px-4 py-3 font-semibold text-gray-600 border-b border-gray-100">المرجع</th>
               <th className="px-4 py-3 font-semibold text-gray-600 border-b border-gray-100">التاريخ</th>
               <th className="px-4 py-3 font-semibold text-gray-600 border-b border-gray-100">نوع المعاملة</th>
-              <th className="px-4 py-3 font-semibold text-gray-600 border-b border-gray-100">المنتج</th>
-              <th className="px-4 py-3 font-semibold text-gray-600 border-b border-gray-100">الطالب</th>
-              <th className="px-4 py-3 font-semibold text-gray-600 border-b border-gray-100">التغيير في الرصيد</th>
-              <th className="px-4 py-3 font-semibold text-gray-600 border-b border-gray-100">الرصيد</th>
+              <th className="px-4 py-3 font-semibold text-gray-600 border-b border-gray-100">الوصف</th>
+              <th className="px-4 py-3 font-semibold text-gray-600 border-b border-gray-100">المبلغ</th>
+              <th className="px-4 py-3 font-semibold text-gray-600 border-b border-gray-100">الرصيد بعد المعاملة</th>
             </tr>
           </thead>
           <tbody>
-            {transactions.map((transaction, index) => (
-              <tr key={index} className="hover:bg-gray-50/50 transition-colors">
-                <td className="px-4 py-4 text-gray-900 border-b border-gray-50">{transaction.date}</td>
-                <td className="px-4 py-4 border-b border-gray-50">
-                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-${transaction.typeColor}-100 text-${transaction.typeColor}-700`}>
-                    {transaction.type}
-                  </span>
-                </td>
-                <td className="px-4 py-4 text-gray-600 border-b border-gray-50">{transaction.product}</td>
-                <td className="px-4 py-4 text-gray-600 border-b border-gray-50">{transaction.student}</td>
-                <td className="px-4 py-4 text-green-600 font-semibold border-b border-gray-50">﷼{transaction.change}</td>
-                <td className="px-4 py-4 text-gray-900 font-medium border-b border-gray-50">﷼{transaction.after}</td>
-              </tr>
-            ))}
+            {transactions.map((transaction) => {
+              const typeInfo = getTypeInfo(transaction.type);
+              const isPositive = ['payment', 'commission'].includes(transaction.type);
+              const amountSign = isPositive ? '+' : '-';
+              const amountColor = isPositive ? 'text-green-600' : 'text-red-600';
+              
+                             return (
+                 <tr key={transaction.id} className="hover:bg-gray-50/50 transition-colors">
+                   <td className="px-4 py-4 text-gray-600 border-b border-gray-50">
+                     {transaction.reference_id}
+                   </td>
+                   <td className="px-4 py-4 text-gray-900 border-b border-gray-50">
+                     {formatDate(transaction.created_at)}
+                   </td>
+                   <td className="px-4 py-4 border-b border-gray-50">
+                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-${typeInfo.color}-100 text-${typeInfo.color}-700`}>
+                       {typeInfo.label}
+                     </span>
+                   </td>
+                   <td className="px-4 py-4 text-gray-600 border-b border-gray-50">
+                     {transaction.description}
+                   </td>
+                   <td className={`px-4 py-4 font-semibold border-b border-gray-50 ${amountColor}`}>
+                     {amountSign}﷼{transaction.amount.toFixed(2)}
+                   </td>
+                   <td className="px-4 py-4 text-gray-900 font-medium border-b border-gray-50">
+                     ﷼{transaction.balance_after.toFixed(2)}
+                   </td>
+                 </tr>
+                              );
+             })}
+             {transactions.length === 0 && (
+               <tr>
+                 <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                   لا توجد معاملات مالية
+                 </td>
+               </tr>
+             )}
           </tbody>
         </table>
       </div>
     </Card>
   );
 }
+ 

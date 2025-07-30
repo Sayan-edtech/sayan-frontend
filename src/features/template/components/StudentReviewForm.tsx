@@ -16,16 +16,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, Star, CheckCircle } from "lucide-react";
+import { useCreateOpinion } from "../hooks/useOpinionsMutations";
 
 interface ReviewFormData {
-  studentName: string;
+  name: string;
+  content: string;
   rating: number;
-  comment: string;
-  studentImage?: File | null;
+  image?: File | null;
 }
 
 const StudentReviewForm = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const createOpinionMutation = useCreateOpinion();
 
   const {
     control,
@@ -34,23 +37,32 @@ const StudentReviewForm = () => {
     reset,
   } = useForm<ReviewFormData>({
     defaultValues: {
-      studentName: "",
+      name: "",
+      content: "",
       rating: 5,
-      comment: "",
-      studentImage: null,
+      image: null,
     },
     mode: "onChange",
   });
 
-
-
-  const onSubmit = (data: ReviewFormData) => {
-    // Handle form submission logic here
-    console.log("Review Data:", data);
-    
-    // Reset form and close dialog
-    reset();
-    setIsOpen(false);
+  const onSubmit = async (data: ReviewFormData) => {
+    try {
+      const payload = {
+        name: data.name,
+        title: `تقييم ${data.name}`, // إنشاء title تلقائياً من اسم الطالب
+        content: data.content,
+        rating: data.rating,
+      };
+      
+      // إرسال البيانات للـ API
+      await createOpinionMutation.mutateAsync(payload);
+      
+      // إعادة تعيين النموذج وإغلاق النافذة
+      reset();
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Error creating opinion:", error);
+    }
   };
 
   const resetForm = () => {
@@ -98,16 +110,16 @@ const StudentReviewForm = () => {
               </Label>
               <Controller
                 control={control}
-                name="studentName"
+                name="name"
                 rules={{ required: "اسم الطالب مطلوب" }}
                 render={({ field: { onChange, value } }) => (
                   <Input
                     id="student-name"
-                    value={value}
+                    value={value || ""}
                     onChange={onChange}
                     placeholder="أدخل اسم الطالب"
                     className={`${
-                      errors.studentName
+                      errors.name
                         ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                         : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                     } h-10 !bg-transparent`}
@@ -115,12 +127,14 @@ const StudentReviewForm = () => {
                   />
                 )}
               />
-              {errors.studentName && (
+              {errors.name && (
                 <p className="text-sm text-destructive">
-                  {errors.studentName.message}
+                  {errors.name.message}
                 </p>
               )}
             </div>
+
+
             
             <div className="space-y-2">
               <Label className="text-sm font-medium text-card-foreground">
@@ -129,29 +143,35 @@ const StudentReviewForm = () => {
               <Controller
                 control={control}
                 name="rating"
+                rules={{ required: "التقييم مطلوب", min: { value: 1, message: "يجب أن يكون التقييم على الأقل نجمة واحدة" } }}
                 render={({ field: { onChange, value } }) => (
                   renderStars(value, true, onChange)
                 )}
               />
+              {errors.rating && (
+                <p className="text-sm text-destructive">
+                  {errors.rating.message}
+                </p>
+              )}
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="comment" className="text-sm font-medium text-card-foreground">
+              <Label htmlFor="content" className="text-sm font-medium text-card-foreground">
                 التعليق
               </Label>
               <Controller
                 control={control}
-                name="comment"
+                name="content"
                 rules={{ required: "التعليق مطلوب" }}
                 render={({ field: { onChange, value } }) => (
                   <Textarea
-                    id="comment"
-                    value={value}
+                    id="content"
+                    value={value || ""}
                     onChange={onChange}
                     placeholder="اكتب تعليق الطالب هنا..."
                     rows={4}
                     className={`${
-                      errors.comment
+                      errors.content
                         ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                         : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                     } !bg-transparent resize-none`}
@@ -159,16 +179,16 @@ const StudentReviewForm = () => {
                   />
                 )}
               />
-              {errors.comment && (
+              {errors.content && (
                 <p className="text-sm text-destructive">
-                  {errors.comment.message}
+                  {errors.content.message}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
               <ImageField
-                name="studentImage"
+                name="image"
                 type="image"
                 label="صورة الطالب (اختيارية)"
                 placeholder="اختر صورة الطالب"
@@ -191,10 +211,11 @@ const StudentReviewForm = () => {
             </Button>
             <Button
               type="submit"
+              disabled={createOpinionMutation.isPending}
               className="flex-1 gap-2"
             >
               <CheckCircle className="w-4 h-4" />
-              إضافة التقييم
+              {createOpinionMutation.isPending ? "جاري الحفظ..." : "إضافة التقييم"}
             </Button>
           </DialogFooter>
         </form>

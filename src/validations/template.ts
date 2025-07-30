@@ -89,10 +89,6 @@ export const academyAboutSchema = z.object({
     .string()
     .min(2, { message: "العنوان يجب أن يكون أكثر من حرفين" })
     .max(100, { message: "العنوان يجب أن يكون أقل من 100 حرف" }),
-  subtitle: z
-    .string()
-    .min(2, { message: "العنوان الفرعي يجب أن يكون أكثر من حرفين" })
-    .max(150, { message: "العنوان الفرعي يجب أن يكون أقل من 150 حرف" }),
   description: z
     .string()
     .min(10, { message: "الوصف يجب أن يكون أكثر من 10 أحرف" })

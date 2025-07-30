@@ -6,7 +6,7 @@ interface HeaderProps {
 
 const Header = ({ selectedItem }: HeaderProps) => {
   const getTitle = () => {
-    return "درس HTML الأساسي";
+    return selectedItem?.lesson?.title || "درس HTML الأساسي";
   };
 
   const getCourseTitle = () => {
@@ -14,7 +14,7 @@ const Header = ({ selectedItem }: HeaderProps) => {
   };
 
   const getSectionTitle = () => {
-    return "المقدمة";
+    return selectedItem?.section?.title || "المقدمة";
   };
 
   return (

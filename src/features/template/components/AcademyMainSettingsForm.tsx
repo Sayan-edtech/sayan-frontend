@@ -79,11 +79,26 @@ const AcademyMainSettingsForm = ({
   const onSubmit = async (data: AcademyMainSettingsFormData) => {
     toast.error(null);
     try {
+      // التحقق من وجود بيانات للتحديث
+      if (!data.academyName || data.academyName.trim() === "") {
+        toast.error("يجب إدخال اسم الأكاديمية");
+        return;
+      }
+
       const formData = new FormData();
-      formData.append("platform_name", data.academyName);
-      // formData.append("subdomain", data.subdomain);
-      // formData.append("primary_color", data.primaryColor);
-      // formData.append("secondary_color", data.secondaryColor);
+      formData.append("platform_name", data.academyName.trim());
+      
+      // إضافة الحقول الأخرى إذا توفرت
+      if (data.subdomain) {
+        formData.append("subdomain", data.subdomain.trim());
+      }
+      if (data.primaryColor) {
+        formData.append("primary_color", data.primaryColor);
+      }
+      if (data.secondaryColor) {
+        formData.append("secondary_color", data.secondaryColor);
+      }
+
       await academyMainSettingsMutation.mutateAsync(formData);
       setHasUserChanges(false);
     } catch (error: unknown) {
