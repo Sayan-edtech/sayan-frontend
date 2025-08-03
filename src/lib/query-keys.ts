@@ -195,4 +195,18 @@ export const queryKeys = {
         `skip-${skip}-limit-${limit}`,
       ] as const,
   },
+  exam: {
+    all: ["exam"] as const,
+    lists: () => [...queryKeys.exam.all, "list"] as const,
+    list: (filters: string) => [...queryKeys.exam.lists(), filters] as const,
+    details: () => [...queryKeys.exam.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.exam.details(), id] as const,
+
+    // Mutation keys for Exam operations
+    mutations: {
+      create: () => [...queryKeys.exam.all, "create"] as const,
+      update: (id: string) => [...queryKeys.exam.all, "update", id] as const,
+      delete: (id: string) => [...queryKeys.exam.all, "delete", id] as const,
+    },
+  },
 };
