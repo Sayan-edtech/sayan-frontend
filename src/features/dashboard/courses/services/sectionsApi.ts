@@ -1,4 +1,4 @@
-import axios from "@/lib/axios";
+import { api } from "@/lib/axios";
 import type { Section } from "@/types/couse";
 import type {
   SectionPayload,
@@ -25,7 +25,7 @@ export interface SectionResponse {
 export const sectionsApi = {
   // Get all sections
   getSections: async (courseId: string): Promise<SectionsListResponse> => {
-    const response = await axios.get(`/academy/courses/${courseId}/chapters`);
+    const response = await api.get(`/academy/courses/${courseId}/chapters`);
     return response.data;
   },
 
@@ -33,13 +33,13 @@ export const sectionsApi = {
   getSectionsByCourse: async (
     courseId: string
   ): Promise<SectionsListResponse> => {
-    const response = await axios.get(`/academy/courses/${courseId}/sections`);
+    const response = await api.get(`/academy/courses/${courseId}/sections`);
     return response.data;
   },
 
   // Get single section by ID
   getSection: async (id: string): Promise<SectionResponse> => {
-    const response = await axios.get(`/academy/sections/${id}`);
+    const response = await api.get(`/academy/sections/${id}`);
     return response.data;
   },
 
@@ -53,7 +53,7 @@ export const sectionsApi = {
         ? { headers: { "Content-Type": "multipart/form-data" } }
         : {};
 
-    const response = await axios.post(
+    const response = await api.post(
       `/academy/courses/${courseId}/chapters`,
       data,
       config
@@ -66,7 +66,7 @@ export const sectionsApi = {
     data,
     sectionId,
   }: SectionUpdatePayload): Promise<SectionResponse> => {
-    const response = await axios.put(`/chapters/${sectionId}`, data, {
+    const response = await api.put(`/chapters/${sectionId}`, data, {
       headers: {
         "Content-Type":
           typeof data === "object" ? "application/json" : "multipart/form-data",
@@ -77,7 +77,7 @@ export const sectionsApi = {
 
   // Delete section
   deleteSection: async (id: string): Promise<void> => {
-    await axios.delete(`/chapters/${id}`);
+    await api.delete(`/chapters/${id}`);
   },
 
   // Toggle section publish status
@@ -85,7 +85,7 @@ export const sectionsApi = {
     id: string,
     isPublished: boolean
   ): Promise<SectionResponse> => {
-    const response = await axios.patch(`/academy/sections/${id}/status`, {
+    const response = await api.patch(`/academy/sections/${id}/status`, {
       is_published: isPublished,
     });
     return response.data;

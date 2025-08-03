@@ -44,8 +44,10 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useUpdateOpinion, useDeleteOpinion } from "../hooks/useOpinionsMutations";
-import { toast } from "sonner";
+import {
+  useUpdateOpinion,
+  useDeleteOpinion,
+} from "../hooks/useOpinionsMutations";
 
 interface StudentReview {
   id: string | number;
@@ -78,15 +80,17 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  
+
   // Edit Dialog States
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingReview, setEditingReview] = useState<StudentReview | null>(null);
-  
+  const [editingReview, setEditingReview] = useState<StudentReview | null>(
+    null
+  );
+
   // Mutations
   const updateOpinionMutation = useUpdateOpinion();
   const deleteOpinionMutation = useDeleteOpinion();
-  
+
   // Edit Form
   const {
     control,
@@ -109,13 +113,17 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
       header: "الصورة",
       cell: ({ row }) => (
         <img
-          src={row.getValue("image") || "https://via.placeholder.com/48x48/e5e7eb/9ca3af?text=صورة"}
+          src={
+            row.getValue("image") ||
+            "https://via.placeholder.com/48x48/e5e7eb/9ca3af?text=صورة"
+          }
           alt={`صورة ${row.getValue("name")}`}
           className="h-12 w-12 rounded-lg object-cover"
           loading="lazy"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = "https://via.placeholder.com/48x48/e5e7eb/9ca3af?text=صورة";
+            target.src =
+              "https://via.placeholder.com/48x48/e5e7eb/9ca3af?text=صورة";
           }}
         />
       ),
@@ -132,12 +140,14 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
         </div>
       ),
     },
-   
+
     {
       accessorKey: "rating",
       header: "التقييم",
       cell: ({ row }) => (
-        <div className="text-[#FFC107]">{"★".repeat(row.getValue("rating"))}</div>
+        <div className="text-[#FFC107]">
+          {"★".repeat(row.getValue("rating"))}
+        </div>
       ),
     },
     {
@@ -177,17 +187,16 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]" dir="rtl">
                 <DialogHeader>
-                  <DialogTitle className="text-right">حذف تقييم الطالب</DialogTitle>
+                  <DialogTitle className="text-right">
+                    حذف تقييم الطالب
+                  </DialogTitle>
                   <DialogDescription className="text-right">
-                    هل أنت متأكد أنك تريد حذف هذا التقييم؟ هذه العملية لا يمكن التراجع عنها.
+                    هل أنت متأكد أنك تريد حذف هذا التقييم؟ هذه العملية لا يمكن
+                    التراجع عنها.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1"
-                  >
+                  <Button type="button" variant="outline" className="flex-1">
                     إلغاء
                   </Button>
                   <Button
@@ -238,7 +247,7 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
 
   const onEditSubmit = async (data: ReviewFormData) => {
     if (!editingReview) return;
-    
+
     try {
       await updateOpinionMutation.mutateAsync({
         id: editingReview.id.toString(),
@@ -249,7 +258,7 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
           rating: data.rating,
         },
       });
-      
+
       setEditDialogOpen(false);
       setEditingReview(null);
       reset();
@@ -266,16 +275,18 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
     }
   };
 
-  const renderStars = (rating: number, interactive = false, onStarClick?: (rating: number) => void) => {
+  const renderStars = (
+    rating: number,
+    interactive = false,
+    onStarClick?: (rating: number) => void
+  ) => {
     return (
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
             className={`w-5 h-5 ${
-              star <= rating 
-                ? "text-yellow-400 fill-current" 
-                : "text-gray-300"
+              star <= rating ? "text-yellow-400 fill-current" : "text-gray-300"
             } ${interactive ? "cursor-pointer hover:text-yellow-300" : ""}`}
             onClick={() => interactive && onStarClick?.(star)}
           />
@@ -289,9 +300,7 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 py-4">
         <Input
           placeholder="البحث في الاراء عن اسم الطالب..."
-          value={
-            (table.getColumn("name")?.getFilterValue() as string) ?? ""
-          }
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
@@ -341,13 +350,17 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
             >
               <div className="flex items-start gap-3">
                 <img
-                  src={row.getValue("image") || "https://via.placeholder.com/64x64/e5e7eb/9ca3af?text=صورة"}
+                  src={
+                    row.getValue("image") ||
+                    "https://via.placeholder.com/64x64/e5e7eb/9ca3af?text=صورة"
+                  }
                   alt={`صورة ${row.getValue("name")}`}
                   className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
                   loading="lazy"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = "https://via.placeholder.com/64x64/e5e7eb/9ca3af?text=صورة";
+                    target.src =
+                      "https://via.placeholder.com/64x64/e5e7eb/9ca3af?text=صورة";
                   }}
                 />
                 <div className="flex-1 min-w-0">
@@ -382,9 +395,12 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]" dir="rtl">
                       <DialogHeader>
-                        <DialogTitle className="text-right">حذف تقييم الطالب</DialogTitle>
+                        <DialogTitle className="text-right">
+                          حذف تقييم الطالب
+                        </DialogTitle>
                         <DialogDescription className="text-right">
-                          هل أنت متأكد أنك تريد حذف هذا التقييم؟ هذه العملية لا يمكن التراجع عنها.
+                          هل أنت متأكد أنك تريد حذف هذا التقييم؟ هذه العملية لا
+                          يمكن التراجع عنها.
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter className="gap-2">
@@ -398,11 +414,15 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
                         <Button
                           type="button"
                           variant="destructive"
-                          onClick={() => handleDelete(row.original.id.toString())}
+                          onClick={() =>
+                            handleDelete(row.original.id.toString())
+                          }
                           disabled={deleteOpinionMutation.isPending}
                           className="flex-1"
                         >
-                          {deleteOpinionMutation.isPending ? "جاري الحذف..." : "حذف"}
+                          {deleteOpinionMutation.isPending
+                            ? "جاري الحذف..."
+                            : "حذف"}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
@@ -424,7 +444,9 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
               {row.original.is_approved !== undefined && (
                 <div className="flex justify-end">
                   <Badge
-                    variant={row.original.is_approved ? "default" : "destructive"}
+                    variant={
+                      row.original.is_approved ? "default" : "destructive"
+                    }
                     className="text-xs"
                   >
                     {row.original.is_approved ? "معتمد" : "في انتظار الموافقة"}
@@ -536,7 +558,10 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
           <form onSubmit={handleSubmit(onEditSubmit)}>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-student-name" className="text-sm font-medium text-card-foreground">
+                <Label
+                  htmlFor="edit-student-name"
+                  className="text-sm font-medium text-card-foreground"
+                >
                   اسم الطالب
                 </Label>
                 <Controller
@@ -565,8 +590,6 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
                 )}
               </div>
 
-
-              
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-card-foreground">
                   التقييم
@@ -574,10 +597,16 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
                 <Controller
                   control={control}
                   name="rating"
-                  rules={{ required: "التقييم مطلوب", min: { value: 1, message: "يجب أن يكون التقييم على الأقل نجمة واحدة" } }}
-                  render={({ field: { onChange, value } }) => (
+                  rules={{
+                    required: "التقييم مطلوب",
+                    min: {
+                      value: 1,
+                      message: "يجب أن يكون التقييم على الأقل نجمة واحدة",
+                    },
+                  }}
+                  render={({ field: { onChange, value } }) =>
                     renderStars(value, true, onChange)
-                  )}
+                  }
                 />
                 {errors.rating && (
                   <p className="text-sm text-destructive">
@@ -585,9 +614,12 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
                   </p>
                 )}
               </div>
-              
+
               <div className="space-y-2">
-                <Label htmlFor="edit-content" className="text-sm font-medium text-card-foreground">
+                <Label
+                  htmlFor="edit-content"
+                  className="text-sm font-medium text-card-foreground"
+                >
                   التعليق
                 </Label>
                 <Controller
@@ -635,7 +667,9 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
                 disabled={updateOpinionMutation.isPending}
                 className="flex-1 gap-2"
               >
-                {updateOpinionMutation.isPending ? "جاري الحفظ..." : "حفظ التعديلات"}
+                {updateOpinionMutation.isPending
+                  ? "جاري الحفظ..."
+                  : "حفظ التعديلات"}
               </Button>
             </DialogFooter>
           </form>

@@ -38,4 +38,4 @@ export interface FAQPayload {
   category?: string;
   order?: number;
   is_active?: boolean;
-} 
+}

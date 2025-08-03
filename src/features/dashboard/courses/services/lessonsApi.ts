@@ -1,4 +1,4 @@
-import axios from "@/lib/axios";
+import { api } from "@/lib/axios";
 import type { Lesson } from "@/types/couse";
 
 // Types for API responses
@@ -37,7 +37,7 @@ export const lessonsApi = {
   getLessonsBySection: async (
     sectionId: string
   ): Promise<LessonsListResponse> => {
-    const response = await axios.get(`/academy/chapters/${sectionId}/lessons`);
+    const response = await api.get(`/academy/chapters/${sectionId}/lessons`);
     return response.data;
   },
 
@@ -45,13 +45,13 @@ export const lessonsApi = {
   getLessonsByCourse: async (
     courseId: string
   ): Promise<LessonsListResponse> => {
-    const response = await axios.get(`/academy/courses/${courseId}/lessons`);
+    const response = await api.get(`/academy/courses/${courseId}/lessons`);
     return response.data;
   },
 
   // Get single lesson by ID
   getLesson: async (id: string): Promise<LessonResponse> => {
-    const response = await axios.get(`/academy/lessons/${id}`);
+    const response = await api.get(`/academy/lessons/${id}`);
     return response.data;
   },
 
@@ -60,7 +60,7 @@ export const lessonsApi = {
     sectionId,
     data,
   }: LessonPayload): Promise<LessonResponse> => {
-    const response = await axios.post(`/lessons/${sectionId}`, data, {
+    const response = await api.post(`/lessons/${sectionId}`, data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -73,7 +73,7 @@ export const lessonsApi = {
     lessonId,
     data,
   }: LessonUpdatePayload): Promise<LessonResponse> => {
-    const response = await axios.put(`/lessons/${lessonId}`, data, {
+    const response = await api.put(`/lessons/${lessonId}`, data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -83,12 +83,12 @@ export const lessonsApi = {
 
   // Delete lesson
   deleteLesson: async (id: string): Promise<LessonResponse> => {
-    const response = await axios.delete(`/lessons/${id}`);
+    const response = await api.delete(`/lessons/${id}`);
     return response.data;
   },
 
   getVideoLesson: async (video_id: string): Promise<Blob> => {
-    const response = await axios.get(`/videos/watch-direct/${video_id}`, {
+    const response = await api.get(`/videos/watch-direct/${video_id}`, {
       responseType: "blob",
     });
     return response.data;
@@ -97,7 +97,7 @@ export const lessonsApi = {
     lessonId: string,
     data: FormData
   ): Promise<LessonResponse> => {
-    const response = await axios.post(`/lessons/${lessonId}/video`, data, {
+    const response = await api.post(`/lessons/${lessonId}/video`, data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

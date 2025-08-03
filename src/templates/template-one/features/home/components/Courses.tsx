@@ -160,7 +160,6 @@ export default Courses;
 
 function CoursesList() {
   const { academySlug } = useParams();
-  console.log("academySlug", academySlug);
   return (
     <div className="relative">
       <Swiper

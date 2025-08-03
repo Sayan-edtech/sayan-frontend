@@ -1,4 +1,5 @@
 import { api } from "@/lib/axios";
+import { appendFormData } from "@/lib/formdata";
 import type {
   AuthResponse,
   LoginRequest,
@@ -19,12 +20,7 @@ export const authService = {
   async signup(userData: SignupRequest): Promise<AuthResponse> {
     const formData = new FormData();
 
-    // Append all fields that exist and have truthy values
-    Object.entries(userData).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        formData.append(key, value);
-      }
-    });
+    appendFormData(formData, userData);
 
     const response = await api.post<AuthResponse>("/auth/register", formData, {
       headers: {

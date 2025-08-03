@@ -5,57 +5,64 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import ImageField from "@/components/shared/formFields/image-field";
 import TextareaField from "@/components/shared/formFields/textarea-field";
-import {
-  academyMainMenuSchema,
-  type AcademyMainMenuForm as AcademyMainMenuFormType,
-} from "@/validations/template";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Menu, Settings, Link2, Image as ImageIcon, CheckCircle, Loader2 } from "lucide-react";
+import {
+  Menu,
+  Link2,
+  Image as ImageIcon,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
+import {
+  academyHeroSchema,
+  type AcademyHeroForm as AcademyHeroFormType,
+} from "@/validations/template";
+import { useAcademyHero } from "../hooks/useHeroQueries";
+import { useAcademyHeroMutation } from "../hooks/useHeroMutations";
 
-const AcademyMainMenuForm = () => {
-  const [hasUserChanges, setHasUserChanges] = useState(false);
-
+const AcademyHeroForm = () => {
+  const { data: hero } = useAcademyHero();
+  const academyHeroMutation = useAcademyHeroMutation();
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid, isDirty, isSubmitting },
+    formState: { errors, isSubmitting },
     reset,
-  } = useForm<AcademyMainMenuFormType>({
-    resolver: zodResolver(academyMainMenuSchema),
+  } = useForm<AcademyHeroFormType>({
+    resolver: zodResolver(academyHeroSchema),
     defaultValues: {
-      mainTitle: "",
-      subTitle: "",
-      description: "",
-      firstLinkTitle: "",
-      firstLinkUrl: "",
-      secondLinkTitle: "",
-      secondLinkUrl: "",
+      mainTitle: hero?.data?.mainTitle || "",
+      subTitle: hero?.data?.subTitle || "",
+      description: hero?.data?.description || "",
+      firstLinkTitle: hero?.data?.firstLinkTitle || "",
+      firstLinkUrl: hero?.data?.firstLinkUrl || "",
+      secondLinkTitle: hero?.data?.secondLinkTitle || "",
+      secondLinkUrl: hero?.data?.secondLinkUrl || "",
     },
     mode: "onChange",
   });
 
-  // Track when user actually makes changes (after initial render)
-  useEffect(() => {
-    if (isDirty) {
-      setHasUserChanges(true);
+  const onSubmit = async (data: AcademyHeroFormType) => {
+    const payload = {
+      mainTitle: data.mainTitle,
+      subTitle: data.subTitle,
+      description: data.description,
+      firstLinkTitle: data.firstLinkTitle,
+      firstLinkUrl: data.firstLinkUrl,
+      secondLinkTitle: data.secondLinkTitle,
+      secondLinkUrl: data.secondLinkUrl,
+    };
+
+    try {
+      await academyHeroMutation.mutateAsync(payload);
+    } catch (error) {
+      console.error("Error submitting Hero form:", error);
     }
-  }, [isDirty]);
-
-  const onSubmit = async (data: AcademyMainMenuFormType) => {
-    // Handle form submission logic here
-    console.log("Form submitted with data:", data);
-    // You can call your API or perform any other actions here
-
-    // After successful submission, reset the user changes flag
-    setHasUserChanges(false);
   };
 
   const handleReset = () => {
     reset();
-    setHasUserChanges(false);
   };
 
   const formLoading = isSubmitting;
@@ -67,15 +74,13 @@ const AcademyMainMenuForm = () => {
         <div className="flex items-center gap-3">
           <Menu className="w-5 h-5 text-purple-600" />
           <div>
-            <h2 className="text-base font-semibold text-gray-900">تحرير القسم الرئيسي </h2>
-            <p className="text-sm text-gray-600">قم بتخصيص المحتوى والروابط في القسم الرئيسي </p>
+            <h2 className="text-base font-semibold text-gray-900">
+              تحرير القسم الرئيسي{" "}
+            </h2>
+            <p className="text-sm text-gray-600">
+              قم بتخصيص المحتوى والروابط في القسم الرئيسي{" "}
+            </p>
           </div>
-          {hasUserChanges && (
-            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 mr-auto">
-              <Settings className="w-3 h-3 ml-1" />
-              يوجد تغييرات غير محفوظة
-            </Badge>
-          )}
         </div>
       </div>
 
@@ -335,7 +340,9 @@ const AcademyMainMenuForm = () => {
                   type="image"
                   label=""
                   placeholder="اختر الصورة الرئيسية"
-                  control={control as unknown as Control<Record<string, unknown>>}
+                  control={
+                    control as unknown as Control<Record<string, unknown>>
+                  }
                   errors={errors}
                   disabled={formLoading}
                 />
@@ -346,11 +353,7 @@ const AcademyMainMenuForm = () => {
 
         {/* Form Actions */}
         <div className="flex justify-start gap-3 pt-4 border-t border-gray-100">
-          <Button
-            type="submit"
-            disabled={!isValid || isSubmitting || !hasUserChanges}
-            className="px-6"
-          >
+          <Button type="submit" disabled={isSubmitting} className="px-6">
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 ml-2 animate-spin" />
@@ -367,7 +370,7 @@ const AcademyMainMenuForm = () => {
             type="button"
             variant="outline"
             onClick={handleReset}
-            disabled={isSubmitting || !hasUserChanges}
+            disabled={isSubmitting}
             className="px-6"
           >
             إلغاء التغييرات
@@ -378,4 +381,4 @@ const AcademyMainMenuForm = () => {
   );
 };
 
-export default AcademyMainMenuForm;
+export default AcademyHeroForm;

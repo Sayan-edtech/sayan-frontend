@@ -4,7 +4,7 @@ import type {
   SlidersListResponse,
   SliderResponse,
   SliderPayload,
-} from "@/types/slider";
+} from "@/types/academy/about";
 
 // API service for Sliders (About Us section)
 export const slidersApi = {
@@ -27,7 +27,10 @@ export const slidersApi = {
   },
 
   // Update existing slider
-  updateSlider: async (id: string, sliderData: SliderPayload): Promise<SliderResponse> => {
+  updateSlider: async (
+    id: string,
+    sliderData: SliderPayload
+  ): Promise<SliderResponse> => {
     const response = await api.put(`sliders/${id}`, sliderData);
     return response.data;
   },
@@ -37,4 +40,4 @@ export const slidersApi = {
     const response = await api.delete(`sliders/${id}`);
     return response.data;
   },
-}; 
+};

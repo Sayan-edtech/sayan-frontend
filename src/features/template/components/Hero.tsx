@@ -1,16 +1,16 @@
 import { Menu } from "lucide-react";
-import AcademyMainMenuForm from "./AcademyMainMenuForm";
+import AcademyHeroForm from "./AcademyHeroForm";
 
-function MainMenu() {
+function Hero() {
   return (
     <div className="space-y-6">
       <Header />
-      <AcademyMainMenuForm />
+      <AcademyHeroForm />
     </div>
   );
 }
 
-export default MainMenu;
+export default Hero;
 
 function Header() {
   return (
@@ -19,7 +19,7 @@ function Header() {
         <div className="flex items-center gap-2 text-gray-600">
           <Menu className="w-5 h-5 text-blue-600" />
           <span className="font-medium text-sm lg:text-base">
-          القسم الرئيسي
+            القسم الرئيسي
           </span>
         </div>
       </div>

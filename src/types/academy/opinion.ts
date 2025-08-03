@@ -39,10 +39,9 @@ export interface OpinionResponse {
 
 export interface OpinionPayload {
   name: string;
-  title: string;
   content: string;
   rating: number;
   image?: File | string;
   is_featured?: boolean;
   is_approved?: boolean;
-} 
+}

@@ -17,13 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Star, CheckCircle } from "lucide-react";
 import { useCreateOpinion } from "../hooks/useOpinionsMutations";
-
-interface ReviewFormData {
-  name: string;
-  content: string;
-  rating: number;
-  image?: File | null;
-}
+import type { OpinionPayload } from "@/types/academy/opinion";
 
 const StudentReviewForm = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,29 +29,19 @@ const StudentReviewForm = () => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<ReviewFormData>({
+  } = useForm<OpinionPayload>({
     defaultValues: {
       name: "",
       content: "",
       rating: 5,
-      image: null,
     },
     mode: "onChange",
   });
 
-  const onSubmit = async (data: ReviewFormData) => {
+  const onSubmit = async (data: OpinionPayload) => {
     try {
-      const payload = {
-        name: data.name,
-        title: `تقييم ${data.name}`, // إنشاء title تلقائياً من اسم الطالب
-        content: data.content,
-        rating: data.rating,
-      };
-      
-      // إرسال البيانات للـ API
-      await createOpinionMutation.mutateAsync(payload);
-      
-      // إعادة تعيين النموذج وإغلاق النافذة
+      await createOpinionMutation.mutateAsync(data);
+
       reset();
       setIsOpen(false);
     } catch (error) {
@@ -69,16 +53,18 @@ const StudentReviewForm = () => {
     reset();
   };
 
-  const renderStars = (rating: number, interactive = false, onStarClick?: (rating: number) => void) => {
+  const renderStars = (
+    rating: number,
+    interactive = false,
+    onStarClick?: (rating: number) => void
+  ) => {
     return (
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
             className={`w-5 h-5 ${
-              star <= rating 
-                ? "text-yellow-400 fill-current" 
-                : "text-gray-300"
+              star <= rating ? "text-yellow-400 fill-current" : "text-gray-300"
             } ${interactive ? "cursor-pointer hover:text-yellow-300" : ""}`}
             onClick={() => interactive && onStarClick?.(star)}
           />
@@ -97,7 +83,9 @@ const StudentReviewForm = () => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]" dir="rtl">
         <DialogHeader>
-          <DialogTitle className="text-right">إضافة تقييم طالب جديد</DialogTitle>
+          <DialogTitle className="text-right">
+            إضافة تقييم طالب جديد
+          </DialogTitle>
           <DialogDescription className="text-right">
             أضف تقييماً جديداً من أحد الطلبة مع إمكانية رفع صورة
           </DialogDescription>
@@ -105,7 +93,10 @@ const StudentReviewForm = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="student-name" className="text-sm font-medium text-card-foreground">
+              <Label
+                htmlFor="student-name"
+                className="text-sm font-medium text-card-foreground"
+              >
                 اسم الطالب
               </Label>
               <Controller
@@ -134,8 +125,6 @@ const StudentReviewForm = () => {
               )}
             </div>
 
-
-            
             <div className="space-y-2">
               <Label className="text-sm font-medium text-card-foreground">
                 التقييم
@@ -143,10 +132,16 @@ const StudentReviewForm = () => {
               <Controller
                 control={control}
                 name="rating"
-                rules={{ required: "التقييم مطلوب", min: { value: 1, message: "يجب أن يكون التقييم على الأقل نجمة واحدة" } }}
-                render={({ field: { onChange, value } }) => (
+                rules={{
+                  required: "التقييم مطلوب",
+                  min: {
+                    value: 1,
+                    message: "يجب أن يكون التقييم على الأقل نجمة واحدة",
+                  },
+                }}
+                render={({ field: { onChange, value } }) =>
                   renderStars(value, true, onChange)
-                )}
+                }
               />
               {errors.rating && (
                 <p className="text-sm text-destructive">
@@ -154,9 +149,12 @@ const StudentReviewForm = () => {
                 </p>
               )}
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="content" className="text-sm font-medium text-card-foreground">
+              <Label
+                htmlFor="content"
+                className="text-sm font-medium text-card-foreground"
+              >
                 التعليق
               </Label>
               <Controller
@@ -215,7 +213,9 @@ const StudentReviewForm = () => {
               className="flex-1 gap-2"
             >
               <CheckCircle className="w-4 h-4" />
-              {createOpinionMutation.isPending ? "جاري الحفظ..." : "إضافة التقييم"}
+              {createOpinionMutation.isPending
+                ? "جاري الحفظ..."
+                : "إضافة التقييم"}
             </Button>
           </DialogFooter>
         </form>

@@ -1,6 +1,8 @@
 import { buttonVariants } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAcademy } from "../hooks/useAcademyQueries";
+import { Routes } from "@/constants/enums";
 
 const imageVariants = {
   hidden: { opacity: 0, scale: 0.8, rotate: -5 },
@@ -8,6 +10,13 @@ const imageVariants = {
 };
 
 export default function Hero() {
+  const { academySlug } = useParams();
+  // const subdomain = window.location.hostname.split(".")[0];
+  const { data: academyInfo, isPending } = useAcademy({ slug: academySlug });
+  if (!isPending && !academyInfo) {
+    return <Navigate to={Routes.ROOT} state={{ from: location }} replace />;
+  }
+  console.log(academyInfo);
   return (
     <section id="home" className="pt-32 pb-16">
       <div className="container">

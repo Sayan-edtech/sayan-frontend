@@ -1,4 +1,4 @@
-export interface Slider {
+export interface About {
   id: string | number;
   title: string;
   description: string;
@@ -9,30 +9,20 @@ export interface Slider {
   updated_at?: string;
 }
 
-export interface SlidersListResponse {
+export interface AboutResponse {
   status: string;
   status_code: number;
   error_type: string | null;
   message: string;
-  data: Slider[];
+  data: About;
   path: string | null;
   timestamp: string;
 }
 
-export interface SliderResponse {
-  status: string;
-  status_code: number;
-  error_type: string | null;
-  message: string;
-  data: Slider;
-  path: string | null;
-  timestamp: string;
-}
-
-export interface SliderPayload {
+export interface AboutPayload {
   title: string;
   description: string;
   featureOne: string;
   featureTwo: string;
   heroImage?: File | string;
-} 
+}
