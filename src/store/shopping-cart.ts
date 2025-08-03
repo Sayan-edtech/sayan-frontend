@@ -14,13 +14,13 @@ interface ShoppingCartState {
   isOpen: boolean;
   // Actions
   addItem: (course: Course) => void;
-  removeItem: (courseId: number) => void;
-  updateQuantity: (courseId: number, quantity: number) => void;
+  removeItem: (courseId: string) => void;
+  updateQuantity: (courseId: string, quantity: number) => void;
   clearCart: () => void;
   toggleCart: () => void;
   setIsOpen: (isOpen: boolean) => void;
   // Helper
-  getItemById: (courseId: number) => CartItem | undefined;
+  getItemById: (courseId: string) => CartItem | undefined;
 }
 
 export const useShoppingCart = create<ShoppingCartState>()(
@@ -54,14 +54,14 @@ export const useShoppingCart = create<ShoppingCartState>()(
         }
       },
 
-      removeItem: (courseId: number) => {
+      removeItem: (courseId: string) => {
         const { items } = get();
         set({
           items: items.filter((item) => item.course.id !== courseId),
         });
       },
 
-      updateQuantity: (courseId: number, quantity: number) => {
+      updateQuantity: (courseId: string, quantity: number) => {
         const { items } = get();
         if (quantity <= 0) {
           // Remove item if quantity is 0 or less
@@ -89,7 +89,7 @@ export const useShoppingCart = create<ShoppingCartState>()(
         set({ isOpen });
       },
 
-      getItemById: (courseId: number) => {
+      getItemById: (courseId: string) => {
         return get().items.find((item) => item.course.id === courseId);
       },
     }),

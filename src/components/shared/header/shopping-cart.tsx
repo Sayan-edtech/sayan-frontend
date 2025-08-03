@@ -18,7 +18,7 @@ function ShoppingCart() {
   const { items, removeItem, updateQuantity, clearCart, isOpen, setIsOpen } =
     useShoppingCart();
   const { totalItems, totalPrice } = useCart();
-  const handleQuantityChange = (courseId: number, newQuantity: number) => {
+  const handleQuantityChange = (courseId: string, newQuantity: number) => {
     if (newQuantity < 1) {
       removeItem(courseId);
     } else {
@@ -94,7 +94,10 @@ function ShoppingCart() {
                         {item.course.title}
                       </h4>
                       <p className="text-xs text-muted-foreground mb-2">
-                        المحاضر: {item.course.trainer ? `${item.course.trainer.fname} ${item.course.trainer.lname}` : 'غير محدد'}
+                        المحاضر:{" "}
+                        {item.course.trainer
+                          ? `${item.course.trainer.fname} ${item.course.trainer.lname}`
+                          : "غير محدد"}
                       </p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -104,7 +107,7 @@ function ShoppingCart() {
                             className="h-6 w-6"
                             onClick={() =>
                               handleQuantityChange(
-                                Number(item.course.id),
+                                item.course.id,
                                 item.quantity - 1
                               )
                             }
@@ -120,7 +123,7 @@ function ShoppingCart() {
                             className="h-6 w-6"
                             onClick={() =>
                               handleQuantityChange(
-                                Number(item.course.id),
+                                item.course.id,
                                 item.quantity + 1
                               )
                             }
@@ -130,13 +133,15 @@ function ShoppingCart() {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-sm">
-                            {formatCurrency((item.course.price || 0) * item.quantity)}
+                            {formatCurrency(
+                              (item.course.price || 0) * item.quantity
+                            )}
                           </span>
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 text-destructive hover:text-destructive"
-                            onClick={() => removeItem(Number(item.course.id))}
+                            onClick={() => removeItem(item.course.id)}
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>

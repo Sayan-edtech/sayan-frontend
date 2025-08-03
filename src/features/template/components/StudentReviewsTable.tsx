@@ -253,7 +253,6 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
         id: editingReview.id.toString(),
         data: {
           name: data.name,
-          title: `تقييم ${data.name}`, // إنشاء title تلقائياً من اسم الطالب
           content: data.content,
           rating: data.rating,
         },

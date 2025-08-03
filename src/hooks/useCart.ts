@@ -22,12 +22,12 @@ export const useCart = () => {
   );
 
   // Helper function to check if a course is in the cart
-  const isInCart = (courseId: number): boolean => {
+  const isInCart = (courseId: string): boolean => {
     return items.some((item) => item.course.id === courseId);
   };
 
   // Helper function to get quantity of a specific course in cart
-  const getQuantity = (courseId: number): number => {
+  const getQuantity = (courseId: string): number => {
     const item = getItemById(courseId);
     return item ? item.quantity : 0;
   };
@@ -39,7 +39,7 @@ export const useCart = () => {
   };
 
   // Helper function to remove course with notification/feedback
-  const removeFromCart = (courseId: number) => {
+  const removeFromCart = (courseId: string) => {
     const item = getItemById(courseId);
     if (item) {
       removeItem(courseId);

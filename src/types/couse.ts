@@ -47,7 +47,7 @@ export interface Course {
   created_at: string; // or Date if parsed
   updated_at: string; // or Date if parsed
   title: string;
-  price: number | null;
+  price: number;
   discount_price: number | null;
   discount_ends_at: string | null; // or Date if parsed
 }
