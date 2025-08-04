@@ -24,6 +24,10 @@ const useFormValidations = (props: IFormFieldsVariables) => {
         return forgotPasswordSchema;
       case Pages.RESET_PASSWORD:
         return resetPassordSchema;
+      case Pages.SIGNIN_WITH_GOOGLE:
+        return z.object({
+          user_type: z.string().min(1, "يرجى تحديد نوع المستخدم"),
+        });
 
       default:
         return z.object({});

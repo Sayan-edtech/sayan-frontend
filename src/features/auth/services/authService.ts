@@ -12,14 +12,13 @@ export const authService = {
   // Login user
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/login", credentials);
-
+    console.log(response);
     return response.data;
   },
 
   // Register user
   async signup(userData: SignupRequest): Promise<AuthResponse> {
     const formData = new FormData();
-
     appendFormData(formData, userData);
 
     const response = await api.post<AuthResponse>("/auth/register", formData, {
@@ -27,7 +26,6 @@ export const authService = {
         "Content-Type": "multipart/form-data",
       },
     });
-
     return response.data;
   },
   // Forgot password

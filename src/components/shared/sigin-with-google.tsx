@@ -1,11 +1,11 @@
 import { useGoogleLogin } from "@react-oauth/google";
-import { authService } from "@/features/auth/services/authService";
-import { authCookies } from "@/lib/cookies";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Loader } from "./Loader";
-import { Routes, type UserType } from "@/constants/enums";
+import { Pages, Routes, type UserType } from "@/constants/enums";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/features/auth/hooks/useAuthStore";
+import { cookieStorage } from "@/lib/cookies";
 
 function SiginWithGoogle({
   children,
@@ -17,38 +17,56 @@ function SiginWithGoogle({
   setError: (name: string, error: { type: string; message: string }) => void;
 }) {
   const navigate = useNavigate();
+  const { login, signup } = useAuth();
   const isSignupPage = window.location.pathname.includes("signup");
   const [loading, setLoading] = useState(false);
-  const login = useGoogleLogin({
+  const sigin = useGoogleLogin({
     onSuccess: async ({ access_token }) => {
       try {
-        setLoading(false);
-        let data;
         if (isSignupPage && userType) {
-          data = await authService.signup({
+          const { message } = await signup({
             google_token: access_token,
             user_type: userType as UserType,
           });
+          toast.success(message || "تم التسجيل بنجاح");
+          navigate(Routes.DASHBOARD, {
+            replace: true,
+          });
+          return;
         }
-        data = await authService.login({
+        cookieStorage.setItem("google_token", access_token);
+        const { message, status_code } = await login({
           google_token: access_token,
         });
-        // Store in cookies
-        authCookies.setAuthData(
-          data.access_token,
-          data.refresh_token,
-          data.user_data
-        );
+        if (status_code !== 200) {
+          setLoading(false);
+          navigate(`/${Routes.AUTH}/${Pages.SIGNIN_WITH_GOOGLE}`, {
+            replace: true,
+          });
+          return;
+        }
 
-        toast(data.message || "تم تسجيل الدخول بنجاح");
-        navigate(`/${Routes.DASHBOARD}`, {
+        toast.success(message || "تم تسجيل الدخول بنجاح");
+        navigate(Routes.DASHBOARD, {
           replace: true,
         });
+
+        return;
       } catch (error) {
         setLoading(false);
+        // Check if it's a 400 error that requires redirect to Google signup
+        const axiosError = error as {
+          response?: { status?: number; data?: { message?: string } };
+        };
+        if (axiosError.response?.status === 400) {
+          navigate(`/${Routes.AUTH}/${Pages.SIGNIN_WITH_GOOGLE}`, {
+            replace: true,
+          });
+          return;
+        }
         toast.error(
-          (error as { response?: { data?: { message?: string } } })?.response
-            ?.data?.message || "فشل في تسجيل الدخول باستخدام جوجل"
+          axiosError?.response?.data?.message ||
+            "فشل في تسجيل الدخول باستخدام جوجل"
         );
         console.error("Google login failed:", error);
         throw error;
@@ -63,7 +81,7 @@ function SiginWithGoogle({
   const handleLoginClick = () => {
     setLoading(true);
     if (!userType && isSignupPage) {
-      toast.error("يرجى تحديد نوع المستخدم قبل تسجيل الدخول");
+      toast.error("يرجى تحديد نوع المستخدم قبل البدء في التسجيل");
       setLoading(false);
       setError("user_type", {
         type: "manual",
@@ -71,7 +89,7 @@ function SiginWithGoogle({
       });
       return;
     }
-    login();
+    sigin();
   };
 
   return (

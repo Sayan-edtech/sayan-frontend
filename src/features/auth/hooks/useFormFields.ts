@@ -109,6 +109,19 @@ const useFormFields = ({ slug }: IFormFieldsVariables) => {
       autoFocus: true,
     },
   ];
+  const signinWithGoogleFields = (): IFormField[] => [
+    {
+      label: "نوع الحساب",
+      name: "user_type",
+      type: "select",
+      placeholder: "اختر نوع حسابك",
+      autoFocus: true,
+      options: [
+        { value: UserType.STUDENT, label: "طالب" },
+        { value: UserType.ACADEMY, label: "أكاديمية" },
+      ],
+    },
+  ];
 
   const getFormFields = (): IFormField[] => {
     switch (slug) {
@@ -122,6 +135,8 @@ const useFormFields = ({ slug }: IFormFieldsVariables) => {
         return resetFields();
       case Pages.VERIFY_ACCOUNT:
         return verifyAccountFields();
+      case Pages.SIGNIN_WITH_GOOGLE:
+        return signinWithGoogleFields();
 
       default:
         return [];

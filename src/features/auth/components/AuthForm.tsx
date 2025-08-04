@@ -13,6 +13,7 @@ import { useAuth } from "@/features/auth/hooks/useAuthStore";
 import useFormFields from "../hooks/useFormFields";
 import useFormValidations from "../hooks/useFormValidations";
 import SiginWithGoogle from "@/components/shared/sigin-with-google";
+import { cookieStorage } from "@/lib/cookies";
 
 const AuthForm: React.FC<{
   slug: string;
@@ -61,7 +62,7 @@ const AuthForm: React.FC<{
           });
 
           toast.success(message);
-          navigate("/dashboard", {
+          navigate(Routes.DASHBOARD, {
             replace: true,
           });
         } else if (slug === Pages.SIGNUP) {
@@ -75,7 +76,6 @@ const AuthForm: React.FC<{
             user_type: data.user_type as UserType,
             profile_picture: data.profile_picture as File,
           });
-          console.log("status_code", status_code);
           if (status_code === 201) {
             toast.success(message);
             navigate(
@@ -115,6 +115,16 @@ const AuthForm: React.FC<{
               replace: true,
             });
           }
+        } else if (slug === Pages.SIGNIN_WITH_GOOGLE) {
+          const { message } = await login({
+            google_token: cookieStorage.getItem("google_token") as string,
+            user_type: data.user_type as UserType,
+          });
+
+          toast.success(message);
+          navigate(Routes.DASHBOARD, {
+            replace: true,
+          });
         }
       } catch (error: unknown) {
         const errorMessage =
@@ -229,6 +239,7 @@ function SubmitButton({
         return "تأكيد";
       case Pages.RESET_PASSWORD:
         return "تغيير كلمة المرور";
+
       default:
         return "تسجيل الدخول";
     }
@@ -312,6 +323,13 @@ function NavigationLink({
           isButton: true,
           disabled: countdown > 0 || isLoading,
           onClick: handleResendOtp,
+        };
+      case Pages.SIGNIN_WITH_GOOGLE:
+        return {
+          desc: "لديك حساب بالفعل؟",
+          title: "تسجيل الدخول",
+          href: `/${Routes.AUTH}/${Pages.SIGNIN}`,
+          isButton: false,
         };
       default:
         return {
