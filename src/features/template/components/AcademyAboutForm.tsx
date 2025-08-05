@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import ImageField from "@/components/shared/formFields/image-field";
-import TextareaField from "@/components/shared/formFields/textarea-field";
 import {
   academyAboutSchema,
   type AcademyAboutForm as AcademyAboutFormType,
@@ -14,13 +13,13 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info, Image as ImageIcon, CheckCircle, Loader2 } from "lucide-react";
 import { useAcademyAboutMutation } from "../hooks/useAboutMutations";
-import { useAcademyAbout } from "../hooks/useAboutQueries";
-import type { AboutPayload } from "@/types/academy/about";
+import type { About, AboutPayload } from "@/types/academy/about";
+import RichTextEditor from "@/components/shared/RichTextEditor";
 
-const AcademyAboutForm = () => {
+const AcademyAboutForm = ({ about }: { about: About }) => {
   const academyAboutMutation = useAcademyAboutMutation();
   const [currentSliderId, setCurrentSliderId] = useState<string | null>(null);
-  const { data: about } = useAcademyAbout();
+  const [isChangingImage, setIsChangingImage] = useState(false);
   const {
     control,
     handleSubmit,
@@ -29,10 +28,10 @@ const AcademyAboutForm = () => {
   } = useForm<AcademyAboutFormType>({
     resolver: zodResolver(academyAboutSchema),
     defaultValues: {
-      title: about?.data?.title || "",
-      description: about?.data?.description || "",
-      featureOne: about?.data?.featureOne || "",
-      featureTwo: about?.data?.featureTwo || "",
+      title: about.title || "",
+      content: about.content || "",
+      feature_one: about.feature_one || "",
+      feature_two: about.feature_two || "",
     },
     mode: "onChange",
   });
@@ -96,18 +95,11 @@ const AcademyAboutForm = () => {
                   control={control}
                   name="title"
                   render={({ field: { onChange, value } }) => (
-                    <Input
-                      type="text"
-                      value={value || ""}
+                    <RichTextEditor
+                      content={value || ""}
                       onChange={onChange}
-                      placeholder="أدخل العنوان الجذاب"
+                      minHeight="20px"
                       disabled={formLoading}
-                      className={`${
-                        errors.title
-                          ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
-                          : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
-                      } h-10 !bg-transparent`}
-                      dir="rtl"
                     />
                   )}
                 />
@@ -135,7 +127,7 @@ const AcademyAboutForm = () => {
                 </Label>
                 <Controller
                   control={control}
-                  name="featureOne"
+                  name="feature_one"
                   render={({ field: { onChange, value } }) => (
                     <Input
                       type="text"
@@ -144,7 +136,7 @@ const AcademyAboutForm = () => {
                       placeholder="مثال: +500 طالب"
                       disabled={formLoading}
                       className={`${
-                        errors.featureOne
+                        errors.feature_one
                           ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                           : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                       } h-10 !bg-transparent`}
@@ -152,9 +144,9 @@ const AcademyAboutForm = () => {
                     />
                   )}
                 />
-                {errors.featureOne && (
+                {errors.feature_one && (
                   <p className="text-sm text-destructive">
-                    {errors.featureOne.message}
+                    {errors.feature_one.message}
                   </p>
                 )}
               </div>
@@ -165,7 +157,7 @@ const AcademyAboutForm = () => {
                 </Label>
                 <Controller
                   control={control}
-                  name="featureTwo"
+                  name="feature_two"
                   render={({ field: { onChange, value } }) => (
                     <Input
                       type="text"
@@ -174,7 +166,7 @@ const AcademyAboutForm = () => {
                       placeholder="مثال: +50 دورة"
                       disabled={formLoading}
                       className={`${
-                        errors.featureTwo
+                        errors.feature_two
                           ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                           : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                       } h-10 !bg-transparent`}
@@ -182,9 +174,9 @@ const AcademyAboutForm = () => {
                     />
                   )}
                 />
-                {errors.featureTwo && (
+                {errors.feature_two && (
                   <p className="text-sm text-destructive">
-                    {errors.featureTwo.message}
+                    {errors.feature_two.message}
                   </p>
                 )}
               </div>
@@ -201,23 +193,59 @@ const AcademyAboutForm = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <ImageField
-                  name="heroImage"
-                  type="image"
-                  label=""
-                  placeholder="اختر الصورة الرئيسية"
-                  control={
-                    control as unknown as Control<Record<string, unknown>>
-                  }
-                  errors={errors}
-                  disabled={formLoading}
-                />
+                {about.image && !isChangingImage ? (
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <img
+                        src={about.image}
+                        alt="Hero Image"
+                        className="w-full h-40 object-cover rounded-lg border"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsChangingImage(true)}
+                      disabled={formLoading}
+                      className="w-full"
+                    >
+                      تغيير الصورة
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <ImageField
+                      name="heroImage"
+                      type="image"
+                      label=""
+                      placeholder="اختر الصورة الرئيسية"
+                      control={
+                        control as unknown as Control<Record<string, unknown>>
+                      }
+                      errors={errors}
+                      disabled={formLoading}
+                    />
+                    {about.image && isChangingImage && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsChangingImage(false)}
+                        disabled={formLoading}
+                        className="w-full"
+                      >
+                        إلغاء التغيير
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Description - Second Row */}
+        {/* content - Second Row */}
         <Card className="shadow-sm border-0">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-gray-800 text-sm font-medium">
@@ -226,17 +254,23 @@ const AcademyAboutForm = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <TextareaField
-              name="description"
-              type="textarea"
-              label=""
-              placeholder="اكتب وصفاً شاملاً عن الأكاديمية، رؤيتها، رسالتها، والخدمات التي تقدمها..."
+            <Controller
               control={control}
-              errors={errors}
-              disabled={formLoading}
-              rows={6}
-              maxLength={1000}
+              name="content"
+              render={({ field: { onChange, value } }) => (
+                <RichTextEditor
+                  content={value || ""}
+                  onChange={onChange}
+                  minHeight="150px"
+                  disabled={formLoading}
+                />
+              )}
             />
+            {errors.content && (
+              <p className="text-sm text-destructive">
+                {errors.content.message}
+              </p>
+            )}
           </CardContent>
         </Card>
 

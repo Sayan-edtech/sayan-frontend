@@ -29,6 +29,7 @@ export function DashboardLayout() {
   }
 
   return (
+    !isLoading &&
     user && (
       <div className="min-h-screen bg-background flex">
         <DashboardSidebar user={user} />

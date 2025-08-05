@@ -1,12 +1,15 @@
 export interface Hero {
-  id: string | number;
-  mainTitle: string;
-  subTitle: string;
+  title: string;
   description: string;
-  firstLinkTitle: string;
-  firstLinkUrl: string;
-  secondLinkTitle: string;
-  secondLinkUrl: string;
+  first_link: {
+    title: string;
+    url: string;
+  };
+  second_link: {
+    title: string;
+    url: string;
+  };
+  image: string;
 }
 
 export interface HeroResponse {
@@ -20,11 +23,11 @@ export interface HeroResponse {
 }
 
 export interface HeroPayload {
-  mainTitle: string;
-  subTitle: string;
+  title: string;
+  image?: File;
   description: string;
-  firstLinkTitle: string;
-  firstLinkUrl: string;
-  secondLinkTitle: string;
-  secondLinkUrl: string;
+  first_link_title: string;
+  first_link_url: string;
+  second_link_title: string;
+  second_link_url: string;
 }

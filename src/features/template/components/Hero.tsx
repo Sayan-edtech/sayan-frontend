@@ -1,12 +1,26 @@
 import { Menu } from "lucide-react";
 import AcademyHeroForm from "./AcademyHeroForm";
+import { useAcademyHero } from "../hooks/useHeroQueries";
+import { Loader } from "@/components/shared";
 
 function Hero() {
+  const { data: hero, isPending } = useAcademyHero();
+
+  if (isPending) {
+    return (
+      <div className="element-center">
+        <Loader />
+      </div>
+    );
+  }
   return (
-    <div className="space-y-6">
-      <Header />
-      <AcademyHeroForm />
-    </div>
+    !isPending &&
+    hero && (
+      <div className="space-y-6">
+        <Header />
+        <AcademyHeroForm hero={hero.data} />
+      </div>
+    )
   );
 }
 

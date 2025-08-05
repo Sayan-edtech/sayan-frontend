@@ -47,31 +47,27 @@ export type AcademyMainSettingsFormData = z.infer<
   typeof academyMainSettingsSchema
 >;
 export const academyHeroSchema = z.object({
-  mainTitle: z
+  title: z
     .string()
     .min(2, { message: "العنوان الرئيسي يجب أن يكون أكثر من حرفين" })
     .max(100, { message: "العنوان الرئيسي يجب أن يكون أقل من 100 حرف" }),
-  subTitle: z
-    .string()
-    .min(2, { message: "العنوان الفرعي يجب أن يكون أكثر من حرفين" })
-    .max(150, { message: "العنوان الفرعي يجب أن يكون أقل من 150 حرف" }),
   description: z
     .string()
     .min(10, { message: "الوصف يجب أن يكون أكثر من 10 أحرف" })
     .max(500, { message: "الوصف يجب أن يكون أقل من 500 حرف" }),
-  firstLinkTitle: z
+  first_link_title: z
     .string()
     .min(1, { message: "عنوان الرابط الأول مطلوب" })
     .max(50, { message: "عنوان الرابط الأول يجب أن يكون أقل من 50 حرف" }),
-  firstLinkUrl: z
+  first_link_url: z
     .string()
     .url({ message: "يجب أن يكون رابط صحيح" })
     .min(1, { message: "رابط الرابط الأول مطلوب" }),
-  secondLinkTitle: z
+  second_link_title: z
     .string()
     .min(1, { message: "عنوان الرابط الثاني مطلوب" })
     .max(50, { message: "عنوان الرابط الثاني يجب أن يكون أقل من 50 حرف" }),
-  secondLinkUrl: z
+  second_link_url: z
     .string()
     .url({ message: "يجب أن يكون رابط صحيح" })
     .min(1, { message: "رابط الرابط الثاني مطلوب" }),
@@ -83,7 +79,8 @@ export const academyHeroSchema = z.object({
     .refine(
       (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
       { message: "نوع الملف يجب أن يكون JPEG أو PNG أو WebP" }
-    ),
+    )
+    .optional(),
 });
 export type AcademyHeroForm = z.infer<typeof academyHeroSchema>;
 
@@ -92,19 +89,19 @@ export const academyAboutSchema = z.object({
     .string()
     .min(2, { message: "العنوان يجب أن يكون أكثر من حرفين" })
     .max(100, { message: "العنوان يجب أن يكون أقل من 100 حرف" }),
-  description: z
+  content: z
     .string()
     .min(10, { message: "الوصف يجب أن يكون أكثر من 10 أحرف" })
     .max(1000, { message: "الوصف يجب أن يكون أقل من 1000 حرف" }),
-  featureOne: z
+  feature_one: z
     .string()
     .min(1, { message: "السمة الأولى مطلوبة" })
     .max(100, { message: "السمة الأولى يجب أن تكون أقل من 100 حرف" }),
-  featureTwo: z
+  feature_two: z
     .string()
     .min(1, { message: "السمة الثانية مطلوبة" })
     .max(100, { message: "السمة الثانية يجب أن تكون أقل من 100 حرف" }),
-  heroImage: z
+  image: z
     .instanceof(File, { message: "الصورة مطلوبة" })
     .refine((file) => file.size <= 5 * 1024 * 1024, {
       message: "حجم الملف يجب أن يكون أقل من 5 ميجابايت",
@@ -112,7 +109,8 @@ export const academyAboutSchema = z.object({
     .refine(
       (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
       { message: "نوع الملف يجب أن يكون JPEG أو PNG أو WebP" }
-    ),
+    )
+    .optional(),
 });
 export type AcademyAboutForm = z.infer<typeof academyAboutSchema>;
 export const studentReviewSchema = z.object({

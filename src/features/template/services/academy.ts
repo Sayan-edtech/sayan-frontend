@@ -27,12 +27,24 @@ export const academyApi = {
     });
     return response.data;
   },
-  getAbout: async (): Promise<AboutResponse> => {
-    const response = await api.get("/about/");
+  getHero: async (): Promise<HeroResponse> => {
+    const response = await api.get("/academy/hero");
     return response.data;
   },
-  getHero: async (): Promise<HeroResponse> => {
-    const response = await api.get("/hero/");
+  updateHero: async (data: HeroPayload): Promise<HeroResponse> => {
+    const formData = new FormData();
+    appendFormData(formData, {
+      ...data,
+    });
+    const response = await api.put("/academy/hero", formData, {
+      headers: {
+        "Content-Type": "form-data",
+      },
+    });
+    return response.data;
+  },
+  getAbout: async (): Promise<AboutResponse> => {
+    const response = await api.get("/academy/about");
     return response.data;
   },
   updateAbout: async (data: AboutPayload): Promise<AboutResponse> => {
@@ -41,18 +53,6 @@ export const academyApi = {
       ...data,
     });
     const response = await api.put("/about/", formData, {
-      headers: {
-        "Content-Type": "form-data",
-      },
-    });
-    return response.data;
-  },
-  updateHero: async (data: HeroPayload): Promise<HeroResponse> => {
-    const formData = new FormData();
-    appendFormData(formData, {
-      ...data,
-    });
-    const response = await api.put("/hero/", formData, {
       headers: {
         "Content-Type": "form-data",
       },

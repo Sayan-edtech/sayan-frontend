@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import ImageField from "@/components/shared/formFields/image-field";
-import TextareaField from "@/components/shared/formFields/textarea-field";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,16 +13,20 @@ import {
   CheckCircle,
   Loader2,
 } from "lucide-react";
+import { useState } from "react";
 import {
   academyHeroSchema,
   type AcademyHeroForm as AcademyHeroFormType,
 } from "@/validations/template";
-import { useAcademyHero } from "../hooks/useHeroQueries";
 import { useAcademyHeroMutation } from "../hooks/useHeroMutations";
+import type { Hero } from "@/types/academy/hero";
+import RemoteImage from "@/components/shared/RemoteImage";
+import RichTextEditor from "@/components/shared/RichTextEditor";
 
-const AcademyHeroForm = () => {
-  const { data: hero } = useAcademyHero();
+const AcademyHeroForm = ({ hero }: { hero: Hero }) => {
   const academyHeroMutation = useAcademyHeroMutation();
+  const [isChangingImage, setIsChangingImage] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -32,30 +35,19 @@ const AcademyHeroForm = () => {
   } = useForm<AcademyHeroFormType>({
     resolver: zodResolver(academyHeroSchema),
     defaultValues: {
-      mainTitle: hero?.data?.mainTitle || "",
-      subTitle: hero?.data?.subTitle || "",
-      description: hero?.data?.description || "",
-      firstLinkTitle: hero?.data?.firstLinkTitle || "",
-      firstLinkUrl: hero?.data?.firstLinkUrl || "",
-      secondLinkTitle: hero?.data?.secondLinkTitle || "",
-      secondLinkUrl: hero?.data?.secondLinkUrl || "",
+      title: hero.title || "",
+      description: hero.description || "",
+      first_link_title: hero.first_link.title || "",
+      first_link_url: hero.first_link.url || "",
+      second_link_title: hero.second_link.title || "",
+      second_link_url: hero.second_link.url || "",
     },
     mode: "onChange",
   });
 
   const onSubmit = async (data: AcademyHeroFormType) => {
-    const payload = {
-      mainTitle: data.mainTitle,
-      subTitle: data.subTitle,
-      description: data.description,
-      firstLinkTitle: data.firstLinkTitle,
-      firstLinkUrl: data.firstLinkUrl,
-      secondLinkTitle: data.secondLinkTitle,
-      secondLinkUrl: data.secondLinkUrl,
-    };
-
     try {
-      await academyHeroMutation.mutateAsync(payload);
+      await academyHeroMutation.mutateAsync(data);
     } catch (error) {
       console.error("Error submitting Hero form:", error);
     }
@@ -101,56 +93,19 @@ const AcademyHeroForm = () => {
                 </Label>
                 <Controller
                   control={control}
-                  name="mainTitle"
+                  name="title"
                   render={({ field: { onChange, value } }) => (
-                    <Input
-                      type="text"
-                      value={value || ""}
+                    <RichTextEditor
+                      content={value || ""}
                       onChange={onChange}
-                      placeholder="أدخل العنوان الجذاب"
+                      minHeight="20px"
                       disabled={formLoading}
-                      className={`${
-                        errors.mainTitle
-                          ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
-                          : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
-                      } h-10 !bg-transparent`}
-                      dir="rtl"
                     />
                   )}
                 />
-                {errors.mainTitle && (
+                {errors.title && (
                   <p className="text-sm text-destructive">
-                    {errors.mainTitle.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-card-foreground">
-                  العنوان الفرعي
-                </Label>
-                <Controller
-                  control={control}
-                  name="subTitle"
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      type="text"
-                      value={value || ""}
-                      onChange={onChange}
-                      placeholder="أدخل العنوان الفرعي"
-                      disabled={formLoading}
-                      className={`${
-                        errors.subTitle
-                          ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
-                          : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
-                      } h-10 !bg-transparent`}
-                      dir="rtl"
-                    />
-                  )}
-                />
-                {errors.subTitle && (
-                  <p className="text-sm text-destructive">
-                    {errors.subTitle.message}
+                    {errors.title.message}
                   </p>
                 )}
               </div>
@@ -172,7 +127,7 @@ const AcademyHeroForm = () => {
                 </Label>
                 <Controller
                   control={control}
-                  name="firstLinkTitle"
+                  name="first_link_title"
                   render={({ field: { onChange, value } }) => (
                     <Input
                       type="text"
@@ -181,7 +136,7 @@ const AcademyHeroForm = () => {
                       placeholder="عنوان الرابط"
                       disabled={formLoading}
                       className={`${
-                        errors.firstLinkTitle
+                        errors.first_link_title
                           ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                           : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                       } h-10 !bg-transparent`}
@@ -189,9 +144,9 @@ const AcademyHeroForm = () => {
                     />
                   )}
                 />
-                {errors.firstLinkTitle && (
+                {errors.first_link_title && (
                   <p className="text-sm text-destructive">
-                    {errors.firstLinkTitle.message}
+                    {errors.first_link_title.message}
                   </p>
                 )}
               </div>
@@ -202,7 +157,7 @@ const AcademyHeroForm = () => {
                 </Label>
                 <Controller
                   control={control}
-                  name="firstLinkUrl"
+                  name="first_link_url"
                   render={({ field: { onChange, value } }) => (
                     <Input
                       type="url"
@@ -211,7 +166,7 @@ const AcademyHeroForm = () => {
                       placeholder="https://example.com"
                       disabled={formLoading}
                       className={`${
-                        errors.firstLinkUrl
+                        errors.first_link_url
                           ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                           : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                       } h-10 !bg-transparent`}
@@ -219,9 +174,9 @@ const AcademyHeroForm = () => {
                     />
                   )}
                 />
-                {errors.firstLinkUrl && (
+                {errors.first_link_url && (
                   <p className="text-sm text-destructive">
-                    {errors.firstLinkUrl.message}
+                    {errors.first_link_url.message}
                   </p>
                 )}
               </div>
@@ -243,7 +198,7 @@ const AcademyHeroForm = () => {
                 </Label>
                 <Controller
                   control={control}
-                  name="secondLinkTitle"
+                  name="second_link_title"
                   render={({ field: { onChange, value } }) => (
                     <Input
                       type="text"
@@ -252,7 +207,7 @@ const AcademyHeroForm = () => {
                       placeholder="عنوان الرابط"
                       disabled={formLoading}
                       className={`${
-                        errors.secondLinkTitle
+                        errors.second_link_title
                           ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                           : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                       } h-10 !bg-transparent`}
@@ -260,9 +215,9 @@ const AcademyHeroForm = () => {
                     />
                   )}
                 />
-                {errors.secondLinkTitle && (
+                {errors.second_link_title && (
                   <p className="text-sm text-destructive">
-                    {errors.secondLinkTitle.message}
+                    {errors.second_link_title.message}
                   </p>
                 )}
               </div>
@@ -273,7 +228,7 @@ const AcademyHeroForm = () => {
                 </Label>
                 <Controller
                   control={control}
-                  name="secondLinkUrl"
+                  name="second_link_url"
                   render={({ field: { onChange, value } }) => (
                     <Input
                       type="url"
@@ -282,7 +237,7 @@ const AcademyHeroForm = () => {
                       placeholder="https://example.com"
                       disabled={formLoading}
                       className={`${
-                        errors.secondLinkUrl
+                        errors.second_link_url
                           ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                           : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                       } h-10 !bg-transparent`}
@@ -290,19 +245,17 @@ const AcademyHeroForm = () => {
                     />
                   )}
                 />
-                {errors.secondLinkUrl && (
+                {errors.second_link_url && (
                   <p className="text-sm text-destructive">
-                    {errors.secondLinkUrl.message}
+                    {errors.second_link_url.message}
                   </p>
                 )}
               </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Description and Image - Second Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Description */}
+          {/*Description */}
           <Card className="shadow-sm border-0">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-gray-800 text-sm font-medium">
@@ -311,17 +264,23 @@ const AcademyHeroForm = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <TextareaField
-                name="description"
-                type="textarea"
-                label=""
-                placeholder="اكتب وصفاً جذاباً للصفحة الرئيسية..."
+              <Controller
                 control={control}
-                errors={errors}
-                disabled={formLoading}
-                rows={4}
-                maxLength={500}
+                name="description"
+                render={({ field: { onChange, value } }) => (
+                  <RichTextEditor
+                    content={value || ""}
+                    onChange={onChange}
+                    minHeight="150px"
+                    disabled={formLoading}
+                  />
+                )}
               />
+              {errors.description && (
+                <p className="text-sm text-destructive">
+                  {errors.description.message}
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -335,17 +294,58 @@ const AcademyHeroForm = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <ImageField
-                  name="heroImage"
-                  type="image"
-                  label=""
-                  placeholder="اختر الصورة الرئيسية"
-                  control={
-                    control as unknown as Control<Record<string, unknown>>
-                  }
-                  errors={errors}
-                  disabled={formLoading}
-                />
+                {hero.image && !isChangingImage ? (
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <RemoteImage
+                        prefix="static"
+                        src={hero.image}
+                        alt="Hero Image"
+                        className="w-full h-40 object-cover rounded-lg border"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setIsChangingImage(true);
+                      }}
+                      disabled={formLoading}
+                      className="w-full"
+                    >
+                      تغيير الصورة
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <ImageField
+                      name="image"
+                      type="image"
+                      label=""
+                      placeholder="اختر الصورة الرئيسية"
+                      control={
+                        control as unknown as Control<Record<string, unknown>>
+                      }
+                      errors={errors}
+                      disabled={formLoading}
+                    />
+                    {hero.image && isChangingImage && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setIsChangingImage(false);
+                        }}
+                        disabled={formLoading}
+                        className="w-full"
+                      >
+                        إلغاء التغيير
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
