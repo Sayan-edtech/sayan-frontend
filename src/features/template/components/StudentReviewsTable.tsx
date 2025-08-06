@@ -48,6 +48,7 @@ import {
   useUpdateOpinion,
   useDeleteOpinion,
 } from "../hooks/useOpinionsMutations";
+import RemoteImage from "@/components/shared/RemoteImage";
 
 interface StudentReview {
   id: string | number;
@@ -111,22 +112,16 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
     {
       accessorKey: "image",
       header: "الصورة",
-      cell: ({ row }) => (
-        <img
-          src={
-            row.getValue("image") ||
-            "https://via.placeholder.com/48x48/e5e7eb/9ca3af?text=صورة"
-          }
-          alt={`صورة ${row.getValue("name")}`}
-          className="h-12 w-12 rounded-lg object-cover"
-          loading="lazy"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src =
-              "https://via.placeholder.com/48x48/e5e7eb/9ca3af?text=صورة";
-          }}
-        />
-      ),
+      cell: ({ row }) => {
+        const image = row.getValue("image") as string;
+        return (
+          <RemoteImage
+            src={image?.replace("static/", "") || ""}
+            alt={`صورة ${row.getValue("name")}`}
+            className="h-12 w-12 rounded-lg object-cover"
+          />
+        );
+      },
       enableSorting: false,
     },
     {

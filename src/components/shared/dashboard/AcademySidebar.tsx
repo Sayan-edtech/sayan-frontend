@@ -25,9 +25,10 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getAcademyDetails } from "@/lib/academy";
 import type { User } from "@/types/user";
+import RemoteImage from "../RemoteImage";
 
 interface SidebarSubItem {
   id: string;
@@ -543,9 +544,9 @@ function AcademySidebar({
           {/* Academy Profile */}
           <div className="flex items-center gap-3">
             <Avatar className="w-12 h-12 rounded-lg object-cover shadow-sm">
-              {academy.academy_name && (
-                <AvatarImage
-                  src={academy.academy_name}
+              {academy.settings.logo && (
+                <RemoteImage
+                  src={academy.settings.logo}
                   alt={academy.academy_name}
                 />
               )}

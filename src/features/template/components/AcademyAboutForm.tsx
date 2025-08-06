@@ -15,6 +15,7 @@ import { Info, Image as ImageIcon, CheckCircle, Loader2 } from "lucide-react";
 import { useAcademyAboutMutation } from "../hooks/useAboutMutations";
 import type { About, AboutPayload } from "@/types/academy/about";
 import RichTextEditor from "@/components/shared/RichTextEditor";
+import RemoteImage from "@/components/shared/RemoteImage";
 
 const AcademyAboutForm = ({ about }: { about: About }) => {
   const academyAboutMutation = useAcademyAboutMutation();
@@ -196,7 +197,8 @@ const AcademyAboutForm = ({ about }: { about: About }) => {
                 {about.image && !isChangingImage ? (
                   <div className="space-y-3">
                     <div className="relative">
-                      <img
+                      <RemoteImage
+                        prefix="static"
                         src={about.image}
                         alt="Hero Image"
                         className="w-full h-40 object-cover rounded-lg border"

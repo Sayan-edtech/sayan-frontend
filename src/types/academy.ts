@@ -1,19 +1,6 @@
-export interface AcademyResponse {
-  status: string;
-  status_code: number;
-  error_type: string | null;
-  message: string;
-  data: {
-    academy: Academy;
-    about: string | null;
-    // sliders: any[]; // You can replace `any` with a specific type if known
-    // faqs: any[];
-    // opinions: any[];
-    settings: Settings;
-  };
-  path: string | null;
-  timestamp: string;
-}
+import type { About } from "./academy/about";
+import type { Opinion } from "./academy/opinion";
+import type { FAQ } from "./faq";
 
 export interface Academy {
   id: number;
@@ -24,14 +11,34 @@ export interface Academy {
   email: string;
   phone: string;
   address: string | null;
-  logo: string | null;
-  banner: string;
+  logo: string;
+  banner: string | null;
   description: string | null;
   status: string;
-  created_at: string;
+  created_at: string; // ISO date string
   updated_at: string | null;
 }
 
+export interface Hero {
+  id: number;
+  second_link_title: string;
+  updated_at: string; // ISO date string
+  title: string;
+  second_link_url: string;
+  content: string | null;
+  subtitle: string | null;
+  image: string;
+  button_text: string | null;
+  status: boolean;
+  order: number;
+  description: string;
+  is_active: boolean;
+  first_link_title: string;
+  link: string | null;
+  academy_id: number;
+  first_link_url: string;
+  created_at: string; // ISO date string
+}
 export interface Settings {
   platform_name: string;
   primary_color: string;
@@ -62,4 +69,21 @@ export interface Settings {
   banner: string;
   custom_css: string;
   custom_js: string;
+}
+
+export interface AcademyResponse {
+  status: string;
+  status_code: number;
+  error_type: string | null;
+  message: string;
+  data: {
+    academy: Academy;
+    about: About;
+    hero: Hero;
+    settings: Settings;
+    faqs: FAQ[];
+    opinions: Opinion[];
+  };
+  path: string | null;
+  timestamp: string;
 }

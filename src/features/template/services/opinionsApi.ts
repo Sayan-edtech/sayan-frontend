@@ -56,7 +56,14 @@ export const opinionsApi = {
         opinionData.is_approved !== undefined ? opinionData.is_approved : true,
     };
 
-    const response = await api.put(`opinions/${id}`, payload);
+    const formData = new FormData();
+    appendFormData(formData, payload);
+
+    const response = await api.put(`opinions/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   },
 

@@ -52,7 +52,7 @@ export const academyApi = {
     appendFormData(formData, {
       ...data,
     });
-    const response = await api.put("/about/", formData, {
+    const response = await api.put("/academy/about", formData, {
       headers: {
         "Content-Type": "form-data",
       },

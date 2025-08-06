@@ -18,24 +18,7 @@ function About() {
     about && (
       <div className="space-y-6">
         <Header />
-        <AcademyAboutForm
-          about={{
-            id: 1,
-            sub_title: "",
-            feature_one: "200 student",
-            image: "/images/academy/about.jpg",
-            vision: "",
-            video_url: null,
-            updated_at: "",
-            academy_id: 1,
-            title: "Hello World",
-            content: "Welcome to our academy",
-            feature_two: "200 courses",
-            mission: "",
-            values: [],
-            created_at: "",
-          }}
-        />
+        <AcademyAboutForm about={about.data} />
       </div>
     )
   );

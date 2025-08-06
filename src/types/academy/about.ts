@@ -1,13 +1,13 @@
 export interface About {
-  id: number;
   sub_title: string;
+  id: number;
   feature_one: string;
-  image: string | null;
+  image: string;
   vision: string;
   video_url: string | null;
   updated_at: string;
-  academy_id: number;
   title: string;
+  academy_id: number;
   content: string;
   feature_two: string;
   mission: string;

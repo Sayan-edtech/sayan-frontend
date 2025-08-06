@@ -5,7 +5,7 @@ import type { FAQsListResponse, FAQResponse, FAQPayload } from "@/types/faq";
 export const faqsApi = {
   // Get all FAQs
   getFAQs: async (): Promise<FAQsListResponse> => {
-    const response = await api.get("/faqs");
+    const response = await api.get("/faqs/");
     return response.data;
   },
 

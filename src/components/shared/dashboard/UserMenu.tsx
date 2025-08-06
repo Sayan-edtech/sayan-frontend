@@ -29,7 +29,6 @@ export function UserMenu({ align }: { align?: "start" | "end" | "center" }) {
   if (isLoading) {
     return <Skeleton className="h-10 w-10 rounded-full" />;
   }
-
   return (
     !isLoading &&
     user && (

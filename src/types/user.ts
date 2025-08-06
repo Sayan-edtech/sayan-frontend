@@ -17,6 +17,9 @@ export type AcademyMembership = {
     status: "active" | "inactive";
     created_at: string;
   };
+  settings: {
+    logo: string;
+  };
 };
 export type User = {
   id: string;
