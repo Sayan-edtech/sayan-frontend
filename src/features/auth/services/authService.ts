@@ -11,7 +11,6 @@ export const authService = {
   // Login user
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/login", credentials);
-
     return response.data;
   },
 
@@ -20,10 +19,9 @@ export const authService = {
     const formData = new FormData();
 
     // Append text fields
-    formData.append("fname", userData.fname);
-    formData.append("lname", userData.lname);
+    formData.append("name", userData.name);
     formData.append("email", userData.email);
-    formData.append("phone_number", userData.phone_number);
+    formData.append("phone", userData.phone);
     formData.append("password", userData.password);
     formData.append("user_type", userData.user_type);
 
@@ -36,31 +34,6 @@ export const authService = {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-    });
-    return response.data;
-  },
-  // Forgot password
-  async forgotPassword(email: string): Promise<AuthResponse> {
-    const response = await api.post("/auth/password/forgot", {
-      email,
-      redirect_url: `${location.origin}/auth/reset-password`,
-    });
-    return response.data;
-  },
-  // Verify account
-  async verifyAccount(data: {
-    email: string;
-    otp: string;
-  }): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/otp/verify", data);
-    return response.data;
-  },
-  // Resend OTP
-  async resendOtp(email: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>("/auth/otp/request", {
-      email,
-      expires_in_minutes: 1,
-      purpose: "email_verification",
     });
     return response.data;
   },
@@ -84,13 +57,13 @@ export const authService = {
     return response.data;
   },
 
+  // Request password reset
+  async requestPasswordReset(email: string): Promise<void> {
+    await api.post("/auth/forgot-password", { email });
+  },
+
   // Reset password
-  async resetPassword(data: {
-    new_password: string;
-    confirm_password: string;
-    verification_token: string;
-  }): Promise<AuthResponse> {
-    const response = await api.post("/auth/password/reset-with-token", data);
-    return response.data;
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    await api.post("/auth/reset-password", { token, password: newPassword });
   },
 };

@@ -1,6 +1,5 @@
-import { useForm, Controller } from "react-hook-form";
-import type { Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import ImageField from "@/components/shared/formFields/image-field";
@@ -11,63 +10,40 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Settings,
-  Palette,
-  Image as ImageIcon,
-  CheckCircle,
-  Loader2,
-  School,
-} from "lucide-react";
+import { Settings, Palette, Image as ImageIcon, CheckCircle, Loader2, School } from "lucide-react";
 import { useState, useEffect } from "react";
-import type { AxiosError } from "axios";
-import { useCheckSubdomain } from "../hooks/useMainSettingsQueries";
-import { useDebounce } from "@/hooks/useDebounce";
-import type { AcademyMainSettingsResponse } from "../services/academyTemplate";
-import RemoteImage from "@/components/shared/RemoteImage";
-import { toast } from "sonner";
-import { useAcademyMainSettingsMutation } from "../hooks/useMainSettingsMutations";
+import useAcademySettings from "@/hooks/useAcademySettings";
+import CSSPreview from "./CSSPreview";
+import AdvancedCSSEditor from "@/components/ui/advanced-css-editor";
 
-const AcademyMainSettingsForm = ({
-  mainSettings,
-}: {
-  mainSettings: AcademyMainSettingsResponse["data"];
-}) => {
+/**
+ * نموذج إعدادات الأكاديمية الرئيسية
+ * يتيح للمستخدم تخصيص اسم الأكاديمية، الألوان، الشعار، الأيقونة، وإضافة CSS مخصص
+ */
+const AcademyMainSettingsForm = () => {
   const [hasUserChanges, setHasUserChanges] = useState(false);
-  const academyMainSettingsMutation = useAcademyMainSettingsMutation();
-  const [isChangingFavicon, setIsChangingFavicon] = useState(false);
-  const [isChangingLogo, setIsChangingLogo] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const { settings, updateSettings, loading: settingsLoading } = useAcademySettings();
 
   const {
     control,
     handleSubmit,
-    formState: { errors, isDirty, isSubmitting },
+    formState: { errors, isDirty, isValid, isSubmitting },
     reset,
-    getValues,
     watch,
   } = useForm<AcademyMainSettingsFormData>({
     resolver: zodResolver(academyMainSettingsSchema),
     defaultValues: {
-      academyName: mainSettings?.platform_name || "",
-      subdomain: mainSettings?.subdomain || "",
+      academyName: "",
       primaryColor: "#3B82F6",
       secondaryColor: "#10B981",
+      customCSS: "",
     },
     mode: "onChange",
   });
 
-  const watchedSubdomain = watch("subdomain");
-  const debouncedSubdomain = useDebounce(watchedSubdomain, 500);
-  const shouldCheck =
-    !!debouncedSubdomain &&
-    mainSettings?.subdomain !== getValues("subdomain") &&
-    !errors.subdomain &&
-    debouncedSubdomain.length >= 3;
-  const {
-    data: subdomainCheck,
-    isLoading: subdomainLoading,
-    isError: subdomainCheckError,
-  } = useCheckSubdomain(debouncedSubdomain, shouldCheck);
+  // Watch custom CSS for preview
+  const watchedCustomCSS = watch("customCSS") || "";
 
   // Track when user actually makes changes (after initial render)
   useEffect(() => {
@@ -77,39 +53,30 @@ const AcademyMainSettingsForm = ({
   }, [isDirty]);
 
   const onSubmit = async (data: AcademyMainSettingsFormData) => {
-    toast.error(null);
     try {
-      // التحقق من وجود بيانات للتحديث
-      if (!data.academyName || data.academyName.trim() === "") {
-        toast.error("يجب إدخال اسم الأكاديمية");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("platform_name", data.academyName.trim());
+      // استدعاء API لتحديث الإعدادات
+      const result = await updateSettings({
+        academyName: data.academyName,
+        primaryColor: data.primaryColor,
+        secondaryColor: data.secondaryColor,
+        customCSS: data.customCSS,
+        academyLogo: data.academyLogo,
+        academyIcon: data.academyIcon,
+      });
       
-      // إضافة الحقول الأخرى إذا توفرت
-      if (data.subdomain) {
-        formData.append("subdomain", data.subdomain.trim());
-      }
-      if (data.primaryColor) {
-        formData.append("primary_color", data.primaryColor);
-      }
-      if (data.secondaryColor) {
-        formData.append("secondary_color", data.secondaryColor);
-      }
-
-      await academyMainSettingsMutation.mutateAsync(formData);
-      setHasUserChanges(false);
-    } catch (error: unknown) {
-      if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as AxiosError<{ message?: string }>;
-        toast.error(
-          axiosError.response?.data?.message || "حدث خطأ أثناء حفظ الإعدادات"
-        );
+      if (result.success) {
+        // إعادة تعيين حالة التغييرات
+        setHasUserChanges(false);
+        // إظهار رسالة نجاح
+        setShowSuccessMessage(true);
+        // إخفاء رسالة النجاح بعد 3 ثوان
+        setTimeout(() => setShowSuccessMessage(false), 3000);
+        console.log('تم حفظ الإعدادات بنجاح');
       } else {
-        toast.error("حدث خطأ أثناء حفظ الإعدادات");
+        console.error('فشل في حفظ الإعدادات:', result.error);
       }
+    } catch (error) {
+      console.error('خطأ في حفظ الإعدادات:', error);
     }
   };
 
@@ -118,7 +85,7 @@ const AcademyMainSettingsForm = ({
     setHasUserChanges(false);
   };
 
-  const formLoading = isSubmitting || academyMainSettingsMutation.isPending;
+  const formLoading = isSubmitting;
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -127,18 +94,17 @@ const AcademyMainSettingsForm = ({
         <div className="flex items-center gap-3">
           <Settings className="w-5 h-5 text-indigo-600" />
           <div>
-            <h2 className="text-base font-semibold text-gray-900">
-              الإعدادات الرئيسية
-            </h2>
-            <p className="text-sm text-gray-600">
-              قم بتخصيص هوية وألوان أكاديميتك
-            </p>
+            <h2 className="text-base font-semibold text-gray-900">الإعدادات الرئيسية</h2>
+            <p className="text-sm text-gray-600">قم بتخصيص هوية وألوان أكاديميتك</p>
           </div>
-          {hasUserChanges && (
-            <Badge
-              variant="outline"
-              className="bg-amber-50 text-amber-700 border-amber-200 mr-auto"
-            >
+          {showSuccessMessage && (
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 mr-auto animate-pulse">
+              <CheckCircle className="w-3 h-3 ml-1" />
+              تم حفظ الإعدادات بنجاح
+            </Badge>
+          )}
+          {hasUserChanges && !showSuccessMessage && (
+            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 mr-auto">
               <Settings className="w-3 h-3 ml-1" />
               يوجد تغييرات غير محفوظة
             </Badge>
@@ -189,74 +155,6 @@ const AcademyMainSettingsForm = ({
             </CardContent>
           </Card>
 
-          {/* Subdomain Field */}
-          <Card className="shadow-sm border-0">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-gray-800 text-sm font-medium">
-                <Settings className="w-4 h-4 text-green-600" />
-                النطاق الفرعي
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <Controller
-                  control={control}
-                  name="subdomain"
-                  render={({ field: { onChange, value } }) => (
-                    <div className="flex flex-col gap-2">
-                      <Input
-                        type="text"
-                        value={value || ""}
-                        onChange={onChange}
-                        placeholder="أدخل النطاق الفرعي (مثال: academy) "
-                        disabled={formLoading}
-                        className={`${
-                          errors.subdomain
-                            ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
-                            : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
-                        } h-10 !bg-transparent`}
-                      />
-                    </div>
-                  )}
-                />
-                {errors.subdomain && (
-                  <p className="text-sm text-destructive">
-                    {errors.subdomain.message}
-                  </p>
-                )}
-                {/* Subdomain availability feedback */}
-                {!errors.subdomain &&
-                  watchedSubdomain &&
-                  watchedSubdomain.length >= 3 && (
-                    <div className="text-xs min-h-[20px]">
-                      {subdomainLoading && (
-                        <span className="text-gray-500">
-                          جاري التحقق من توفر النطاق...
-                        </span>
-                      )}
-                      {subdomainCheck &&
-                        subdomainCheck.available &&
-                        !subdomainLoading && (
-                          <span className="text-green-600">النطاق متاح ✅</span>
-                        )}
-                      {subdomainCheck &&
-                        !subdomainCheck.available &&
-                        !subdomainLoading && (
-                          <span className="text-destructive">
-                            {subdomainCheck.message || "النطاق غير متاح"}
-                          </span>
-                        )}
-                      {subdomainCheckError && !subdomainLoading && (
-                        <span className="text-destructive">
-                          تعذر التحقق من النطاق
-                        </span>
-                      )}
-                    </div>
-                  )}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Colors Combined */}
           <Card className="shadow-sm border-0">
             <CardHeader className="pb-3">
@@ -276,14 +174,10 @@ const AcademyMainSettingsForm = ({
                     name="primaryColor"
                     render={({ field: { onChange, value } }) => (
                       <div className="flex items-center gap-3">
-                        <div
+                        <div 
                           className="w-12 h-10 rounded-md border-2 border-gray-200 shadow-sm cursor-pointer transition-all hover:scale-105"
                           style={{ backgroundColor: value }}
-                          onClick={() =>
-                            document
-                              .getElementById("primaryColorPicker")
-                              ?.click()
-                          }
+                          onClick={() => document.getElementById('primaryColorPicker')?.click()}
                         />
                         <input
                           id="primaryColorPicker"
@@ -323,14 +217,10 @@ const AcademyMainSettingsForm = ({
                     name="secondaryColor"
                     render={({ field: { onChange, value } }) => (
                       <div className="flex items-center gap-3">
-                        <div
+                        <div 
                           className="w-12 h-10 rounded-md border-2 border-gray-200 shadow-sm cursor-pointer transition-all hover:scale-105"
                           style={{ backgroundColor: value }}
-                          onClick={() =>
-                            document
-                              .getElementById("secondaryColorPicker")
-                              ?.click()
-                          }
+                          onClick={() => document.getElementById('secondaryColorPicker')?.click()}
                         />
                         <input
                           id="secondaryColorPicker"
@@ -372,52 +262,18 @@ const AcademyMainSettingsForm = ({
                 ايقونة المنصة التعليمية
               </CardTitle>
             </CardHeader>
-
             <CardContent>
-              {mainSettings.favicon && !isChangingFavicon ? (
-                <div className="flex flex-col gap-2 items-center space-y-2">
-                  <RemoteImage
-                    className="w-full h-32"
-                    src={mainSettings?.favicon || ""}
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => setIsChangingFavicon(true)}
-                      disabled={formLoading}
-                    >
-                      تغيير الأيقونة
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <ImageField
-                    name="favicon" // Changed from "academyIcon" to "favicon" for consistency
-                    type="image"
-                    label=""
-                    placeholder="اختر أيقونة المنصة"
-                    control={
-                      control as unknown as Control<Record<string, unknown>>
-                    }
-                    errors={errors}
-                    disabled={formLoading}
-                  />
-                  {isChangingFavicon && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setIsChangingFavicon(false)}
-                      disabled={formLoading}
-                    >
-                      إلغاء
-                    </Button>
-                  )}
-                </div>
-              )}
+              <div className="space-y-2">
+                <ImageField
+                  name="academyIcon"
+                  type="image"
+                  label=""
+                  placeholder="اختر أيقونة المنصة"
+                  errors={errors}
+                  disabled={formLoading}
+                  control={control}
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -430,59 +286,75 @@ const AcademyMainSettingsForm = ({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {mainSettings.logo && !isChangingLogo ? (
-                <div className="flex flex-col gap-2 items-center space-y-2">
-                  <RemoteImage
-                    className="w-full h-32"
-                    src={mainSettings?.logo || ""}
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => setIsChangingLogo(true)}
-                      disabled={formLoading}
-                    >
-                      تغيير الشعار
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <ImageField
-                    name="academyLogo"
-                    type="image"
-                    label=""
-                    placeholder="اختر شعار المنصة"
-                    control={
-                      control as unknown as Control<Record<string, unknown>>
-                    }
-                    errors={errors}
-                    disabled={formLoading}
-                  />
-                  {isChangingLogo && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setIsChangingLogo(false)}
-                      disabled={formLoading}
-                    >
-                      إلغاء
-                    </Button>
-                  )}
-                </div>
-              )}
+              <div className="space-y-2">
+                <ImageField
+                  name="academyLogo"
+                  type="image"
+                  label=""
+                  placeholder="اختر شعار المنصة"
+                  errors={errors}
+                  disabled={formLoading}
+                  control={control}
+                />
+              </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Custom CSS Section */}
+        <Card className="shadow-sm border-0">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-gray-800 text-sm font-medium">
+              <Settings className="w-4 h-4 text-green-600" />
+              CSS مخصص
+            </CardTitle>
+            <p className="text-xs text-gray-500 mt-1">
+              أضف CSS مخصص لتخصيص مظهر أكاديميتك (اختياري)
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Controller
+                control={control}
+                name="customCSS"
+                render={({ field: { onChange, value } }) => (
+                  <div className="space-y-2">
+                    <AdvancedCSSEditor
+                      value={value || ""}
+                      onChange={onChange}
+                      disabled={formLoading}
+                      error={errors.customCSS?.message}
+                      height={400}
+                      label=""
+                    />
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="inline-flex items-center gap-1">
+                        ⚠️ تأكد من صحة CSS قبل الحفظ
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        💡 استخدم متغيرات CSS للألوان
+                      </span>
+                    </div>
+                  </div>
+                )}
+              />
+              {errors.customCSS && (
+                <p className="text-sm text-destructive">
+                  {errors.customCSS.message}
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* CSS Preview */}
+        <CSSPreview customCSS={watchedCustomCSS} />
 
         {/* Form Actions */}
         <div className="flex justify-start gap-3 pt-4 border-t border-gray-100">
           <Button
             type="submit"
-            disabled={isSubmitting || !hasUserChanges}
+            disabled={!isValid || isSubmitting || !hasUserChanges}
             className="px-6"
           >
             {isSubmitting ? (

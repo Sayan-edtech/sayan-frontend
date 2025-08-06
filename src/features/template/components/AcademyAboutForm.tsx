@@ -14,29 +14,20 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Info, Settings, Image as ImageIcon, CheckCircle, Loader2 } from "lucide-react";
-import { useSliders } from "../hooks/useSlidersQueries";
-import { useCreateSlider, useUpdateSlider } from "../hooks/useSlidersMutations";
-import { Loader } from "@/components/shared";
 
 const AcademyAboutForm = () => {
   const [hasUserChanges, setHasUserChanges] = useState(false);
-  const [currentSliderId, setCurrentSliderId] = useState<string | null>(null);
-
-  // API Hooks
-  const { data: slidersResponse, isLoading: isLoadingSliders, error: slidersError } = useSliders();
-  const createSliderMutation = useCreateSlider();
-  const updateSliderMutation = useUpdateSlider();
 
   const {
     control,
     handleSubmit,
     formState: { errors, isValid, isDirty, isSubmitting },
     reset,
-    setValue,
   } = useForm<AcademyAboutFormType>({
     resolver: zodResolver(academyAboutSchema),
     defaultValues: {
       title: "",
+      subtitle: "",
       description: "",
       featureOne: "",
       featureTwo: "",
@@ -51,47 +42,13 @@ const AcademyAboutForm = () => {
     }
   }, [isDirty]);
 
-  // Load data from API when available
-  useEffect(() => {
-    if (slidersResponse?.data && slidersResponse.data.length > 0) {
-      const slider = slidersResponse.data[0]; // Get first slider
-      setCurrentSliderId(slider.id.toString());
-      setValue("title", slider.title || "");
-      setValue("description", slider.description || "");
-      setValue("featureOne", slider.featureOne || "");
-      setValue("featureTwo", slider.featureTwo || "");
-    }
-  }, [slidersResponse, setValue]);
-
   const onSubmit = async (data: AcademyAboutFormType) => {
-    try {
-      const payload = {
-        title: data.title,
-        description: data.description,
-        featureOne: data.featureOne,
-        featureTwo: data.featureTwo,
-        heroImage: data.heroImage,
-      };
+    // Handle form submission logic here
+    console.log("Form submitted with data:", data);
+    // You can call your API or perform any other actions here
 
-      if (currentSliderId) {
-        // Update existing slider
-        await updateSliderMutation.mutateAsync({
-          id: currentSliderId,
-          data: payload,
-        });
-      } else {
-        // Create new slider
-        const response = await createSliderMutation.mutateAsync(payload);
-        if (response.data?.id) {
-          setCurrentSliderId(response.data.id.toString());
-        }
-      }
-
-      // After successful submission, reset the user changes flag
-      setHasUserChanges(false);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
+    // After successful submission, reset the user changes flag
+    setHasUserChanges(false);
   };
 
   const handleReset = () => {
@@ -99,47 +56,7 @@ const AcademyAboutForm = () => {
     setHasUserChanges(false);
   };
 
-  const formLoading = isSubmitting || createSliderMutation.isPending || updateSliderMutation.isPending;
-
-  // Show loading state while fetching data
-  if (isLoadingSliders) {
-    return (
-      <div className="space-y-6" dir="rtl">
-        <div className="bg-blue-50 rounded-lg p-4">
-          <div className="flex items-center gap-3">
-            <Info className="w-5 h-5 text-blue-600" />
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">تحرير قسم "من نحن"</h2>
-              <p className="text-sm text-gray-600">قم بتخصيص المعلومات التعريفية لأكاديميتك</p>
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-center py-10">
-          <Loader />
-        </div>
-      </div>
-    );
-  }
-
-  // Show error state if there's an error
-  if (slidersError) {
-    return (
-      <div className="space-y-6" dir="rtl">
-        <div className="bg-blue-50 rounded-lg p-4">
-          <div className="flex items-center gap-3">
-            <Info className="w-5 h-5 text-blue-600" />
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">تحرير قسم "من نحن"</h2>
-              <p className="text-sm text-gray-600">قم بتخصيص المعلومات التعريفية لأكاديميتك</p>
-            </div>
-          </div>
-        </div>
-        <div className="text-center py-10 text-red-500">
-          حدث خطأ أثناء جلب البيانات
-        </div>
-      </div>
-    );
-  }
+  const formLoading = isSubmitting;
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -201,7 +118,35 @@ const AcademyAboutForm = () => {
                 )}
               </div>
 
-
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-card-foreground">
+                  العنوان الفرعي
+                </Label>
+                <Controller
+                  control={control}
+                  name="subtitle"
+                  render={({ field: { onChange, value } }) => (
+                    <Input
+                      type="text"
+                      value={value || ""}
+                      onChange={onChange}
+                      placeholder="أدخل العنوان الفرعي"
+                      disabled={formLoading}
+                      className={`${
+                        errors.subtitle
+                          ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
+                          : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
+                      } h-10 !bg-transparent`}
+                      dir="rtl"
+                    />
+                  )}
+                />
+                {errors.subtitle && (
+                  <p className="text-sm text-destructive">
+                    {errors.subtitle.message}
+                  </p>
+                )}
+              </div>
             </CardContent>
           </Card>
 

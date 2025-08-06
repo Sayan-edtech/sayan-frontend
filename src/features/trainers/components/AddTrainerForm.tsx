@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import FormFields from "@/components/shared/formFields/form-fields";
+import FlowbiteTextEditor from "@/components/ui/FlowbiteTextEditor";
 import { trainerSchema, type ITrainerForm } from "@/validations/trainer";
 import { toast } from "sonner";
 import { Save, Trash2 } from "lucide-react";
@@ -95,6 +96,22 @@ const AddTrainerForm = ({
     }
   }, [clearDraftData, getSavedFormData, reset]);
 
+  useEffect(() => {
+    const savedData = getFromLocalStorage(FORM_DATA_KEY);
+    if (
+      savedData &&
+      Object.keys(savedData).some((key) => savedData[key] !== "")
+    ) {
+      toast.info("تم استعادة المسودة المحفوظة مسبقاً", {
+        duration: 5000,
+        action: {
+          label: "بدء من جديد",
+          onClick: () => handleClearDraft(),
+        },
+      });
+    }
+  }, [handleClearDraft]);
+
   const handleFormSubmit = async (data: ITrainerForm) => {
     try {
       console.log("Trainer Form Data:", data);
@@ -165,15 +182,21 @@ const AddTrainerForm = ({
             </div>
 
             <div>
-              <FormFields
-                name="name"
-                label="اسم المدرب"
-                type="text"
-                placeholder="أدخل اسم المدرب الكامل"
-                control={control}
-                errors={errors}
+              <FlowbiteTextEditor
+                value={watchedValues.name || ""}
+                onChange={(value) => {
+                  reset({ ...watchedValues, name: value });
+                }}
+                placeholder="أدخل اسم المدرب الكامل مع إمكانية التنسيق"
                 disabled={formLoading}
+                error={!!errors.name}
+                label="اسم المدرب"
+                name="name"
+                className="w-full"
               />
+              {errors.name && (
+                <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
+              )}
             </div>
 
             <div>

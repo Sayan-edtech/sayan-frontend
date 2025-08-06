@@ -8,7 +8,7 @@ export const links = [
   },
   {
     id: crypto.randomUUID(),
-    title: "اطلق اكادميتك",
+    title: "اطلق منصتك التعليمية",
     href: "/launch-academy",
   },
   {

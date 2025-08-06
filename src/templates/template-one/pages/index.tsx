@@ -4,7 +4,8 @@ import Hero from "../features/home/components/Hero";
 import HomeLayout from "../features/home/components/HomeLayout";
 import Testimonials from "../features/home/components/Testimonials";
 import { motion } from "framer-motion";
-import Courses from "../features/home/components/Courses";
+import Courses from "@/features/home/components/Courses";
+import useAcademySettings from "@/hooks/useAcademySettings";
 import "swiper/css";
 import "swiper/css/navigation";
 
@@ -20,8 +21,10 @@ const sectionVariants = {
 };
 
 function Home() {
+  const { settings } = useAcademySettings();
+  
   return (
-    <HomeLayout>
+    <HomeLayout customCSS={settings.customCSS}>
       <main className="bg-[rgb(249_250_251)]">
         <motion.div
           variants={sectionVariants}

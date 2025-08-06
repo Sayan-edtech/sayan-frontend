@@ -5,10 +5,11 @@ import type {
   InternalAxiosRequestConfig,
 } from "axios";
 import { authCookies } from "@/lib/cookies";
+import { Pages, Routes } from "@/constants/enums";
 
 // Create axios instance
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -50,13 +51,14 @@ api.interceptors.response.use(
             }
           );
 
-          const { data } = response.data;
+          const { access_token, refresh_token: newRefreshToken } =
+            response.data;
 
           // Update tokens in cookies
-          authCookies.setTokens(data.access_token, data.newRefreshToken);
+          authCookies.setTokens(access_token, newRefreshToken);
 
           // Update the original request with new token
-          originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
+          originalRequest.headers.Authorization = `Bearer ${access_token}`;
 
           // Retry the original request
           return api(originalRequest);
@@ -64,13 +66,13 @@ api.interceptors.response.use(
           console.error("Token refresh failed:", refreshError);
           // Clear invalid auth cookies and redirect to login
           authCookies.clearAll();
-          // window.location.href = `${Routes.AUTH}/${Pages.SIGNIN}`;
+          window.location.href = `${Routes.AUTH}/${Pages.SIGNIN}`;
           return Promise.reject(refreshError);
         }
       } else {
         // No refresh token available, clear auth and redirect
         authCookies.clearAll();
-        // window.location.href = `${Routes.AUTH}/${Pages.SIGNIN}`;
+        window.location.href = `${Routes.AUTH}/${Pages.SIGNIN}`;
       }
     }
 

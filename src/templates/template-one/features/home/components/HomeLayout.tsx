@@ -1,20 +1,21 @@
-import Footer from "@/templates/template-one/components/footer";
+import React from "react";
 import Header from "@/templates/template-one/components/header";
-import { Helmet } from "react-helmet-async";
+import Footer from "@/templates/template-one/components/footer";
+import CustomCSSProvider from "@/features/template/components/CustomCSSProvider";
 
-function HomeLayout({ children }: { children: React.ReactNode }) {
+interface HomeLayoutProps {
+  children: React.ReactNode;
+  customCSS?: string;
+}
+
+const HomeLayout: React.FC<HomeLayoutProps> = ({ children, customCSS }) => {
   return (
-    <>
-      <Helmet>
-        <title>Home Page</title>
-        <meta name="description" content="This is the home page of our app." />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-      </Helmet>
+    <CustomCSSProvider customCSS={customCSS}>
       <Header />
       {children}
       <Footer />
-    </>
+    </CustomCSSProvider>
   );
-}
+};
 
 export default HomeLayout;

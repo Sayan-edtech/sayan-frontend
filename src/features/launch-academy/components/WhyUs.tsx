@@ -77,10 +77,10 @@ function WhyUs() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-16 md:py-20 bg-white">
       <div className="container">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-12">
-          لماذا <span className="text-primary">نحن</span>؟
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-12 text-center">
+          لماذا <span className="text-primary">نختار</span> منصة سيان؟
         </h2>
         <Features features={features} />
       </div>

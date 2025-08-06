@@ -9,14 +9,14 @@ const imageVariants = {
 
 export default function Hero() {
   return (
-    <section id="home" className="pt-32 pb-16">
+    <section id="home" className="pt-[15vh] lg:pt-[20vh] pb-16">
       <div className="container">
-        <div className="grid lg:grid-cols-2 gap-8 items-center">
+        <div className="grid lg:grid-cols-2 gap-6 md:gap-12 lg:gap-20 xl:gap-30 items-center">
           <div className="flex flex-col gap-6 py-8 lg:py-16">
-            <h1 className="text-3xl lg:text-4xl font-bold leading-tight text-foreground">
+            <h1 className="text-4xl lg:text-3xl font-bold leading-tight text-foreground">
               المدرب عبدالرحمن .
             </h1>
-            <p className="text-base lg:text-lg text-muted-foreground leading-relaxed">
+            <p className="text-lg lg:text-lg text-muted-foreground leading-relaxed">
               المدرب عبدالرحمن يتميز بشغفه الكبير في نقل المعرفة وتمكين الآخرين،
               بخبرة عملية تجمع بين التدريب والتطوير الشخصي والمهني. عرف بأسلوبه
               المبسط والجاذب، وقدرته على تحفيز المتدربين لتحقيق أهدافهم بثقة
@@ -26,16 +26,16 @@ export default function Hero() {
             <div className="flex items-center gap-4 pt-2">
               <Link
                 to="/auth/signup"
-                className={`${buttonVariants({ size: "default" })} text-base`}
+                className={`${buttonVariants({ size: "lg" })} bg-primary text-primary-foreground hover:bg-primary/90 transition-transform duration-300 ease-in-out hover:scale-105 rounded-full font-bold px-8`}
               >
                 مدونتي
               </Link>
               <Link
                 to="/auth/signup"
                 className={`${buttonVariants({
-                  size: "default",
+                  size: "lg",
                   variant: "outline",
-                })} text-base border border-border hover:border-primary hover:text-primary transition-colors`}
+                })} border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-transform duration-300 ease-in-out hover:scale-105 rounded-full font-bold px-8`}
               >
                 قناتي في اليوتيوب
               </Link>
@@ -52,7 +52,7 @@ export default function Hero() {
               src="https://www.sayan-server.com/uploads/academies/sliders/FT288bmUcvJCtXwng9s9.png"
               alt="Hero"
               loading="eager"
-              className="w-full min-h-[350px] object-cover rounded-lg"
+              className="w-full h-auto object-contain rounded-lg"
             />
           </motion.div>
         </div>

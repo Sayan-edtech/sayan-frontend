@@ -1,52 +1,20 @@
 import { UserType } from "@/constants/enums";
 
-export type AcademyMembership = {
-  membership_id: number;
-  academy_id: number;
-  academy_name: string;
-  academy_slug: string;
-  user_role: "owner" | "admin" | "member";
-  is_active: boolean;
-  joined_at: string;
-  academy_details: {
-    about: string | null;
-    image: string | null;
-    email: string;
-    phone: string;
-    address: string | null;
-    status: "active" | "inactive";
-    created_at: string;
-  };
-};
 export type User = {
   id: string;
+  name: string;
   email: string;
-  fname: string;
-  lname: string;
+  phone?: string;
   user_type: UserType;
-  verified: boolean;
-  avatar?: string;
-  academy_memberships?: AcademyMembership[];
+  profile_picture?: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
-type UserWithTokens = {
-  user_data: User;
+export type AuthResponse = {
+  user: User;
   access_token: string;
   refresh_token: string;
-};
-export type AuthResponse = UserWithTokens & {
-  status_code: number;
-  message: string;
-  data: {
-    user_data: User;
-    access_token: string;
-    refresh_token: string;
-    data?: {
-      access_token: string;
-      refresh_token: string;
-      user_data: User;
-    };
-  };
 };
 
 export type TokenRefreshResponse = {
@@ -60,10 +28,9 @@ export type LoginRequest = {
 };
 
 export type SignupRequest = {
-  fname: string;
-  lname: string;
+  name: string;
   email: string;
-  phone_number: string;
+  phone: string;
   password: string;
   confirm_password: string;
   user_type: UserType;
