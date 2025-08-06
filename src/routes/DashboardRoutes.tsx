@@ -1,6 +1,7 @@
 import Dashboard from "@/pages/dashboard";
 import MyCourses from "@/pages/dashboard/my-courses";
 import DigitalProducts from "@/pages/dashboard/digital-products";
+import Certificates from "@/pages/dashboard/certificates";
 import Favorites from "@/pages/dashboard/favorites";
 import Profile from "@/pages/dashboard/profile";
 import Purchases from "@/pages/dashboard/purchases";
@@ -38,7 +39,7 @@ export const dashboardRoutes = (
     <Route path="courses/manage/:courseId" element={<ManageCourse />} />
 
     <Route path="digital-products" element={<DigitalProducts />} />
-    <Route path="certificates" element={<div>الشهادات - قريباً</div>} />
+    <Route path="certificates" element={<Certificates />} />
     <Route path="favorites" element={<Favorites />} />
     {/* Other Routes */}
     <Route path="purchases" element={<Purchases />} />

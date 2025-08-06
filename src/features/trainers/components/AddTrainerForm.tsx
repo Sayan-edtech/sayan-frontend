@@ -7,6 +7,7 @@ import { trainerSchema, type ITrainerForm } from "@/validations/trainer";
 import { toast } from "sonner";
 import { Save, Trash2 } from "lucide-react";
 import { useEffect, useCallback } from "react";
+import { trainersApi } from "../services/trainersApi";
 
 interface AddTrainerFormProps {
   onSubmit?: (data: ITrainerForm) => void;
@@ -51,13 +52,15 @@ const AddTrainerForm = ({
 }: AddTrainerFormProps) => {
   const getSavedFormData = useCallback(() => {
     const savedData = getFromLocalStorage(FORM_DATA_KEY);
-    return (
-      savedData || {
-        name: "",
-        email: "",
-        phone: "",
-      }
-    );
+      return (
+    savedData || {
+      fname: "",
+      lname: "",
+      email: "",
+      phone: "",
+      image: null,
+    }
+  );
   }, []);
 
   const clearDraftData = useCallback(() => {
@@ -97,7 +100,18 @@ const AddTrainerForm = ({
 
   const handleFormSubmit = async (data: ITrainerForm) => {
     try {
-      console.log("Trainer Form Data:", data);
+      // Create trainer payload
+      const trainerPayload = {
+        fname: data.fname,
+        lname: data.lname,
+        email: data.email,
+        phone_number: data.phone,
+        image: data.image || null
+      };
+      
+      // Send API request
+      await trainersApi.createTrainer(trainerPayload);
+      
       toast.success("تم إضافة المدرب بنجاح!");
       clearDraftData();
       onSubmit?.(data);
@@ -142,8 +156,8 @@ const AddTrainerForm = ({
         </div>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
+          <div className="flex flex-row gap-4 items-start">
+            <div className="w-1/5">
               <FormFields
                 name="image"
                 label="الصورة الشخصية"
@@ -164,19 +178,31 @@ const AddTrainerForm = ({
               />
             </div>
 
-            <div>
+            <div className="w-1/5">
               <FormFields
-                name="name"
-                label="اسم المدرب"
+                name="fname"
+                label="الاسم الأول"
                 type="text"
-                placeholder="أدخل اسم المدرب الكامل"
+                placeholder="أدخل الاسم الأول"
+                control={control}
+                errors={errors}
+                disabled={formLoading}
+              />
+            </div>
+            
+            <div className="w-1/5">
+              <FormFields
+                name="lname"
+                label="اسم العائلة"
+                type="text"
+                placeholder="أدخل اسم العائلة"
                 control={control}
                 errors={errors}
                 disabled={formLoading}
               />
             </div>
 
-            <div>
+            <div className="w-1/5">
               <FormFields
                 name="email"
                 label="البريد الإلكتروني"
@@ -188,7 +214,7 @@ const AddTrainerForm = ({
               />
             </div>
 
-            <div className="md:col-span-2">
+            <div className="w-1/5">
               <FormFields
                 name="phone"
                 label="رقم الهاتف"

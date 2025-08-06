@@ -1,82 +1,122 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Camera, User } from "lucide-react";
-import Icon from "@/components/shared/Icon";
+import { Camera, User } from "lucide-react";
 import { EditUserInfoModal } from "@/components/shared/dashboard/EditUserInfoModal";
 import { useState } from "react";
+import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks/useUserQueries";
+import { useUpdateUserProfile } from "@/features/dashboard/profile/hooks/useUserMutations";
 
 function Profile() {
-  const [userInfo, setUserInfo] = useState({
-    name: "محمد أحمد",
-    email: "mohammed.ahmed@example.com",
-    phone: "966512345678",
-    avatar: "https://avatars.githubusercontent.com/u/87553297?v=4" as
-      | string
-      | undefined,
-    coverImage: undefined as string | undefined,
-  });
+  // Get user profile data from API
+  const { data: userProfile, isLoading, isError } = useCurrentUserProfile();
+  const updateProfileMutation = useUpdateUserProfile();
+  
+  const [coverImage, setCoverImage] = useState<string | undefined>(undefined);
 
-  const handleSaveUserInfo = (updatedInfo: {
-    name: string;
-    email: string;
-    phone: string;
-    avatar?: string;
-    coverImage?: string;
-  }) => {
-    setUserInfo({
-      name: updatedInfo.name,
-      email: updatedInfo.email,
-      phone: updatedInfo.phone,
-      avatar: updatedInfo.avatar,
-      coverImage: updatedInfo.coverImage,
-    });
-    // Here you would typically make an API call to save the data
-    console.log("User info updated:", updatedInfo);
+  // Function to create full image URL
+  const getImageUrl = (imagePath?: string) => {
+    if (!imagePath) return undefined;
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (!apiUrl) return undefined;
+    try {
+      const origin = new URL(apiUrl).origin;
+      return `${origin}/static/${imagePath}`;
+    } catch {
+      return undefined;
+    }
   };
 
-  const handleCoverImageUpload = (
+  const handleSaveUserInfo = async (updatedInfo: {
+    fname: string;
+    lname: string;
+    email: string;
+    phone: string;
+    gender?: string;
+    avatar?: File;
+    coverImage?: File;
+  }) => {
+    try {
+      await updateProfileMutation.mutateAsync({
+        fname: updatedInfo.fname,
+        lname: updatedInfo.lname,
+        email: updatedInfo.email,
+        phone_number: updatedInfo.phone,
+        gender: updatedInfo.gender,
+        avatar: updatedInfo.avatar || null,
+        banner: updatedInfo.coverImage || null,
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Header />
+        <div className="flex justify-center items-center h-64">
+          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError || !userProfile) {
+    return (
+      <div className="space-y-6">
+        <Header />
+        <div className="text-center text-red-600 py-8">
+          حدث خطأ في تحميل بيانات الملف الشخصي
+        </div>
+      </div>
+    );
+  }
+
+  // Map API data to component format
+  const userInfo = {
+    fname: userProfile.fname,
+    lname: userProfile.lname,
+    name: `${userProfile.fname} ${userProfile.lname}`,
+    email: userProfile.email,
+    phone: userProfile.phone_number,
+    gender: userProfile.gender,
+    avatar: userProfile.avatar, // Keep original path for modal
+    coverImage: userProfile.banner, // Keep original path for modal
+  };
+
+  // For display purposes, create URLs
+  const displayInfo = {
+    ...userInfo,
+    avatar: getImageUrl(userProfile.avatar) || coverImage,
+    coverImage: getImageUrl(userProfile.banner) || coverImage,
+  };
+
+  const handleCoverImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setUserInfo((prev) => ({
-          ...prev,
-          coverImage: result,
-        }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        // Update banner via API
+        await updateProfileMutation.mutateAsync({
+          banner: file,
+        });
+        
+        // Also update local state for immediate visual feedback
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          setCoverImage(result);
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error updating banner:", error);
+      }
     }
   };
 
-  const socialMediaLinks = [
-    {
-      platform: "Twitter",
-      username: "Mohammed@",
-      iconName: "twitter" as const,
-      bgColor: "bg-black",
-    },
-    {
-      platform: "Facebook",
-      username: "Mohammed@",
-      iconName: "facebook" as const,
-      bgColor: "bg-blue-600",
-    },
-    {
-      platform: "Snapchat",
-      username: "Mohammed@",
-      iconName: "snapchat" as const,
-      bgColor: "bg-yellow-400",
-    },
-    {
-      platform: "Instagram",
-      username: "Mohammed@",
-      iconName: "instagram" as const,
-      bgColor: "bg-gradient-to-r from-purple-500 to-pink-500",
-    },
-  ];
+
 
   return (
     <div className="space-y-6">
@@ -86,9 +126,9 @@ function Profile() {
       <div className="rounded-xl shadow-sm overflow-hidden mb-6 relative">
         {/* Cover Image */}
         <div className="h-72 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 relative overflow-hidden group">
-          {userInfo.coverImage ? (
+          {displayInfo.coverImage ? (
             <img
-              src={userInfo.coverImage}
+              src={displayInfo.coverImage}
               alt="Cover"
               className="w-full h-full object-cover"
             />
@@ -122,9 +162,12 @@ function Profile() {
         <div className="flex items-end justify-between absolute bottom-0 bg-white w-full pt-10 md:pt-4 pb-4 px-4">
           <div className="flex items-end gap-4">
             <Avatar className="w-24 h-24 border-4 border-white">
-              <AvatarImage src={userInfo.avatar} alt={userInfo.name} />
+              <AvatarImage 
+                src={displayInfo.avatar || undefined} 
+                alt={displayInfo.name} 
+              />
               <AvatarFallback className="bg-gray-200 text-gray-600 text-2xl">
-                {userInfo.name.charAt(0)}
+                {displayInfo.name?.charAt(0) || "?"}
               </AvatarFallback>
             </Avatar>
             <div className="mb-2">
@@ -143,77 +186,52 @@ function Profile() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Social Media Links */}
-
-        {/* Personal Information */}
+      {/* Personal Information Section - Full Width */}
+      <div className="w-full">
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">
             المعلومات الشخصية
           </h2>
 
           <div className="space-y-6">
-            <div className="text-right">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                الاسم
-              </label>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-gray-900 font-medium">{userInfo.name}</p>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                رقم الهاتف
-              </label>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-gray-900 font-medium">{userInfo.phone}</p>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                البريد الإلكتروني
-              </label>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-gray-900 font-medium">{userInfo.email}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-sm">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">
-            وسائل التواصل الاجتماعي
-          </h2>
-
-          <div className="space-y-4">
-            {socialMediaLinks.map((social, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between py-3"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 ${social.bgColor} rounded-full flex items-center justify-center text-white font-bold`}
-                  >
-                    <Icon
-                      name={social.iconName}
-                      size="20"
-                      className="text-white"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      {social.platform}
-                    </p>
-                    <p className="text-sm text-gray-500">{social.username}</p>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="text-right">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  الاسم الأول
+                </label>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-gray-900 font-medium">{userInfo.fname}</p>
                 </div>
-                <Button variant="ghost" size="sm">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
               </div>
-            ))}
+
+              <div className="text-right">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  اسم العائلة
+                </label>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-gray-900 font-medium">{userInfo.lname}</p>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  البريد الإلكتروني
+                </label>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-gray-900 font-medium">{userInfo.email}</p>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  رقم الهاتف
+                </label>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-gray-900 font-medium">{userInfo.phone}</p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

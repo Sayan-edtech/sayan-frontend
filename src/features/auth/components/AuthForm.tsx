@@ -12,8 +12,12 @@ import { UserType } from "@/constants/enums";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
 import useFormFields from "../hooks/useFormFields";
 import useFormValidations from "../hooks/useFormValidations";
+import SiginWithGoogle from "@/components/shared/sigin-with-google";
+import { cookieStorage } from "@/lib/cookies";
 
-const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
+const AuthForm: React.FC<{
+  slug: string;
+}> = ({ slug }) => {
   const navigate = useNavigate();
   const { getFormFields } = useFormFields({ slug });
   const { getValidationSchema } = useFormValidations({ slug });
@@ -39,6 +43,8 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
   const {
     handleSubmit,
     control,
+    getValues,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(getValidationSchema()),
@@ -56,7 +62,7 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
           });
 
           toast.success(message);
-          navigate("/dashboard", {
+          navigate(Routes.DASHBOARD, {
             replace: true,
           });
         } else if (slug === Pages.SIGNUP) {
@@ -109,6 +115,16 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
               replace: true,
             });
           }
+        } else if (slug === Pages.SIGNIN_WITH_GOOGLE) {
+          const { message } = await login({
+            google_token: cookieStorage.getItem("google_token") as string,
+            user_type: data.user_type as UserType,
+          });
+
+          toast.success(message);
+          navigate(Routes.DASHBOARD, {
+            replace: true,
+          });
         }
       } catch (error: unknown) {
         const errorMessage =
@@ -131,21 +147,45 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
   );
 
   const formLoading = isSubmitting || isLoading;
-
+  const shouldShowGoogleButton = slug === Pages.SIGNUP || slug === Pages.SIGNIN;
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      {getFormFields().map((field: IFormField) => (
-        <div key={field.name} className="mb-4">
-          <FormFields {...field} control={control} errors={errors} />
-        </div>
-      ))}
+    <>
+      {shouldShowGoogleButton && (
+        <>
+          <SiginWithGoogle
+            userType={getValues("user_type")}
+            setError={setError}
+          >
+            {slug === Pages.SIGNUP
+              ? "إنشاء حساب باستخدام"
+              : "تسجيل الدخول باستخدام"}
+          </SiginWithGoogle>
 
-      {slug === Pages.SIGNIN && (
-        <ForgotPassword control={control} errors={errors} />
+          <div className="relative flex items-center">
+            <div className="flex-grow border-t border-border"></div>
+            <span className="text-muted-foreground text-sm px-4">أو</span>
+            <div className="flex-grow border-t border-border"></div>
+          </div>
+        </>
       )}
-      <SubmitButton slug={slug} disabled={formLoading} loading={formLoading} />
-      <NavigationLink slug={slug} verifiedEmail={verifiedEmail} />
-    </form>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {getFormFields().map((field: IFormField) => (
+          <div key={field.name} className="mb-4">
+            <FormFields {...field} control={control} errors={errors} />
+          </div>
+        ))}
+
+        {slug === Pages.SIGNIN && (
+          <ForgotPassword control={control} errors={errors} />
+        )}
+        <SubmitButton
+          slug={slug}
+          disabled={formLoading}
+          loading={formLoading}
+        />
+        <NavigationLink slug={slug} verifiedEmail={verifiedEmail} />
+      </form>
+    </>
   );
 };
 
@@ -199,6 +239,7 @@ function SubmitButton({
         return "تأكيد";
       case Pages.RESET_PASSWORD:
         return "تغيير كلمة المرور";
+
       default:
         return "تسجيل الدخول";
     }
@@ -282,6 +323,13 @@ function NavigationLink({
           isButton: true,
           disabled: countdown > 0 || isLoading,
           onClick: handleResendOtp,
+        };
+      case Pages.SIGNIN_WITH_GOOGLE:
+        return {
+          desc: "لديك حساب بالفعل؟",
+          title: "تسجيل الدخول",
+          href: `/${Routes.AUTH}/${Pages.SIGNIN}`,
+          isButton: false,
         };
       default:
         return {

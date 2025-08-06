@@ -3,8 +3,9 @@ import AuthLinks from "./auth-links";
 import MobileMenu from "./mobile-menu";
 import { Link } from "react-router-dom";
 import ShoppingCart from "./shopping-cart";
-import { UserMenu } from "../dashboard/UserMenu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
 
 export default function Header() {
@@ -37,7 +38,18 @@ export default function Header() {
             {isLoading ? (
               <Skeleton className="h-10 w-10 rounded-full" />
             ) : user ? (
-              <UserMenu />
+              <Link to="/dashboard">
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar className="h-10 w-10">
+                    {user?.avatar && (
+                      <AvatarImage src={user.avatar} alt={user.fname} />
+                    )}
+                    <AvatarFallback className="bg-primary text-white">
+                      {user?.fname?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </Link>
             ) : (
               <AuthLinks />
             )}

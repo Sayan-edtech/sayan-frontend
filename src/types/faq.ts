@@ -1,5 +1,5 @@
 export interface FAQ {
-  id: string;
+  id: number;
   question: string;
   answer: string;
   category?: string;
@@ -38,4 +38,4 @@ export interface FAQPayload {
   category?: string;
   order?: number;
   is_active?: boolean;
-} 
+}

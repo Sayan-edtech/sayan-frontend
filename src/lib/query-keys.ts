@@ -131,6 +131,12 @@ export const queryKeys = {
     mainSettings: () => [...queryKeys.academy.all, "main-settings"] as const,
     mainSettingsDetail: (subdomain: string) =>
       [...queryKeys.academy.mainSettings(), subdomain] as const,
+    hero: () => [...queryKeys.academy.all, "hero"] as const,
+    heroDetail: (subdomain: string) =>
+      [...queryKeys.academy.hero(), subdomain] as const,
+    about: () => [...queryKeys.academy.all, "about"] as const,
+    aboutDetail: (subdomain: string) =>
+      [...queryKeys.academy.about(), subdomain] as const,
   },
 
   faqs: {
@@ -151,15 +157,18 @@ export const queryKeys = {
   opinions: {
     all: ["opinions"] as const,
     lists: () => [...queryKeys.opinions.all, "list"] as const,
-    list: (skip: number, limit: number) => [...queryKeys.opinions.lists(), `skip-${skip}-limit-${limit}`] as const,
+    list: (skip: number, limit: number) =>
+      [...queryKeys.opinions.lists(), `skip-${skip}-limit-${limit}`] as const,
     details: () => [...queryKeys.opinions.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.opinions.details(), id] as const,
 
     // Mutation keys for Opinion operations
     mutations: {
       create: () => [...queryKeys.opinions.all, "create"] as const,
-      update: (id: string) => [...queryKeys.opinions.all, "update", id] as const,
-      delete: (id: string) => [...queryKeys.opinions.all, "delete", id] as const,
+      update: (id: string) =>
+        [...queryKeys.opinions.all, "update", id] as const,
+      delete: (id: string) =>
+        [...queryKeys.opinions.all, "delete", id] as const,
     },
   },
 
@@ -180,6 +189,24 @@ export const queryKeys = {
   transactions: {
     all: ["transactions"] as const,
     lists: () => [...queryKeys.transactions.all, "list"] as const,
-    list: (skip: number, limit: number) => [...queryKeys.transactions.lists(), `skip-${skip}-limit-${limit}`] as const,
+    list: (skip: number, limit: number) =>
+      [
+        ...queryKeys.transactions.lists(),
+        `skip-${skip}-limit-${limit}`,
+      ] as const,
+  },
+  exam: {
+    all: ["exam"] as const,
+    lists: () => [...queryKeys.exam.all, "list"] as const,
+    list: (filters: string) => [...queryKeys.exam.lists(), filters] as const,
+    details: () => [...queryKeys.exam.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.exam.details(), id] as const,
+
+    // Mutation keys for Exam operations
+    mutations: {
+      create: () => [...queryKeys.exam.all, "create"] as const,
+      update: (id: string) => [...queryKeys.exam.all, "update", id] as const,
+      delete: (id: string) => [...queryKeys.exam.all, "delete", id] as const,
+    },
   },
 };

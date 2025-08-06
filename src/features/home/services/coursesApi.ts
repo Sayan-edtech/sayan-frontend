@@ -1,4 +1,4 @@
-import axios from "@/lib/axios";
+import { api } from "@/lib/axios";
 import type { Course } from "@/types/couse";
 
 export interface CoursesListResponse {
@@ -22,7 +22,7 @@ export interface CourseResponse {
 export const coursesApi = {
   getCourses: async (filters = ""): Promise<CoursesListResponse> => {
     const queryParams = filters.trim() ? `?${filters}` : "";
-    const response = await axios.get(`public/courses${queryParams}`);
+    const response = await api.get(`public/courses${queryParams}`);
     return response.data;
   },
 };

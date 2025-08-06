@@ -1,4 +1,4 @@
-import { ShoppingCartIcon, Plus, Minus, Trash2, X } from "lucide-react";
+import { ShoppingCartIcon, Trash2, X } from "lucide-react";
 import { useShoppingCart } from "@/store/shopping-cart";
 import { useNavigate } from "react-router-dom";
 import {
@@ -15,16 +15,10 @@ import { useCart } from "@/hooks/useCart";
 
 function ShoppingCart() {
   const navigate = useNavigate();
-  const { items, removeItem, updateQuantity, clearCart, isOpen, setIsOpen } =
+  const { items, removeItem, clearCart, isOpen, setIsOpen } =
     useShoppingCart();
   const { totalItems, totalPrice } = useCart();
-  const handleQuantityChange = (courseId: number, newQuantity: number) => {
-    if (newQuantity < 1) {
-      removeItem(courseId);
-    } else {
-      updateQuantity(courseId, newQuantity);
-    }
-  };
+
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
@@ -47,10 +41,7 @@ function ShoppingCart() {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4">
-          <div
-            dir={Directions.RTL}
-            className="flex items-center justify-between mb-4"
-          >
+          <div className="flex items-center justify-between mb-4" dir={Directions.RTL}>
             <h3 className="font-semibold text-lg">عربة التسوق</h3>
             <Button
               variant="ghost"
@@ -63,7 +54,7 @@ function ShoppingCart() {
           </div>
 
           {items.length === 0 ? (
-            <div className="text-center py-8">
+            <div className="text-center py-8" dir={Directions.RTL}>
               <ShoppingCartIcon className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
               <p className="text-muted-foreground">عربة التسوق فارغة</p>
               <Button
@@ -82,65 +73,31 @@ function ShoppingCart() {
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex gap-3 p-3 border border-border rounded-lg"
+                    className="flex gap-3 p-3 bg-gray-50 rounded-lg"
+                    dir={Directions.RTL}
                   >
                     <img
                       src={item.course.image}
                       alt={item.course.title}
-                      className="w-16 h-16 object-contain bg-gray-50 rounded-md flex-shrink-0"
+                      className="w-24 h-14 object-cover bg-gray-50 rounded-md flex-shrink-0 aspect-[10/6]"
                     />
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 text-right">
                       <h4 className="font-medium text-sm line-clamp-2 mb-1">
                         {item.course.title}
                       </h4>
-                      <p className="text-xs text-muted-foreground mb-2">
-                        المحاضر: {item.course.trainer ? `${item.course.trainer.fname} ${item.course.trainer.lname}` : 'غير محدد'}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() =>
-                              handleQuantityChange(
-                                Number(item.course.id),
-                                item.quantity - 1
-                              )
-                            }
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="text-sm font-medium w-8 text-center">
-                            {item.quantity}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() =>
-                              handleQuantityChange(
-                                Number(item.course.id),
-                                item.quantity + 1
-                              )
-                            }
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">
-                            {formatCurrency((item.course.price || 0) * item.quantity)}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 text-destructive hover:text-destructive"
-                            onClick={() => removeItem(Number(item.course.id))}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
+                      
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-base text-blue-600 font-bold">
+                          {formatCurrency(item.course.price || 0)}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-destructive hover:text-destructive"
+                          onClick={() => removeItem(item.course.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -149,7 +106,7 @@ function ShoppingCart() {
 
               <Separator className="my-4" />
 
-              <div dir={Directions.RTL} className="space-y-3">
+              <div className="space-y-3" dir={Directions.RTL}>
                 <div className="flex justify-between items-center">
                   <span className="font-medium">إجمالي العناصر:</span>
                   <span>{totalItems}</span>
@@ -161,22 +118,23 @@ function ShoppingCart() {
 
                 <div className="grid grid-cols-2 gap-2 mt-4">
                   <Button
-                    variant="outline"
+                    variant="default"
+                    onClick={() => {
+                      setIsOpen(false);
+                      navigate("/dashboard/shopping-cart");
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    disabled={items.length === 0}
+                  >
+                    الدفع الان 
+                  </Button>
+                  <Button
+                    variant="ghost"
                     onClick={clearCart}
-                    className="w-full"
+                    className="w-full text-gray-600 hover:bg-gray-100"
                     disabled={items.length === 0}
                   >
                     مسح سلة التسوق
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setIsOpen(false);
-                      navigate("/checkout");
-                    }}
-                    className="w-full"
-                    disabled={items.length === 0}
-                  >
-                    دفع
                   </Button>
                 </div>
               </div>

@@ -1,26 +1,36 @@
 import { api } from "@/lib/axios";
+import { authCookies } from "@/lib/cookies";
 import type { User } from "@/types/user";
+
+export interface UserProfileData {
+  id: string;
+  fname: string;
+  lname: string;
+  email: string;
+  phone_number: string;
+  gender: string;
+  avatar?: string;
+  banner?: string;
+  verified: boolean;
+  user_type: string;
+}
 
 export interface UserProfile {
   status: string;
   status_code: number;
   error_type: string | null;
   message: string;
-  data: User;
+  data: UserProfileData;
 }
 
 export interface UpdateUserProfileRequest {
   fname?: string;
   lname?: string;
+  email?: string;
   phone_number?: string;
-  bio?: string;
-  location?: string;
-  website?: string;
-  social_links?: {
-    linkedin?: string;
-    twitter?: string;
-    github?: string;
-  };
+  gender?: string;
+  avatar?: File | null;
+  banner?: File | null;
 }
 
 export interface UpdateProfilePictureRequest {
@@ -28,44 +38,89 @@ export interface UpdateProfilePictureRequest {
 }
 
 export const userService = {
-  // Get current user profile
-  async getCurrentUserProfile(): Promise<User> {
-    const response = await api.get<UserProfile>("/me");
-    return response.data.data;
-  },
-
-  // Get user profile by ID
-  async getUserProfile(userId: string): Promise<User> {
-    const response = await api.get<UserProfile>(`/user/profile/${userId}`);
+  // Get current user profile from /me endpoint
+  async getCurrentUserProfile(): Promise<UserProfileData> {
+    // Get tokens for academy
+    const tokens = authCookies.getTokens();
+    
+    const response = await api.get<UserProfile>("/me", {
+      headers: {
+        "X-Academy-Access-Token": tokens.accessToken || "",
+        "X-Academy-Refresh-Token": tokens.refreshToken || "",
+      },
+    });
     return response.data.data;
   },
 
   // Update user profile
-  async updateUserProfile(data: UpdateUserProfileRequest): Promise<User> {
-    const response = await api.put<UserProfile>("/user/profile", data);
+  async updateUserProfile(data: UpdateUserProfileRequest): Promise<UserProfileData> {
+    // Get tokens for academy
+    const tokens = authCookies.getTokens();
+    
+    // Create FormData for file uploads if needed
+    const formData = new FormData();
+    
+    // Add text fields
+    if (data.fname) formData.append("fname", data.fname);
+    if (data.lname) formData.append("lname", data.lname);
+    if (data.email) formData.append("email", data.email);
+    if (data.phone_number) formData.append("phone_number", data.phone_number);
+    if (data.gender) formData.append("gender", data.gender);
+    
+    // Add file fields
+    if (data.avatar) formData.append("avatar", data.avatar);
+    if (data.banner) formData.append("banner", data.banner);
+
+    const response = await api.put<UserProfile>("/me", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "X-Academy-Access-Token": tokens.accessToken || "",
+        "X-Academy-Refresh-Token": tokens.refreshToken || "",
+      },
+    });
     return response.data.data;
   },
 
-  // Update profile picture
-  async updateProfilePicture(data: UpdateProfilePictureRequest): Promise<User> {
-    const formData = new FormData();
-    formData.append("profile_picture", data.profile_picture);
+  // Legacy methods for backward compatibility
+  // Get user profile by ID
+  async getUserProfile(userId: string): Promise<UserProfileData> {
+    const tokens = authCookies.getTokens();
+    
+    const response = await api.get<UserProfile>(`/user/profile/${userId}`, {
+      headers: {
+        "X-Academy-Access-Token": tokens.accessToken || "",
+        "X-Academy-Refresh-Token": tokens.refreshToken || "",
+      },
+    });
+    return response.data.data;
+  },
 
-    const response = await api.put<UserProfile>(
-      "/user/profile/picture",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+  // Update profile picture only
+  async updateProfilePicture(data: UpdateProfilePictureRequest): Promise<UserProfileData> {
+    const tokens = authCookies.getTokens();
+    const formData = new FormData();
+    formData.append("avatar", data.profile_picture);
+
+    const response = await api.put<UserProfile>("/me", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "X-Academy-Access-Token": tokens.accessToken || "",
+        "X-Academy-Refresh-Token": tokens.refreshToken || "",
+      },
+    });
     return response.data.data;
   },
 
   // Delete profile picture
-  async deleteProfilePicture(): Promise<User> {
-    const response = await api.delete<UserProfile>("/user/profile/picture");
+  async deleteProfilePicture(): Promise<UserProfileData> {
+    const tokens = authCookies.getTokens();
+    
+    const response = await api.delete<UserProfile>("/user/profile/picture", {
+      headers: {
+        "X-Academy-Access-Token": tokens.accessToken || "",
+        "X-Academy-Refresh-Token": tokens.refreshToken || "",
+      },
+    });
     return response.data.data;
   },
 };

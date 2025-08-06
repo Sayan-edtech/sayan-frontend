@@ -21,6 +21,7 @@ export enum Routes {
 
 export enum Pages {
   SIGNIN = "signin",
+  SIGNIN_WITH_GOOGLE = "sigin-with-google",
   SIGNUP = "signup",
   VERIFY_ACCOUNT = "verify-account",
   FORGOT_PASSWORD = "forgot-password",

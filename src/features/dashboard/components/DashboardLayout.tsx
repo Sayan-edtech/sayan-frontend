@@ -5,6 +5,8 @@ import { useState } from "react";
 import { DashboardLoading } from "@/components/shared/dashboard";
 import { useCurrentUserProfile } from "../profile/hooks";
 import { Button } from "@/components/ui/button";
+import { UserType } from "@/constants/enums";
+import type { User } from "@/types/user";
 
 export function DashboardLayout() {
   const { data: user, isLoading, isError } = useCurrentUserProfile();
@@ -29,14 +31,21 @@ export function DashboardLayout() {
   }
 
   return (
+    !isLoading &&
     user && (
       <div className="min-h-screen bg-background flex">
-        <DashboardSidebar user={user} />
+        <DashboardSidebar user={{
+          ...user,
+          user_type: user.user_type as UserType
+        } as User} />
         <DashboardSidebar
           isMobile={true}
           isOpen={isMobileSidebarOpen}
           onClose={() => setIsMobileSidebarOpen(false)}
-          user={user}
+          user={{
+            ...user,
+            user_type: user.user_type as UserType
+          } as User}
         />
         <div className="flex-1 flex flex-col">
           <DashboardHeader

@@ -9,7 +9,7 @@ import RemoteImage from "./RemoteImage";
 
 function CourseCard({ course, href }: { course: Course; href?: string }) {
   const { addToCart, isInCart } = useCart();
-  const courseInCart = isInCart(Number(course.id));
+  const courseInCart = isInCart(course.id);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation when clicking the button
@@ -54,7 +54,9 @@ function CourseCard({ course, href }: { course: Course; href?: string }) {
               <div className="flex items-center gap-1 text-yellow-500">
                 <Star className="fill-current w-4 h-4" />
                 <span className="text-sm font-medium">
-                  {course.ratings_count ? course.ratings_count.toFixed(1) : '0.0'}
+                  {course.ratings_count
+                    ? course.ratings_count.toFixed(1)
+                    : "0.0"}
                 </span>
               </div>
             </div>
@@ -77,7 +79,9 @@ function CourseCard({ course, href }: { course: Course; href?: string }) {
             </Avatar>
             <div className="flex flex-col gap-1 items-center">
               <strong className="text-foreground text-lg">
-                {!course.price || course.price === 0 ? "مجاناً" : `${course.price} ريال`}
+                {!course.price || course.price === 0
+                  ? "مجاناً"
+                  : `${course.price} ريال`}
               </strong>
               {course.discount_price && (
                 <strong className="text-sm text-[#33333394] line-through decoration-[#FF4747]">

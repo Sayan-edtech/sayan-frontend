@@ -4,13 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import ImageField from "@/components/shared/formFields/image-field";
-import {
-  academyMainSettingsSchema,
-  type AcademyMainSettingsFormData,
-} from "@/validations/template";
+import { academyMainSettingsSchema } from "@/validations/template";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Settings,
   Palette,
@@ -19,21 +15,23 @@ import {
   Loader2,
   School,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { AxiosError } from "axios";
 import { useCheckSubdomain } from "../hooks/useMainSettingsQueries";
 import { useDebounce } from "@/hooks/useDebounce";
-import type { AcademyMainSettingsResponse } from "../services/academyTemplate";
 import RemoteImage from "@/components/shared/RemoteImage";
 import { toast } from "sonner";
 import { useAcademyMainSettingsMutation } from "../hooks/useMainSettingsMutations";
+import type {
+  MainSettings,
+  MainSettingsPayload,
+} from "@/types/academy/main-settings";
 
 const AcademyMainSettingsForm = ({
   mainSettings,
 }: {
-  mainSettings: AcademyMainSettingsResponse["data"];
+  mainSettings: MainSettings;
 }) => {
-  const [hasUserChanges, setHasUserChanges] = useState(false);
   const academyMainSettingsMutation = useAcademyMainSettingsMutation();
   const [isChangingFavicon, setIsChangingFavicon] = useState(false);
   const [isChangingLogo, setIsChangingLogo] = useState(false);
@@ -41,17 +39,17 @@ const AcademyMainSettingsForm = ({
   const {
     control,
     handleSubmit,
-    formState: { errors, isDirty, isSubmitting },
+    formState: { errors, isSubmitting },
     reset,
     getValues,
     watch,
-  } = useForm<AcademyMainSettingsFormData>({
+  } = useForm<MainSettingsPayload>({
     resolver: zodResolver(academyMainSettingsSchema),
     defaultValues: {
-      academyName: mainSettings?.platform_name || "",
+      platform_name: mainSettings?.platform_name || "",
       subdomain: mainSettings?.subdomain || "",
-      primaryColor: "#3B82F6",
-      secondaryColor: "#10B981",
+      primary_color: "#3B82F6",
+      secondary_color: "#10B981",
     },
     mode: "onChange",
   });
@@ -68,39 +66,9 @@ const AcademyMainSettingsForm = ({
     isLoading: subdomainLoading,
     isError: subdomainCheckError,
   } = useCheckSubdomain(debouncedSubdomain, shouldCheck);
-
-  // Track when user actually makes changes (after initial render)
-  useEffect(() => {
-    if (isDirty) {
-      setHasUserChanges(true);
-    }
-  }, [isDirty]);
-
-  const onSubmit = async (data: AcademyMainSettingsFormData) => {
-    toast.error(null);
+  const onSubmit = async (data: MainSettingsPayload) => {
     try {
-      // التحقق من وجود بيانات للتحديث
-      if (!data.academyName || data.academyName.trim() === "") {
-        toast.error("يجب إدخال اسم الأكاديمية");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("platform_name", data.academyName.trim());
-      
-      // إضافة الحقول الأخرى إذا توفرت
-      if (data.subdomain) {
-        formData.append("subdomain", data.subdomain.trim());
-      }
-      if (data.primaryColor) {
-        formData.append("primary_color", data.primaryColor);
-      }
-      if (data.secondaryColor) {
-        formData.append("secondary_color", data.secondaryColor);
-      }
-
-      await academyMainSettingsMutation.mutateAsync(formData);
-      setHasUserChanges(false);
+      await academyMainSettingsMutation.mutateAsync(data);
     } catch (error: unknown) {
       if (error && typeof error === "object" && "response" in error) {
         const axiosError = error as AxiosError<{ message?: string }>;
@@ -115,7 +83,6 @@ const AcademyMainSettingsForm = ({
 
   const handleReset = () => {
     reset();
-    setHasUserChanges(false);
   };
 
   const formLoading = isSubmitting || academyMainSettingsMutation.isPending;
@@ -134,15 +101,6 @@ const AcademyMainSettingsForm = ({
               قم بتخصيص هوية وألوان أكاديميتك
             </p>
           </div>
-          {hasUserChanges && (
-            <Badge
-              variant="outline"
-              className="bg-amber-50 text-amber-700 border-amber-200 mr-auto"
-            >
-              <Settings className="w-3 h-3 ml-1" />
-              يوجد تغييرات غير محفوظة
-            </Badge>
-          )}
         </div>
       </div>
 
@@ -161,7 +119,7 @@ const AcademyMainSettingsForm = ({
               <div className="space-y-2">
                 <Controller
                   control={control}
-                  name="academyName"
+                  name="platform_name"
                   render={({ field: { onChange, value } }) => (
                     <div className="flex flex-col gap-2">
                       <Input
@@ -171,7 +129,7 @@ const AcademyMainSettingsForm = ({
                         placeholder="أدخل اسم الأكاديمية"
                         disabled={formLoading}
                         className={`${
-                          errors.academyName
+                          errors.platform_name
                             ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                             : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                         } h-10 !bg-transparent`}
@@ -180,9 +138,9 @@ const AcademyMainSettingsForm = ({
                     </div>
                   )}
                 />
-                {errors.academyName && (
+                {errors.platform_name && (
                   <p className="text-sm text-destructive">
-                    {errors.academyName.message}
+                    {errors.platform_name.message}
                   </p>
                 )}
               </div>
@@ -235,12 +193,12 @@ const AcademyMainSettingsForm = ({
                         </span>
                       )}
                       {subdomainCheck &&
-                        subdomainCheck.available &&
+                        subdomainCheck.data.available &&
                         !subdomainLoading && (
                           <span className="text-green-600">النطاق متاح ✅</span>
                         )}
                       {subdomainCheck &&
-                        !subdomainCheck.available &&
+                        !subdomainCheck.data.available &&
                         !subdomainLoading && (
                           <span className="text-destructive">
                             {subdomainCheck.message || "النطاق غير متاح"}
@@ -273,7 +231,7 @@ const AcademyMainSettingsForm = ({
                   </Label>
                   <Controller
                     control={control}
-                    name="primaryColor"
+                    name="primary_color"
                     render={({ field: { onChange, value } }) => (
                       <div className="flex items-center gap-3">
                         <div
@@ -281,12 +239,12 @@ const AcademyMainSettingsForm = ({
                           style={{ backgroundColor: value }}
                           onClick={() =>
                             document
-                              .getElementById("primaryColorPicker")
+                              .getElementById("primary_colorPicker")
                               ?.click()
                           }
                         />
                         <input
-                          id="primaryColorPicker"
+                          id="primary_colorPicker"
                           type="color"
                           value={value}
                           onChange={(e) => onChange(e.target.value)}
@@ -298,7 +256,7 @@ const AcademyMainSettingsForm = ({
                           onChange={(e) => onChange(e.target.value)}
                           placeholder="#3B82F6"
                           className={`flex-1 ${
-                            errors.primaryColor
+                            errors.primary_color
                               ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                               : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                           } h-10 !bg-transparent`}
@@ -307,9 +265,9 @@ const AcademyMainSettingsForm = ({
                       </div>
                     )}
                   />
-                  {errors.primaryColor && (
+                  {errors.primary_color && (
                     <p className="text-sm text-destructive">
-                      {errors.primaryColor.message}
+                      {errors.primary_color.message}
                     </p>
                   )}
                 </div>
@@ -320,7 +278,7 @@ const AcademyMainSettingsForm = ({
                   </Label>
                   <Controller
                     control={control}
-                    name="secondaryColor"
+                    name="secondary_color"
                     render={({ field: { onChange, value } }) => (
                       <div className="flex items-center gap-3">
                         <div
@@ -328,12 +286,12 @@ const AcademyMainSettingsForm = ({
                           style={{ backgroundColor: value }}
                           onClick={() =>
                             document
-                              .getElementById("secondaryColorPicker")
+                              .getElementById("secondary_colorPicker")
                               ?.click()
                           }
                         />
                         <input
-                          id="secondaryColorPicker"
+                          id="secondary_colorPicker"
                           type="color"
                           value={value}
                           onChange={(e) => onChange(e.target.value)}
@@ -345,7 +303,7 @@ const AcademyMainSettingsForm = ({
                           onChange={(e) => onChange(e.target.value)}
                           placeholder="#10B981"
                           className={`flex-1 ${
-                            errors.secondaryColor
+                            errors.secondary_color
                               ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
                               : "!border-border !shadow-none focus-visible:ring-0 focus-visible:border-border"
                           } h-10 !bg-transparent`}
@@ -354,9 +312,9 @@ const AcademyMainSettingsForm = ({
                       </div>
                     )}
                   />
-                  {errors.secondaryColor && (
+                  {errors.secondary_color && (
                     <p className="text-sm text-destructive">
-                      {errors.secondaryColor.message}
+                      {errors.secondary_color.message}
                     </p>
                   )}
                 </div>
@@ -395,7 +353,7 @@ const AcademyMainSettingsForm = ({
               ) : (
                 <div className="space-y-2">
                   <ImageField
-                    name="favicon" // Changed from "academyIcon" to "favicon" for consistency
+                    name="favicon"
                     type="image"
                     label=""
                     placeholder="اختر أيقونة المنصة"
@@ -451,7 +409,7 @@ const AcademyMainSettingsForm = ({
               ) : (
                 <div className="space-y-2">
                   <ImageField
-                    name="academyLogo"
+                    name="logo"
                     type="image"
                     label=""
                     placeholder="اختر شعار المنصة"
@@ -480,11 +438,7 @@ const AcademyMainSettingsForm = ({
 
         {/* Form Actions */}
         <div className="flex justify-start gap-3 pt-4 border-t border-gray-100">
-          <Button
-            type="submit"
-            disabled={isSubmitting || !hasUserChanges}
-            className="px-6"
-          >
+          <Button type="submit" disabled={isSubmitting} className="px-6">
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 ml-2 animate-spin" />
@@ -501,7 +455,7 @@ const AcademyMainSettingsForm = ({
             type="button"
             variant="outline"
             onClick={handleReset}
-            disabled={isSubmitting || !hasUserChanges}
+            disabled={isSubmitting}
             className="px-6"
           >
             استعادة الافتراضي

@@ -15,7 +15,8 @@ import CourseFilters from "@/features/dashboard/courses/components/CourseFilters
 function AcademyCourses() {
   const { data: user } = useCurrentUserProfile();
   const academy = getAcademyDetails(user as User);
-  const { data: courses, isPending } = useAcademyCourses(academy?.academy_id);
+  const academyId = academy?.academy_id || 0; // Provide a default value of 0
+  const { data: courses, isPending } = useAcademyCourses(academyId);
   const [table, setTable] = useState<TanstackTable<Course> | null>(null);
 
   if (isPending) {

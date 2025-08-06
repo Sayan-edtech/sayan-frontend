@@ -78,7 +78,7 @@ const CourseForm = ({ course }: { course?: Course }) => {
     const savedStep = getFromLocalStorage(FORM_STEP_KEY);
     return savedStep || 1;
   });
-  const totalSteps = 3;
+  const totalSteps = course ? 3 : 2;
 
   // Create conditional schema for editing vs creating
   const getValidationSchema = useCallback(() => {
@@ -128,7 +128,7 @@ const CourseForm = ({ course }: { course?: Course }) => {
       ? {
           title: course.title,
           category: String(course.category.id),
-          instructor: course.trainer ? course.trainer.fname : '',
+          instructor: course.trainer ? course.trainer.fname : "",
           level: course.level,
           price: course.price || 0,
           discountPrice: course.discount_price || 0,
@@ -186,20 +186,18 @@ const CourseForm = ({ course }: { course?: Course }) => {
 
       if (course) {
         // Update existing course
-        const { status_code } = await updateCourseMutation.mutateAsync({
+        await updateCourseMutation.mutateAsync({
           id: course.id,
           courseData: formattedData,
         });
-        if (status_code === 200) {
-          navigate("/dashboard/courses");
-        }
       } else {
         // Create new course
-        const { status_code } = await createCourseMutation.mutateAsync(
+        const { status_code, data } = await createCourseMutation.mutateAsync(
           formattedData
         );
         if (status_code === 201) {
-          navigate("/dashboard/courses");
+          setCurrentStep(3);
+          navigate(`/dashboard/courses/manage/${data.id}`);
         }
       }
 
@@ -617,27 +615,41 @@ const CourseForm = ({ course }: { course?: Course }) => {
 
             <div className="flex space-x-4 rtl:space-x-reverse">
               {currentStep < totalSteps ? (
-                <Button
-                  type="button"
-                  onClick={(e) => nextStep(e)}
-                  disabled={formLoading}
-                  className="flex items-center gap-2"
-                >
-                  التالي
-                  <ArrowRight className="w-4 h-4 rotate-180" />
-                </Button>
-              ) : (
                 <div className="flex items-center gap-2">
+                  {course && currentStep == 2 && (
+                    <Button
+                      type="submit"
+                      disabled={formLoading}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      حفظ الدورة كمسودة
+                      {formLoading && <Loader />}
+                    </Button>
+                  )}
                   <Button
-                    type="submit"
+                    type="button"
+                    onClick={(e) => nextStep(e)}
                     disabled={formLoading}
-                    variant={course ? "outline" : "default"}
                     className="flex items-center gap-2"
                   >
-                    {course ? "حفظ الدورة كمسودة" : "إنشاء الدورة"}
-                    {formLoading && <Loader />}
+                    التالي
+                    <ArrowRight className="w-4 h-4 rotate-180" />
                   </Button>
-                  <Button type="button">نشر الدورة</Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {!course && (
+                    <Button
+                      type="submit"
+                      disabled={formLoading}
+                      className="flex items-center gap-2"
+                    >
+                      إنشاء الدورة
+                      {formLoading && <Loader />}
+                    </Button>
+                  )}
+                  {course && <Button type="button">نشر الدورة</Button>}
                 </div>
               )}
             </div>

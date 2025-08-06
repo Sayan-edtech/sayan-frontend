@@ -1,4 +1,5 @@
-import axios from "@/lib/axios";
+import { api } from "@/lib/axios";
+import { appendFormData } from "@/lib/formdata";
 import type { Category, Course } from "@/types/couse";
 
 // Types for API requests
@@ -49,17 +50,17 @@ export interface CourseResponse {
 // API service for courses
 export const coursesApi = {
   getCourses: async (): Promise<CoursesListResponse> => {
-    const response = await axios.get("/academy/courses");
+    const response = await api.get("/academy/courses");
     return response.data;
   },
   getCategories: async (): Promise<CategoriesListResponse> => {
-    const response = await axios.get("/categories");
+    const response = await api.get("/categories");
     return response.data;
   },
 
   // Get single course by ID
   getCourse: async (id: string): Promise<CourseResponse> => {
-    const response = await axios.get(`/academy/courses/${id}`);
+    const response = await api.get(`/academy/courses/${id}`);
     return response.data;
   },
 
@@ -67,26 +68,11 @@ export const coursesApi = {
   createCourse: async (courseData: CoursePayload): Promise<CourseResponse> => {
     // Create FormData for file uploads
     const formData = new FormData();
-
-    // Append all form fields
-    Object.entries(courseData).forEach(([key, value]) => {
-      if (value !== null && value !== undefined) {
-        if (value instanceof File) {
-          formData.append(key, value);
-        } else if (Array.isArray(value)) {
-          // Handle array fields like gallery
-          value.forEach((item, index) => {
-            if (item instanceof File) {
-              formData.append(`${key}[${index}]`, item);
-            }
-          });
-        } else {
-          formData.append(key, String(value));
-        }
-      }
+    appendFormData(formData, {
+      ...courseData,
     });
 
-    const response = await axios.post("/academy/courses", formData, {
+    const response = await api.post("/academy/courses", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -102,25 +88,9 @@ export const coursesApi = {
   ): Promise<CourseResponse> => {
     // Create FormData for file uploads if needed
     const formData = new FormData();
+    appendFormData(formData, courseData);
 
-    Object.entries(courseData).forEach(([key, value]) => {
-      if (value !== null && value !== undefined) {
-        if (value instanceof File) {
-          formData.append(key, value);
-        } else if (Array.isArray(value)) {
-          // Handle array fields like gallery
-          value.forEach((item, index) => {
-            if (item instanceof File) {
-              formData.append(`${key}[${index}]`, item);
-            }
-          });
-        } else {
-          formData.append(key, String(value));
-        }
-      }
-    });
-
-    const response = await axios.put(`/academy/courses/${id}`, formData, {
+    const response = await api.put(`/academy/courses/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -131,7 +101,7 @@ export const coursesApi = {
 
   // Delete course
   deleteCourse: async (id: string): Promise<void> => {
-    await axios.delete(`/courses/academy/courses/${id}`);
+    await api.delete(`/academy/courses/${id}`);
   },
 
   // Publish/Unpublish course
@@ -139,7 +109,7 @@ export const coursesApi = {
     id: string,
     isPublished: boolean
   ): Promise<Course> => {
-    const response = await axios.patch(`/courses/${id}/status`, {
+    const response = await api.patch(`/courses/${id}/status`, {
       isPublished,
     });
     return response.data.course;

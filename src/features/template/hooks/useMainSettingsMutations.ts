@@ -1,10 +1,11 @@
 import { queryKeys } from "@/lib/query-keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  academyTemplateApi,
-  type AcademyMainSettingsResponse,
-} from "../services/academyTemplate";
+import { academyApi } from "../services/academy";
 import { toast } from "sonner";
+import type {
+  MainSettingsPayload,
+  MainSettingsResponse,
+} from "@/types/academy/main-settings";
 
 interface ApiError {
   response?: {
@@ -19,9 +20,9 @@ export const useAcademyMainSettingsMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: FormData) =>
-      academyTemplateApi.updateAcademyTemplate(data),
-    onSuccess: (response: AcademyMainSettingsResponse) => {
+    mutationFn: (data: MainSettingsPayload) =>
+      academyApi.updateMainSetting(data),
+    onSuccess: (response: MainSettingsResponse) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.academy.mainSettings(),
       });

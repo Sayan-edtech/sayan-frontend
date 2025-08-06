@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
-import { academyTemplateApi } from "../services/academyTemplate";
+import { academyApi } from "../services/academy";
 
 export function useAcademyMainSettings(subdomain?: string) {
   return useQuery({
     queryKey: subdomain
       ? queryKeys.academy.mainSettingsDetail(subdomain)
       : queryKeys.academy.mainSettings(),
-    queryFn: () => academyTemplateApi.getAcademyTemplate(),
+    queryFn: () => academyApi.getMainSettings(),
     retry: false,
   });
 }
@@ -15,7 +15,7 @@ export function useAcademyMainSettings(subdomain?: string) {
 export function useCheckSubdomain(subdomain: string, enabled = false) {
   return useQuery({
     queryKey: ["check-subdomain", subdomain],
-    queryFn: () => academyTemplateApi.checkSubdomain(subdomain),
+    queryFn: () => academyApi.checkSubdomain(subdomain),
     enabled: enabled && !!subdomain,
     retry: false,
   });

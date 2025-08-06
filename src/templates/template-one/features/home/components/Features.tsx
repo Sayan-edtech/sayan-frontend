@@ -1,6 +1,8 @@
+import type { About } from "@/types/academy/about";
 import { GraduationCap, Award } from "lucide-react";
 
-function Features() {
+function Features({ about }: { about: About }) {
+  console.log("about", about);
   return (
     <section id="features" className="py-16 relative">
       <div className="container">

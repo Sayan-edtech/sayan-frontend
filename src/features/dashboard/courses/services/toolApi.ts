@@ -1,4 +1,4 @@
-import axios from "@/lib/axios";
+import { api } from "@/lib/axios";
 import type { Tool } from "@/types/couse";
 
 // Types for API responses
@@ -31,7 +31,7 @@ export const toolApi = {
     lessonId,
     data,
   }: ToolPayload): Promise<ToolResponse> => {
-    const response = await axios.post(`/lessons/${lessonId}/tools`, data, {
+    const response = await api.post(`/lessons/${lessonId}/tools`, data, {
       headers: {
         "Content-Type": "application/json",
       },

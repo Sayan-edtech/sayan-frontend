@@ -1,16 +1,11 @@
 import { api } from "@/lib/axios";
-import type {
-  FAQ,
-  FAQsListResponse,
-  FAQResponse,
-  FAQPayload,
-} from "@/types/faq";
+import type { FAQsListResponse, FAQResponse, FAQPayload } from "@/types/faq";
 
 // API service for FAQs
 export const faqsApi = {
   // Get all FAQs
   getFAQs: async (): Promise<FAQsListResponse> => {
-    const response = await api.get("/faqs");
+    const response = await api.get("/faqs/");
     return response.data;
   },
 
@@ -29,7 +24,7 @@ export const faqsApi = {
       order: faqData.order || 1,
       is_active: faqData.is_active !== undefined ? faqData.is_active : true,
     };
-    
+
     const response = await api.post("/faqs", payload);
     return response.data;
   },
@@ -43,7 +38,7 @@ export const faqsApi = {
       order: faqData.order || 1,
       is_active: faqData.is_active !== undefined ? faqData.is_active : true,
     };
-    
+
     const response = await api.put(`/faqs/${id}`, payload);
     return response.data;
   },
@@ -53,4 +48,4 @@ export const faqsApi = {
     const response = await api.delete(`/faqs/${id}`);
     return response.data;
   },
-}; 
+};

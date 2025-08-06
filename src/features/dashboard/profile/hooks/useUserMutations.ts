@@ -4,6 +4,7 @@ import {
   userService,
   type UpdateUserProfileRequest,
   type UpdateProfilePictureRequest,
+  type UserProfileData,
 } from "../services/userService";
 import { userKeys } from "@/lib/query-keys";
 import type { User } from "@/types/user";
@@ -26,7 +27,7 @@ export const useUpdateUserProfile = () => {
   return useMutation({
     mutationFn: (data: UpdateUserProfileRequest) =>
       userService.updateUserProfile(data),
-    onSuccess: (updatedProfile: User) => {
+    onSuccess: (updatedProfile: UserProfileData) => {
       // Update the current user profile in cache
       queryClient.setQueryData(userKeys.currentUser(), updatedProfile);
 
@@ -61,7 +62,7 @@ export const useUpdateProfilePicture = () => {
   return useMutation({
     mutationFn: (data: UpdateProfilePictureRequest) =>
       userService.updateProfilePicture(data),
-    onSuccess: (updatedProfile: User) => {
+    onSuccess: (updatedProfile: UserProfileData) => {
       // Update the current user profile in cache
       queryClient.setQueryData(userKeys.currentUser(), updatedProfile);
 
@@ -95,7 +96,7 @@ export const useDeleteProfilePicture = () => {
 
   return useMutation({
     mutationFn: userService.deleteProfilePicture,
-    onSuccess: (updatedProfile: User) => {
+    onSuccess: (updatedProfile: UserProfileData) => {
       // Update the current user profile in cache
       queryClient.setQueryData(userKeys.currentUser(), updatedProfile);
 

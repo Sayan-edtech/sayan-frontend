@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, Settings, LogOut, HelpCircle } from "lucide-react";
+import { User, LogOut, HelpCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Routes } from "@/constants/enums";
 import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks";
@@ -29,7 +29,6 @@ export function UserMenu({ align }: { align?: "start" | "end" | "center" }) {
   if (isLoading) {
     return <Skeleton className="h-10 w-10 rounded-full" />;
   }
-
   return (
     !isLoading &&
     user && (
@@ -67,12 +66,6 @@ export function UserMenu({ align }: { align?: "start" | "end" | "center" }) {
               <Link to={Routes.DASHBOARD_PROFILE} className="cursor-pointer">
                 <User className="mr-2 h-4 w-4" />
                 <span>الملف الشخصي</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to={Routes.DASHBOARD_SETTINGS} className="cursor-pointer">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>الإعدادات</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer">

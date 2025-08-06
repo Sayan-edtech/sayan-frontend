@@ -17,17 +17,40 @@ function RemoteImage({
   prefix = "static",
   ...rest
 }: RemoteImageProps) {
+  // Don't render if src is empty or invalid
+  if (!src || typeof src !== 'string' || src.trim() === '') {
+    return null;
+  }
+
   const url = import.meta.env.VITE_API_URL;
-  const origin = new URL(url).origin;
-  return (
-    <img
-      src={prefix ? `${origin}/${prefix}/${src}` : `${origin}${src}`}
-      alt={alt}
-      loading={loading}
-      className={`${cn("h-16 w-16 rounded-lg object-cover")} ${className}`}
-      {...rest}
-    />
-  );
+  
+  // Don't render if API URL is not available
+  if (!url) {
+    return null;
+  }
+
+  try {
+    const origin = new URL(url).origin;
+    // Handle cases where src already includes the full path
+    const imageSrc = src.startsWith('http') 
+      ? src 
+      : prefix 
+        ? `${origin}/${prefix}/${src}` 
+        : `${origin}/${src}`;
+    
+    return (
+      <img
+        src={imageSrc}
+        alt={alt}
+        loading={loading}
+        className={`${cn("h-16 w-16 rounded-lg object-cover")} ${className}`}
+        {...rest}
+      />
+    );
+  } catch (error) {
+    console.warn('Invalid API URL:', url);
+    return null;
+  }
 }
 
 export default RemoteImage;

@@ -1,4 +1,5 @@
 import { api } from "@/lib/axios";
+import { appendFormData } from "@/lib/formdata";
 import type {
   AuthResponse,
   LoginRequest,
@@ -11,26 +12,14 @@ export const authService = {
   // Login user
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/login", credentials);
-
+    console.log(response);
     return response.data;
   },
 
   // Register user
   async signup(userData: SignupRequest): Promise<AuthResponse> {
     const formData = new FormData();
-
-    // Append text fields
-    formData.append("fname", userData.fname);
-    formData.append("lname", userData.lname);
-    formData.append("email", userData.email);
-    formData.append("phone_number", userData.phone_number);
-    formData.append("password", userData.password);
-    formData.append("user_type", userData.user_type);
-
-    // Append file if exists
-    if (userData.profile_picture) {
-      formData.append("profile_picture", userData.profile_picture);
-    }
+    appendFormData(formData, userData);
 
     const response = await api.post<AuthResponse>("/auth/register", formData, {
       headers: {
