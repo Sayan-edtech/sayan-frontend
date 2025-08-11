@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info, Image as ImageIcon, CheckCircle, Loader2 } from "lucide-react";
 import { useAcademyAboutMutation } from "../hooks/useAboutMutations";
 import type { About, AboutPayload } from "@/types/academy/about";
-import RichTextEditor from "@/components/shared/RichTextEditor";
+import Editor from "@/components/shared/Editor";
 import RemoteImage from "@/components/shared/RemoteImage";
 
 const AcademyAboutForm = ({ about }: { about: About }) => {
@@ -108,12 +108,7 @@ const AcademyAboutForm = ({ about }: { about: About }) => {
                   control={control}
                   name="title"
                   render={({ field: { onChange, value } }) => (
-                    <RichTextEditor
-                      content={value || ""}
-                      onChange={onChange}
-                      minHeight="20px"
-                      disabled={formLoading}
-                    />
+                    <Editor value={value || ""} onChange={onChange} />
                   )}
                 />
                 {errors.title && (
@@ -271,12 +266,7 @@ const AcademyAboutForm = ({ about }: { about: About }) => {
               control={control}
               name="content"
               render={({ field: { onChange, value } }) => (
-                <RichTextEditor
-                  content={value || ""}
-                  onChange={onChange}
-                  minHeight="150px"
-                  disabled={formLoading}
-                />
+                <Editor value={value || ""} onChange={onChange} />
               )}
             />
             {errors.content && (
