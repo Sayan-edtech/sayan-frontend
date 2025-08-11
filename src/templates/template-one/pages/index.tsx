@@ -24,8 +24,11 @@ const sectionVariants = {
 
 function Home() {
   const { academySlug } = useParams();
-  // const subdomain = window.location.hostname.split(".")[0];
-  const { data: academyInfo, isPending } = useAcademy({ slug: academySlug });
+  const subdomain = window.location.hostname.split(".")[0];
+  const { data: academyInfo, isPending } = useAcademy({
+    slug: academySlug,
+    subdomain: subdomain,
+  });
   if (!isPending && !academyInfo) {
     return <Navigate to={Routes.ROOT} state={{ from: location }} replace />;
   }

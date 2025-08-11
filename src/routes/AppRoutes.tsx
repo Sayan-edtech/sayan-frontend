@@ -14,20 +14,29 @@ import Ai from "@/pages/ai";
 import { dashboardRoutes } from "./DashboardRoutes";
 import { authRoutes } from "./AuthRoutes";
 import { academyRoutes } from "./academy-routes";
+import { hasSubdomain } from "@/lib/subdomain";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route index element={<Home />} />
-      <Route path="about" element={<About />} />
-      <Route path="courses/:courseSlug" element={<CourseDetails />} />
-      <Route path="launch-academy" element={<LaunchAcademy />} />
-      <Route path="ai" element={<Ai />} />
-      <Route path="employee-training" element={<EmployeeTraining />} />
+      {hasSubdomain() ? (
+        // Academy subdomain routes
+        academyRoutes
+      ) : (
+        // Main application routes
+        <>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="courses/:courseSlug" element={<CourseDetails />} />
+          <Route path="launch-academy" element={<LaunchAcademy />} />
+          <Route path="ai" element={<Ai />} />
+          <Route path="employee-training" element={<EmployeeTraining />} />
 
-      {dashboardRoutes}
-      {authRoutes}
-      {academyRoutes}
+          {dashboardRoutes}
+          {authRoutes}
+          {academyRoutes}
+        </>
+      )}
       <Route path="*" element={<NotFound />} />
     </>
   )
