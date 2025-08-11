@@ -1,29 +1,11 @@
-import { useNavigate } from "react-router-dom";
 import AddTrainerForm from "@/features/trainers/components/AddTrainerForm";
-import type { ITrainerForm } from "@/validations/trainer";
 import { UserPlus } from "lucide-react";
-import { toast } from "sonner";
 
 function AddNewTrainer() {
-  const navigate = useNavigate();
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSubmit = (data: ITrainerForm) => {
-    // The API call is now handled in the AddTrainerForm component
-    toast.success("تم إضافة المدرب بنجاح");
-    navigate("/dashboard/trainers");
-  };
-
-  const handleCancel = () => {
-    navigate("/dashboard/trainers");
-  };
-
   return (
     <div className="space-y-6">
       <Header />
-
-      {/* Form */}
-      <AddTrainerForm onSubmit={handleSubmit} onCancel={handleCancel} />
+      <AddTrainerForm />
     </div>
   );
 }
