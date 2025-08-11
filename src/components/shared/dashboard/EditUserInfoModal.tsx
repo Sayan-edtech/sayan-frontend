@@ -30,7 +30,12 @@ interface UserInfo {
 
 interface EditUserInfoModalProps {
   userInfo: UserInfo;
-  onSave: (updatedInfo: UserInfo & { avatar?: File; coverImage?: File }) => void;
+  onSave: (
+    updatedInfo: Omit<UserInfo, "avatar" | "coverImage"> & {
+      avatar?: File;
+      coverImage?: File;
+    }
+  ) => void;
   trigger?: React.ReactNode;
 }
 
@@ -69,7 +74,7 @@ export function EditUserInfoModal({
       lname: userInfo.lname,
       email: userInfo.email,
       phone: userInfo.phone,
-      gender: userInfo.gender as "male" | "female" || "male",
+      gender: (userInfo.gender as "male" | "female") || "male",
       avatar: userInfo.avatar || "",
       coverImage: userInfo.coverImage || "",
     },
@@ -103,14 +108,15 @@ export function EditUserInfoModal({
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const userInfo: UserInfo = {
+      const userInfo = {
         fname: data.fname,
         lname: data.lname,
         email: data.email,
         phone: data.phone,
         gender: data.gender,
         avatar: data.avatar instanceof File ? data.avatar : undefined,
-        coverImage: data.coverImage instanceof File ? data.coverImage : undefined,
+        coverImage:
+          data.coverImage instanceof File ? data.coverImage : undefined,
       };
 
       onSave(userInfo);
@@ -129,10 +135,10 @@ export function EditUserInfoModal({
     setOpen(false);
   };
 
-  const validateCoverImageDimensions = async (file: File): Promise<boolean> => {
-    // No restrictions on cover image dimensions - accept any image
-    return true;
-  };
+  // const validateCoverImageDimensions = async (file: File): Promise<boolean> => {
+  //   // No restrictions on cover image dimensions - accept any image
+  //   return true;
+  // };
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -165,13 +171,13 @@ export function EditUserInfoModal({
       }
 
       // Validate dimensions
-      const isValidDimensions = await validateCoverImageDimensions(file);
-      if (!isValidDimensions) {
-        toast.error(
-          "أبعاد صورة الغلاف غير مناسبة. الحد الأدنى: 800x300 بكسل، الحد الأقصى: 2048x1152 بكسل، ونسبة العرض للارتفاع بين 2:1 و 4:1"
-        );
-        return;
-      }
+      // const isValidDimensions = await validateCoverImageDimensions(file);
+      // if (!isValidDimensions) {
+      //   toast.error(
+      //     "أبعاد صورة الغلاف غير مناسبة. الحد الأدنى: 800x300 بكسل، الحد الأقصى: 2048x1152 بكسل، ونسبة العرض للارتفاع بين 2:1 و 4:1"
+      //   );
+      //   return;
+      // }
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -214,7 +220,8 @@ export function EditUserInfoModal({
               {watchedValues.coverImage || userInfo.coverImage ? (
                 <img
                   src={
-                    typeof watchedValues.coverImage === "string" && watchedValues.coverImage
+                    typeof watchedValues.coverImage === "string" &&
+                    watchedValues.coverImage
                       ? watchedValues.coverImage
                       : getImageUrl(userInfo.coverImage) || ""
                   }
@@ -251,7 +258,8 @@ export function EditUserInfoModal({
               <Avatar className="w-24 h-24 transition-all duration-200 group-hover:opacity-80">
                 <AvatarImage
                   src={
-                    typeof watchedValues.avatar === "string" && watchedValues.avatar
+                    typeof watchedValues.avatar === "string" &&
+                    watchedValues.avatar
                       ? watchedValues.avatar
                       : getImageUrl(userInfo.avatar) || undefined
                   }
@@ -394,7 +402,6 @@ export function EditUserInfoModal({
                 </p>
               )}
             </div>
-
           </form>
         </div>
 
