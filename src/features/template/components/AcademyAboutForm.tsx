@@ -37,14 +37,26 @@ const AcademyAboutForm = ({ about }: { about: About }) => {
     mode: "onChange",
   });
 
-  const onSubmit = async (data: AboutPayload) => {
+  const onSubmit = async (data: AcademyAboutFormType) => {
     try {
+      const payload: AboutPayload = {
+        title: data.title,
+        content: data.content,
+        feature_one: data.feature_one,
+        feature_two: data.feature_two,
+      };
+
+      // Include image if it exists
+      if (data.image) {
+        payload.image = data.image;
+      }
+
       if (currentSliderId) {
-        // Update existing slider
-        await academyAboutMutation.mutateAsync(data);
+        // Update existing about section
+        await academyAboutMutation.mutateAsync(payload);
       } else {
-        // Create new slider
-        const response = await academyAboutMutation.mutateAsync(data);
+        // Create new about section
+        const response = await academyAboutMutation.mutateAsync(payload);
         if (response.data?.id) {
           setCurrentSliderId(response.data.id.toString());
         }
@@ -184,7 +196,6 @@ const AcademyAboutForm = ({ about }: { about: About }) => {
             </CardContent>
           </Card>
 
-          {/* Hero Image */}
           <Card className="shadow-sm border-0">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-gray-800 text-sm font-medium">
@@ -200,7 +211,7 @@ const AcademyAboutForm = ({ about }: { about: About }) => {
                       <RemoteImage
                         prefix="static"
                         src={about.image}
-                        alt="Hero Image"
+                        alt="About Image"
                         className="w-full h-40 object-cover rounded-lg border"
                       />
                     </div>
@@ -218,7 +229,7 @@ const AcademyAboutForm = ({ about }: { about: About }) => {
                 ) : (
                   <div className="space-y-3">
                     <ImageField
-                      name="heroImage"
+                      name="image"
                       type="image"
                       label=""
                       placeholder="اختر الصورة الرئيسية"
