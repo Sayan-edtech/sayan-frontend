@@ -2,14 +2,15 @@ import { useNavigate } from "react-router-dom";
 import AddTrainerForm from "@/features/trainers/components/AddTrainerForm";
 import type { ITrainerForm } from "@/validations/trainer";
 import { UserPlus } from "lucide-react";
+import { toast } from "sonner";
 
 function AddNewTrainer() {
   const navigate = useNavigate();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmit = (data: ITrainerForm) => {
-    console.log("Trainer created:", data);
-    // Here you would typically send the data to your API
-    // For now, we'll just navigate back to trainers
+    // The API call is now handled in the AddTrainerForm component
+    toast.success("تم إضافة المدرب بنجاح");
     navigate("/dashboard/trainers");
   };
 

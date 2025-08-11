@@ -41,20 +41,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-interface StudentFaq {
-  id: string;
-  question: string;
-  answer: string;
-  category?: string;
-  order?: number;
-  is_active?: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
+import type { FAQ } from "@/types/faq";
 
 interface StudentFaqsTableProps {
-  faqs: StudentFaq[];
+  faqs: FAQ[];
 }
 
 function StudentFaqsTable({ faqs }: StudentFaqsTableProps) {
@@ -67,16 +57,16 @@ function StudentFaqsTable({ faqs }: StudentFaqsTableProps) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedFaq, setSelectedFaq] = useState<StudentFaq | null>(null);
+  const [selectedFaq, setSelectedFaq] = useState<FAQ | null>(null);
 
   const deleteFAQMutation = useDeleteFAQ();
 
-  const handleDeleteClick = (faq: StudentFaq) => {
+  const handleDeleteClick = (faq: FAQ) => {
     setSelectedFaq(faq);
     setDeleteDialogOpen(true);
   };
 
-  const handleEditClick = (faq: StudentFaq) => {
+  const handleEditClick = (faq: FAQ) => {
     setSelectedFaq(faq);
     setEditDialogOpen(true);
   };
@@ -93,7 +83,7 @@ function StudentFaqsTable({ faqs }: StudentFaqsTableProps) {
     }
   };
 
-  const columns: ColumnDef<StudentFaq>[] = [
+  const columns: ColumnDef<FAQ>[] = [
     {
       accessorKey: "question",
       header: "السؤال الشائع",
@@ -354,7 +344,8 @@ function StudentFaqsTable({ faqs }: StudentFaqsTableProps) {
           <DialogHeader>
             <DialogTitle className="text-right">حذف السؤال الشائع</DialogTitle>
             <DialogDescription className="text-right">
-              هل أنت متأكد من أنك تريد حذف السؤال "{selectedFaq?.question}"؟ لا يمكن التراجع عن هذا الإجراء.
+              هل أنت متأكد من أنك تريد حذف السؤال "{selectedFaq?.question}"؟ لا
+              يمكن التراجع عن هذا الإجراء.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
@@ -372,17 +363,17 @@ function StudentFaqsTable({ faqs }: StudentFaqsTableProps) {
             >
               {deleteFAQMutation.isPending ? "جاري الحذف..." : "حذف"}
             </Button>
-                     </DialogFooter>
-         </DialogContent>
-       </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-       <StudentFaqsEditForm
-         faq={selectedFaq}
-         open={editDialogOpen}
-         onOpenChange={setEditDialogOpen}
-       />
-      </div>
-    );
+      <StudentFaqsEditForm
+        faq={selectedFaq}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+    </div>
+  );
 }
 
 export default StudentFaqsTable;

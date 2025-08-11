@@ -15,6 +15,8 @@ import type {
 } from "@tanstack/react-table";
 import { ChevronDown, Edit, Trash2, Star } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
+import type { Control } from "react-hook-form";
+import ImageField from "@/components/shared/formFields/image-field";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -49,6 +51,7 @@ import {
   useDeleteOpinion,
 } from "../hooks/useOpinionsMutations";
 import RemoteImage from "@/components/shared/RemoteImage";
+import type { OpinionPayload } from "@/types/academy/opinion";
 
 interface StudentReview {
   id: string | number;
@@ -65,12 +68,6 @@ interface StudentReview {
 
 interface StudentReviewsTableProps {
   reviews: StudentReview[];
-}
-
-interface ReviewFormData {
-  name: string;
-  content: string;
-  rating: number;
 }
 
 function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
@@ -99,7 +96,7 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
     formState: { errors },
     reset,
     setValue,
-  } = useForm<ReviewFormData>({
+  } = useForm({
     defaultValues: {
       name: "",
       content: "",
@@ -118,7 +115,7 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
           <RemoteImage
             src={image?.replace("static/", "") || ""}
             alt={`صورة ${row.getValue("name")}`}
-            className="h-12 w-12 rounded-lg object-cover"
+            className="h-12 w-12 rounded-lg object-contain"
           />
         );
       },
@@ -237,20 +234,17 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
     setValue("name", review.name);
     setValue("content", review.content);
     setValue("rating", review.rating);
+    // Image is handled by the ImageField component
     setEditDialogOpen(true);
   };
 
-  const onEditSubmit = async (data: ReviewFormData) => {
+  const onEditSubmit = async (data: OpinionPayload) => {
     if (!editingReview) return;
 
     try {
       await updateOpinionMutation.mutateAsync({
         id: editingReview.id.toString(),
-        data: {
-          name: data.name,
-          content: data.content,
-          rating: data.rating,
-        },
+        data,
       });
 
       setEditDialogOpen(false);
@@ -349,7 +343,7 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
                     "https://via.placeholder.com/64x64/e5e7eb/9ca3af?text=صورة"
                   }
                   alt={`صورة ${row.getValue("name")}`}
-                  className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
+                  className="h-16 w-16 rounded-lg object-contain flex-shrink-0"
                   loading="lazy"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -640,6 +634,25 @@ function StudentReviewsTable({ reviews }: StudentReviewsTableProps) {
                   <p className="text-sm text-destructive">
                     {errors.content.message}
                   </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <ImageField
+                  name="image"
+                  type="image"
+                  label="صورة الطالب"
+                  placeholder="اختر صورة الطالب"
+                  control={
+                    control as unknown as Control<Record<string, unknown>>
+                  }
+                  errors={errors}
+                />
+                {editingReview?.image && (
+                  <div className="text-sm text-muted-foreground mt-1">
+                    * في حالة عدم اختيار صورة جديدة سيتم الاحتفاظ بالصورة
+                    الحالية
+                  </div>
                 )}
               </div>
             </div>

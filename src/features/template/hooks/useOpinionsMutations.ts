@@ -43,7 +43,7 @@ export const useUpdateOpinion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: OpinionPayload }) =>
+    mutationFn: ({ id, data }: { id: string; data: OpinionPayload | FormData }) =>
       opinionsApi.updateOpinion(id, data),
     onSuccess: (response: OpinionResponse) => {
       // Invalidate all opinions-related queries

@@ -4,7 +4,6 @@ import {
 } from "react-router-dom";
 import {
   Home,
-  Briefcase,
   BookOpen,
   Package,
   GraduationCap,
@@ -23,6 +22,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import type { User } from "@/types/user";
+import { UserType } from "@/constants/enums";
 
 interface SidebarSubItem {
   id: string;
@@ -80,48 +80,36 @@ function StudentSidebar({
   const studentSidebarItems: SidebarItem[] =
     [
       {
-        id: "students-bag",
-        title: "حقيبة الطلاب",
+        id: "courses",
+        title: "المواد التعليمية",
+        href: "/dashboard/my-courses",
         icon: (
-          <Briefcase className="w-5 h-5" />
+          <BookOpen className="w-5 h-5" />
         ),
-        isExpandable: true,
-        subItems: [
-          {
-            id: "courses",
-            title: "المواد التعليمية",
-            href: "/dashboard/courses",
-            icon: (
-              <BookOpen className="w-4 h-4" />
-            ),
-          },
-          {
-            id: "digital-products",
-            title: "المنتجات الرقمية",
-            href: "/dashboard/digital-products",
-            icon: (
-              <Package className="w-4 h-4" />
-            ),
-          },
-          {
-            id: "certificates",
-            title: "الشهادات",
-            href: "/dashboard/certificates",
-            icon: (
-              <GraduationCap className="w-4 h-4" />
-            ),
-            badge: "قريباً",
-            comingSoon: true,
-          },
-          {
-            id: "favorites",
-            title: "قائمة المفضلة",
-            href: "/dashboard/favorites",
-            icon: (
-              <Heart className="w-4 h-4" />
-            ),
-          },
-        ],
+      },
+      {
+        id: "digital-products",
+        title: "المنتجات الرقمية",
+        href: "/dashboard/digital-products",
+        icon: (
+          <Package className="w-5 h-5" />
+        ),
+      },
+      {
+        id: "certificates",
+        title: "الشهادات",
+        href: "/dashboard/certificates",
+        icon: (
+          <GraduationCap className="w-5 h-5" />
+        ),
+      },
+      {
+        id: "favorites",
+        title: "قائمة المفضلة",
+        href: "/dashboard/favorites",
+        icon: (
+          <Heart className="w-5 h-5" />
+        ),
       },
       {
         id: "purchases",
@@ -605,30 +593,25 @@ function StudentSidebar({
           </Link>
         </div>
 
-        {/* Profile Section */}
-        <div className="flex items-center gap-3">
-          <Avatar className="w-12 h-12 rounded-lg object-cover shadow-sm">
-            {user?.avatar && (
+        {/* Academy Profile Section - Only show for academy accounts */}
+        {user?.user_type === UserType.ACADEMY && user?.academy_memberships?.[0] && (
+          <div className="flex items-center gap-3">
+            <Avatar className="w-12 h-12 rounded-lg object-cover shadow-sm">
               <AvatarImage
-                src={user.avatar}
-                alt={user.fname}
+                src={user.academy_memberships[0].settings?.logo || "/api/placeholder/48/48"}
+                alt={user.academy_memberships[0].academy_name}
               />
-            )}
-            <AvatarFallback className="bg-green-100 text-green-700">
-              {user?.fname?.charAt(0) ||
-                "S"}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 text-base truncate">
-              {user?.fname}{" "}
-              {user?.lname}
-            </h3>
-            <p className="text-xs text-gray-500 truncate">
-              طالب
-            </p>
+              <AvatarFallback className="bg-blue-100 text-blue-700">
+                {user.academy_memberships[0].academy_name?.charAt(0) || "أ"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-gray-900 text-base truncate">
+                {user.academy_memberships[0].academy_name}
+              </h3>
+            </div>
           </div>
-        </div>
+        )}
 
         <nav>
           <ul className="flex flex-col gap-1">

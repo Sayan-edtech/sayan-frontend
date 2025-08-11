@@ -4,22 +4,32 @@ import StudentDashboard from "@/features/dashboard/components/StudentDashboard";
 import AcademyDashboard from "@/features/dashboard/components/AcademyDashboard";
 import { LayoutDashboard } from "lucide-react";
 import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks";
+import { Loader } from "@/components/shared";
 
 function Dashboard() {
-  const { data: user } = useCurrentUserProfile();
+  const { data: user, isPending } = useCurrentUserProfile();
 
-  const userType = user?.user_type || UserType.STUDENT;
+  if (isPending) {
+    return (
+      <div className="element-center">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <Header />
-      <StatisticsCards userType={userType} />
-      {userType === UserType.ACADEMY ? (
-        <AcademyDashboard />
-      ) : (
-        <StudentDashboard />
-      )}
-    </div>
+    !isPending &&
+    user && (
+      <div className="space-y-6">
+        <Header />
+        <StatisticsCards userType={user.user_type} />
+        {user.user_type === UserType.ACADEMY ? (
+          <AcademyDashboard />
+        ) : (
+          <StudentDashboard />
+        )}
+      </div>
+    )
   );
 }
 

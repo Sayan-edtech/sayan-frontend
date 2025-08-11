@@ -101,7 +101,7 @@ export const coursesApi = {
 
   // Delete course
   deleteCourse: async (id: string): Promise<void> => {
-    await api.delete(`/courses/academy/courses/${id}`);
+    await api.delete(`/academy/courses/${id}`);
   },
 
   // Publish/Unpublish course

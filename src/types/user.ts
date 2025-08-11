@@ -30,6 +30,9 @@ export type User = {
   verified: boolean;
   avatar?: string;
   academy_memberships?: AcademyMembership[];
+  phone_number: string;
+  gender: string;
+  banner?: string;
 };
 
 type UserWithTokens = {
