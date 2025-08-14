@@ -1,7 +1,12 @@
 import { Pages, Routes } from "@/constants/enums";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import FormFields from "@/components/shared/formFields/form-fields";
 import type { IFormField } from "@/types/app";
 import { useForm, type Control, type FieldErrors } from "react-hook-form";
@@ -12,13 +17,29 @@ import { UserType } from "@/constants/enums";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
 import useFormFields from "../hooks/useFormFields";
 import useFormValidations from "../hooks/useFormValidations";
+import SiginWithGoogle from "@/components/shared/sigin-with-google";
+import { cookieStorage } from "@/lib/cookies";
+import { getAcademyPath, hasSubdomain } from "@/lib/subdomain";
 
-const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
+const AuthForm: React.FC<{
+  slug: string;
+}> = ({ slug }) => {
   const navigate = useNavigate();
   const { getFormFields } = useFormFields({ slug });
   const { getValidationSchema } = useFormValidations({ slug });
-
-  const { login, signup, isLoading } = useAuth();
+  const searchParams = useSearchParams();
+  const { email: verifiedEmail } = Object.fromEntries(searchParams[0]);
+  const { verification_token } = Object.fromEntries(searchParams[0]);
+  const { academySlug } = useParams() as { academySlug: string };
+  const academyPath = hasSubdomain() ? "" : getAcademyPath({ academySlug });
+  const {
+    login,
+    signup,
+    isLoading,
+    forgotPassword,
+    verifyAccount,
+    resetPassword,
+  } = useAuth();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const DEFAULT_VALUES: any = {};
@@ -29,6 +50,8 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
   const {
     handleSubmit,
     control,
+    getValues,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(getValidationSchema()),
@@ -40,20 +63,16 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
     async (data: Record<string, unknown>) => {
       try {
         if (slug === Pages.SIGNIN) {
-          await login({
+          const { message } = await login({
             email: data.email as string,
             password: data.password as string,
           });
 
-          toast.success("تم تسجيل الدخول بنجاح");
-          navigate("/dashboard");
+          toast.success(message);
+          navigate(Routes.DASHBOARD, {
+            replace: true,
+          });
         } else if (slug === Pages.SIGNUP) {
-          console.log("Form data:", data);
-          console.log(
-            "Phone number (after schema processing):",
-            data.phone_number
-          );
-
           const { status_code, message } = await signup({
             fname: data.fname as string,
             lname: data.lname as string,
@@ -66,8 +85,53 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
           });
           if (status_code === 201) {
             toast.success(message);
-            navigate(Routes.DASHBOARD);
+            navigate(
+              `${academyPath}/${Routes.AUTH}/${Pages.VERIFY_ACCOUNT}?email=${data.email}`,
+              {
+                replace: true,
+              }
+            );
           }
+        } else if (slug === Pages.VERIFY_ACCOUNT) {
+          const { status_code, message } = await verifyAccount({
+            email: verifiedEmail as string,
+            otp: data.otp as string,
+          });
+          if (status_code === 200) {
+            toast.success(message);
+            navigate(Routes.DASHBOARD, {
+              replace: true,
+            });
+          }
+        } else if (slug === Pages.FORGOT_PASSWORD) {
+          const { status_code, message } = await forgotPassword(
+            data.email as string
+          );
+          if (status_code === 200) {
+            toast.success(message);
+          }
+        } else if (slug === Pages.RESET_PASSWORD) {
+          const { status_code, message } = await resetPassword({
+            confirm_password: data.confirm_password as string,
+            new_password: data.password as string,
+            verification_token,
+          });
+          if (status_code === 200) {
+            toast.success(message);
+            navigate(`${academyPath}/${Routes.AUTH}/${Pages.SIGNIN}`, {
+              replace: true,
+            });
+          }
+        } else if (slug === Pages.SIGNIN_WITH_GOOGLE) {
+          const { message } = await login({
+            google_token: cookieStorage.getItem("google_token") as string,
+            user_type: data.user_type as UserType,
+          });
+
+          toast.success(message);
+          navigate(Routes.DASHBOARD, {
+            replace: true,
+          });
         }
       } catch (error: unknown) {
         const errorMessage =
@@ -76,25 +140,61 @@ const AuthForm: React.FC<{ slug: string }> = ({ slug }) => {
         toast.error(errorMessage);
       }
     },
-    [slug, login, navigate, signup]
+    [
+      slug,
+      login,
+      navigate,
+      signup,
+      academyPath,
+      verifyAccount,
+      verifiedEmail,
+      forgotPassword,
+      resetPassword,
+      verification_token,
+    ]
   );
 
   const formLoading = isSubmitting || isLoading;
-
+  const isAuthPages = slug === Pages.SIGNUP || slug === Pages.SIGNIN;
+  const shouldShowGoogleButton = isAuthPages && !hasSubdomain();
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      {getFormFields().map((field: IFormField) => (
-        <div key={field.name} className="mb-4">
-          <FormFields {...field} control={control} errors={errors} />
-        </div>
-      ))}
+    <>
+      {shouldShowGoogleButton && (
+        <>
+          <SiginWithGoogle
+            userType={getValues("user_type")}
+            setError={setError}
+          >
+            {slug === Pages.SIGNUP
+              ? "إنشاء حساب باستخدام"
+              : "تسجيل الدخول باستخدام"}
+          </SiginWithGoogle>
 
-      {slug === Pages.SIGNIN && (
-        <ForgotPassword control={control} errors={errors} />
+          <div className="relative flex items-center">
+            <div className="flex-grow border-t border-border"></div>
+            <span className="text-muted-foreground text-sm px-4">أو</span>
+            <div className="flex-grow border-t border-border"></div>
+          </div>
+        </>
       )}
-      <SubmitButton slug={slug} disabled={formLoading} loading={formLoading} />
-      <NavigationLink slug={slug} />
-    </form>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {getFormFields().map((field: IFormField) => (
+          <div key={field.name} className="mb-4">
+            <FormFields {...field} control={control} errors={errors} />
+          </div>
+        ))}
+
+        {slug === Pages.SIGNIN && (
+          <ForgotPassword control={control} errors={errors} />
+        )}
+        <SubmitButton
+          slug={slug}
+          disabled={formLoading}
+          loading={formLoading}
+        />
+        <NavigationLink slug={slug} verifiedEmail={verifiedEmail} />
+      </form>
+    </>
   );
 };
 
@@ -107,6 +207,9 @@ function ForgotPassword({
   errors: FieldErrors;
   control: Control<Record<string, unknown>>;
 }) {
+  const { academySlug } = useParams() as { academySlug: string };
+  const academyPath = hasSubdomain() ? "" : getAcademyPath({ academySlug });
+
   return (
     <div className="flex items-center justify-between mb-6">
       <FormFields
@@ -119,7 +222,7 @@ function ForgotPassword({
         errors={errors}
       />
       <Link
-        to={`/${Routes.AUTH}/${Pages.FORGOT_PASSWORD}`}
+        to={`${academyPath}/${Routes.AUTH}/${Pages.FORGOT_PASSWORD}`}
         className="text-sm font-medium text-primary hover:underline"
       >
         هل نسيت كلمة المرور؟
@@ -145,11 +248,10 @@ function SubmitButton({
       case Pages.FORGOT_PASSWORD:
         return "متابعة";
       case Pages.VERIFY_ACCOUNT:
-        return "إعادة إرسال بريد التحقق";
+        return "تأكيد";
       case Pages.RESET_PASSWORD:
         return "تغيير كلمة المرور";
-      case Pages.ENTER_OTP:
-        return "تأكيد";
+
       default:
         return "تسجيل الدخول";
     }
@@ -172,39 +274,113 @@ function SubmitButton({
   );
 }
 
-function NavigationLink({ slug }: { slug: string }) {
+function NavigationLink({
+  slug,
+  verifiedEmail,
+}: {
+  slug: string;
+  verifiedEmail: string;
+}) {
+  const { resendOtp, isLoading } = useAuth();
+  const [countdown, setCountdown] = useState(60); // Start with 60 seconds
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (countdown > 0 && slug === Pages.VERIFY_ACCOUNT) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown, slug]);
+
+  const handleResendOtp = async () => {
+    try {
+      // Using forgotPassword as a placeholder for resend OTP
+      const { message, status_code } = await resendOtp(verifiedEmail); // This should be the user's email
+      if (status_code === 200) {
+        toast.success(message);
+      }
+
+      setCountdown(60); // Reset countdown after successful resend
+    } catch (error) {
+      console.error("Resend OTP failed:", error);
+      toast.error(
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || "فشل في إعادة إرسال رمز التحقق"
+      );
+      // toast.error("فشل في إرسال رمز التحقق");
+    }
+  };
+  const { academySlug } = useParams() as { academySlug: string };
+  const academyPath = hasSubdomain() ? "" : getAcademyPath({ academySlug });
   const getText = () => {
     switch (slug) {
       case Pages.SIGNIN:
         return {
           desc: "ليس لديك حساب؟",
           title: "سجل الآن",
-          slug: Pages.SIGNUP,
+          href: `${academyPath}/${Routes.AUTH}/${Pages.SIGNUP}`,
+          isButton: false,
         };
       case Pages.SIGNUP:
         return {
           desc: "لديك حساب بالفعل؟",
           title: "تسجيل الدخول",
-          slug: Pages.SIGNIN,
+          href: `${academyPath}/${Routes.AUTH}/${Pages.SIGNIN}`,
+          isButton: false,
+        };
+      case Pages.VERIFY_ACCOUNT:
+        return {
+          desc: "لم تستلم الرمز؟",
+          title: countdown > 0 ? `إعادة إرسال (${countdown}s)` : "إعادة إرسال",
+          href: "",
+          isButton: true,
+          disabled: countdown > 0 || isLoading,
+          onClick: handleResendOtp,
+        };
+      case Pages.SIGNIN_WITH_GOOGLE:
+        return {
+          desc: "لديك حساب بالفعل؟",
+          title: "تسجيل الدخول",
+          href: `${academyPath}/${Routes.AUTH}/${Pages.SIGNIN}`,
+          isButton: false,
         };
       default:
         return {
           desc: "هل تحتاج إلى مساعدة؟",
           title: "اتصل بنا",
-          slug: Pages.FORGOT_PASSWORD,
+          href: Routes.CONTACT,
+          isButton: false,
         };
     }
   };
+
+  const linkData = getText();
+
   return (
     <div className="mt-6 flex items-center gap-2">
-      <p className="text-card-foreground text-sm">{getText().desc}</p>
-      <Link
-        to={`/${Routes.AUTH}/${getText().slug}`}
-        replace
-        className="text-primary hover:underline text-sm font-medium transition-colors duration-200"
-      >
-        {getText().title}
-      </Link>
+      <p className="text-card-foreground text-sm">{linkData.desc}</p>
+      {linkData.isButton ? (
+        <button
+          type="button"
+          onClick={linkData.onClick}
+          disabled={linkData.disabled}
+          className={`text-sm font-medium transition-colors duration-200 ${
+            linkData.disabled
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-primary hover:underline"
+          }`}
+        >
+          {linkData.title}
+        </button>
+      ) : (
+        <Link
+          to={linkData.href}
+          replace
+          className="text-primary hover:underline text-sm font-medium transition-colors duration-200"
+        >
+          {linkData.title}
+        </Link>
+      )}
     </div>
   );
 }

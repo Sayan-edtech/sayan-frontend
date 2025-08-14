@@ -92,7 +92,7 @@ const AuthForm: React.FC<{
           });
           if (status_code === 200) {
             toast.success(message);
-            navigate(`/${Routes.DASHBOARD}`, {
+            navigate(Routes.DASHBOARD, {
               replace: true,
             });
           }

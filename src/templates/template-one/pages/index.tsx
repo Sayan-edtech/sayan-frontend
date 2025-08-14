@@ -29,6 +29,7 @@ function Home() {
     slug: academySlug,
     subdomain: subdomain,
   });
+
   if (!isPending && !academyInfo) {
     return <Navigate to={Routes.ROOT} state={{ from: location }} replace />;
   }
@@ -53,14 +54,16 @@ function Home() {
           >
             <Features about={academyInfo.data.about} />
           </motion.div>
-          <motion.div
-            variants={sectionVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-          >
-            <Courses />
-          </motion.div>
+          {academyInfo.data.courses.length > 0 && (
+            <motion.div
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+            >
+              <Courses />
+            </motion.div>
+          )}
           {academyInfo.data.faqs.length > 0 && (
             <motion.div
               variants={sectionVariants}

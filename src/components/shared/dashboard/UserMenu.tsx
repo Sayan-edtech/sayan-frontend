@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, HelpCircle } from "lucide-react";
+import { User, LogOut, HelpCircle, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Routes } from "@/constants/enums";
 import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks";
@@ -37,12 +37,13 @@ export function UserMenu({ align }: { align?: "start" | "end" | "center" }) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                {user?.avatar && (
+                {user?.avatar ? (
                   <AvatarImage src={user.avatar} alt={user.fname} />
+                ) : (
+                  <AvatarFallback className="bg-primary text-white">
+                    {user.fname?.charAt(0)}
+                  </AvatarFallback>
                 )}
-                <AvatarFallback className="bg-primary text-white">
-                  {user?.fname?.charAt(0)}
-                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
@@ -63,14 +64,31 @@ export function UserMenu({ align }: { align?: "start" | "end" | "center" }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to={Routes.DASHBOARD_PROFILE} className="cursor-pointer">
+              <Link
+                to={Routes.DASHBOARD}
+                className="cursor-pointer flex items-center gap-2"
+              >
+                <Home className="mr-2 h-4 w-4" />
+                <span>لوحة التحكم</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link
+                to={Routes.DASHBOARD_PROFILE}
+                className="cursor-pointer flex items-center gap-2"
+              >
                 <User className="mr-2 h-4 w-4" />
                 <span>الملف الشخصي</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              <HelpCircle className="mr-2 h-4 w-4" />
-              <span>المساعدة والدعم</span>
+            <DropdownMenuItem>
+              <Link
+                to={Routes.CONTACT}
+                className="cursor-pointer flex items-center gap-2"
+              >
+                <HelpCircle className="mr-2 h-4 w-4" />
+                <span>المساعدة والدعم</span>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

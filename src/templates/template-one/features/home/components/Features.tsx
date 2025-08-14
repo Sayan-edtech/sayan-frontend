@@ -1,3 +1,4 @@
+import HtmlRenderer from "@/components/shared/HtmlRenderer";
 import RemoteImage from "@/components/shared/RemoteImage";
 import type { About } from "@/types/academy/about";
 import { GraduationCap, Award } from "lucide-react";
@@ -20,11 +21,11 @@ function Features({ about }: { about: About }) {
           {/* Text Content - Right */}
           <div className="text-right">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-6">
-              {about.title}
+              <HtmlRenderer html={about.title} />
             </h2>
 
             <p className="text-base lg:text-lg text-muted-foreground leading-relaxed mb-8">
-              {about.content}
+              <HtmlRenderer html={about.content} />
             </p>
             <ul className="flex items-center gap-6">
               <li className="flex items-center justify-end gap-3 text-foreground">

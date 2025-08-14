@@ -3,8 +3,6 @@ import Layout from "@/features/course/components/Layout";
 import RelatedCourses from "@/features/course/components/RelatedCourses";
 
 export default function CourseDetails() {
-  // const { slug } = useParams();
-
   return (
     <Layout>
       <main

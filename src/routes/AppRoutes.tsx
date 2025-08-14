@@ -21,7 +21,10 @@ export const router = createBrowserRouter(
     <>
       {hasSubdomain() ? (
         // Academy subdomain routes
-        academyRoutes
+        <>
+          {academyRoutes}
+          {dashboardRoutes}
+        </>
       ) : (
         // Main application routes
         <>
