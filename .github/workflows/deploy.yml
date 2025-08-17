@@ -1,32 +1,24 @@
-name: Deploy to GitHub Pages
+name: Deploy to cPanel/Hostinger
 
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["main", "dev"]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: ["main", "master", "dev"]
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: "deploy-${{ github.ref }}"
   cancel-in-progress: false
 
 jobs:
-  # Build job
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,34 +26,78 @@ jobs:
           node-version: "18"
           cache: "yarn"
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --production=false
 
       - name: Lint code
         run: yarn lint
+        continue-on-error: false
+
+      - name: Run tests (if available)
+        run: |
+          if [ -f "package.json" ] && grep -q '"test"' package.json; then
+            yarn test --passWithNoTests --watchAll=false
+          else
+            echo "No tests found, skipping..."
+          fi
+        continue-on-error: false
 
       - name: Build with Vite
         run: yarn build
         env:
-          # Add any environment variables needed for your build
           NODE_ENV: production
+          CI: true
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Verify build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Error: dist directory not found!"
+            exit 1
+          fi
+          if [ ! -f "dist/index.html" ]; then
+            echo "Error: index.html not found in dist!"
+            exit 1
+          fi
+          echo "Build verification successful"
+          ls -la dist/
+
+      - name: Verify secrets are available
+        run: |
+          if [ -z "${{ secrets.FTP_SERVER }}" ]; then
+            echo "Error: FTP_SERVER secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.FTP_USERNAME }}" ]; then
+            echo "Error: FTP_USERNAME secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.FTP_PASSWORD }}" ]; then
+            echo "Error: FTP_PASSWORD secret is not set"
+            exit 1
+          fi
+          echo "All FTP secrets are configured"
+
+      - name: Deploy to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          path: ./dist
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: /htdocs/sayan.website/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.env*
+            **/.DS_Store
+            **/Thumbs.db
+            **/*.map
+          dangerous-clean-slate: false
+          dry-run: false
 
-  # Deployment job
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Health check (optional)
+        run: |
+          echo "Deployment completed successfully!"
+          # Optional: Add a simple curl check to your domain
+          # curl -f https://yourdomain.com || exit 1
