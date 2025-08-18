@@ -62,14 +62,14 @@ jobs:
           ls -la dist/
 
       - name: Deploy to cPanel via SFTP
-        uses: burnett01/rsync-deployments@6.0.0
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          switches: -avzr --delete
-          path: dist/
+          server: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          local_path: './dist/*'
           remote_path: ${{ secrets.REMOTE_PATH }}
-          remote_host: ${{ secrets.REMOTE_HOST }}
-          remote_user: ${{ secrets.REMOTE_USER }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          sftpArgs: '-o ConnectTimeout=5'
 
       - name: Health check (optional)
         run: |
