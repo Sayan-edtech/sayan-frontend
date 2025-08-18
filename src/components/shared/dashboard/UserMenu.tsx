@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,6 +14,7 @@ import { Routes } from "@/constants/enums";
 import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
 import { Skeleton } from "@/components/ui/skeleton";
+import RemoteImage from "../RemoteImage";
 
 export function UserMenu({ align }: { align?: "start" | "end" | "center" }) {
   const { data: user, isLoading } = useCurrentUserProfile();
@@ -38,7 +39,12 @@ export function UserMenu({ align }: { align?: "start" | "end" | "center" }) {
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
                 {user?.avatar ? (
-                  <AvatarImage src={user.avatar} alt={user.fname} />
+                  <RemoteImage
+                    prefix="static"
+                    src={user.avatar}
+                    alt={user.fname}
+                    className="!h-10 !w-10 object-cover"
+                  />
                 ) : (
                   <AvatarFallback className="bg-primary text-white">
                     {user.fname?.charAt(0)}
