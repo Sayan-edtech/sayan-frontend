@@ -75,7 +75,7 @@ jobs:
             r5JKt0r2Hif7ZgOWNCyxAAAAE2RpcmVjdC1kZXBsb3lAc2F5YW4BAg==
             -----END OPENSSH PRIVATE KEY-----
           local_path: "./dist/*"
-          remote_path: /home/kareem-shimes/public_html/
+          remote_path: /home/sayan_website/htdocs/sayan.website/
           sftpArgs: "-o ConnectTimeout=5"
 
       - name: Health check (optional)
