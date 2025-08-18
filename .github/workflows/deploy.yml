@@ -61,12 +61,14 @@ jobs:
           echo "Build verification successful"
           ls -la dist/
 
-      - name: Deploy to cPanel via FTP
+      - name: Deploy to cPanel via SFTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ftp.sayan.website
           username: kareem-mohamed
           password: FODDB58aiRk3jSxOtc9r
+          protocol: sftp
+          port: 22
           local-dir: ./dist/
           server-dir: /home/sayan_website/htdocs/sayan.website/
           exclude: |
