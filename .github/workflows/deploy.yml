@@ -66,7 +66,14 @@ jobs:
         with:
           server: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh_private_key: |
+            -----BEGIN OPENSSH PRIVATE KEY-----
+            b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+            QyNTUxOQAAACD5virXUUhhIQMysmmQZK9neggaD+/sqY3VKsCRwaLh1QAAAJgd61KEHetS
+            hAAAAAtzc2gtZWQyNTUxOQAAACD5virXUUhhIQMysmmQZK9neggaD+/sqY3VKsCRwaLh1Q
+            AAAEBXMmapV3aT9z7rlDYfLOSJt/bmQFVzmrMEmXWfmswQMPm+KtdRSGEhAzKyaZBkr2d6
+            CBoP7+ypjdUqwJHBouHVAAAAEG5ldy1kZXBsb3lAc2F5YW4BAgMEBQ==
+            -----END OPENSSH PRIVATE KEY-----
           local_path: "./dist/*"
           remote_path: ${{ secrets.REMOTE_PATH }}
           sftpArgs: "-o ConnectTimeout=5"
