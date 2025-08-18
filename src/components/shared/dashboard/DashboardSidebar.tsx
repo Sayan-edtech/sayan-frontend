@@ -1,51 +1,73 @@
+import { Home } from "lucide-react";
 import { UserType } from "@/constants/enums";
 import AcademySidebar from "./AcademySidebar";
 import StudentSidebar from "./StudentSidebar";
-import type { User } from "@/types/user";
-import { Home } from "lucide-react";
+import type { User as UserData } from "@/types/user";
+
+interface SidebarSubItem {
+  id: string;
+  title: string;
+  href: string;
+  icon: React.ReactNode;
+  badge?: string;
+  comingSoon?: boolean;
+}
+
+interface SidebarItem {
+  id: string;
+  title: string;
+  href?: string;
+  icon: React.ReactNode;
+  badge?: string;
+  comingSoon?: boolean;
+  isExpandable?: boolean;
+  subItems?: SidebarSubItem[];
+}
 
 interface DashboardSidebarProps {
   isMobile?: boolean;
   isOpen?: boolean;
   onClose?: () => void;
-  user: User;
+  userType: UserType;
+  user?: UserData;
 }
-
-const baseSidebarItems = [
-  {
-    id: "dashboard",
-    title: "لوحة التحكم",
-    href: "/dashboard",
-    icon: <Home className="w-5 h-5" />,
-  },
-];
 
 function DashboardSidebar({
   isMobile = false,
   isOpen = true,
   onClose,
+  userType,
   user,
 }: DashboardSidebarProps) {
-  // Render appropriate sidebar based on user type
-  if (user.user_type === UserType.ACADEMY) {
+  // Base sidebar items that are common to both academy and student
+  const baseSidebarItems: SidebarItem[] = [
+    {
+      id: "dashboard",
+      title: "لوحة التحكم",
+      href: "/dashboard",
+      icon: <Home className="w-5 h-5" />,
+    },
+  ];
+
+  // Render the appropriate sidebar based on user type
+  if (userType === UserType.ACADEMY) {
     return (
       <AcademySidebar
-        baseSidebarItems={baseSidebarItems}
         isMobile={isMobile}
         isOpen={isOpen}
         onClose={onClose}
-        user={user}
+        baseSidebarItems={baseSidebarItems}
+        user={user!}
       />
     );
   }
 
   return (
     <StudentSidebar
-      baseSidebarItems={baseSidebarItems}
       isMobile={isMobile}
       isOpen={isOpen}
       onClose={onClose}
-      user={user}
+      baseSidebarItems={baseSidebarItems}
     />
   );
 }

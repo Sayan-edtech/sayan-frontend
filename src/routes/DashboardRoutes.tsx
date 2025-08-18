@@ -14,9 +14,9 @@ import AddNewCourse from "@/pages/dashboard/courses/new";
 import Trainers from "../pages/dashboard/trainers";
 import AddNewTrainer from "@/pages/dashboard/trainers/new";
 import { templateRoutes } from "./TemplateRoutes";
-import { DashboardLayout } from "@/features/dashboard/components/DashboardLayout";
 import { ProtectedRoute } from "@/components/shared/GuardRoute";
 import ManageCourse from "@/pages/dashboard/courses/mange";
+import DashboardLayout from "@/features/dashboard/components/DashboardLayout";
 
 export const dashboardRoutes = (
   <Route

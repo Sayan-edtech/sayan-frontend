@@ -20,14 +20,19 @@ import {
   MessageSquare,
   Database,
   Wallet,
+  PanelRightClose,
+  PanelLeftClose,
+  ExternalLink,
+  Menu,
 } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getAcademyDetails } from "@/lib/academy";
 import type { User } from "@/types/user";
+import { UserType } from "@/constants/enums";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import RemoteImage from "../RemoteImage";
 
 interface SidebarSubItem {
@@ -65,6 +70,7 @@ function AcademySidebar({
   baseSidebarItems = [],
   user,
 }: AcademySidebarProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
@@ -243,265 +249,23 @@ function AcademySidebar({
     return location.pathname.startsWith(href);
   };
 
-  const renderSidebarItem = (item: SidebarItem) => {
-    if (item.isExpandable && item.subItems) {
-      const isExpanded = expandedItems.includes(item.id);
-      const hasActiveSubItem = item.subItems.some(
-        (subItem) => subItem.href && isActivePath(subItem.href)
-      );
-
-      return (
-        <li key={item.id} className="space-y-1">
-          {/* Parent Item */}
-          <Button
-            variant="ghost"
-            onClick={() => toggleExpanded(item.id)}
-            className={cn(
-              "w-full justify-between h-auto px-4 py-3 text-right rounded-lg transition-colors group",
-              hasActiveSubItem || isExpanded
-                ? "text-white hover:text-white"
-                : "bg-white text-gray-900 hover:text-white"
-            )}
-            style={
-              hasActiveSubItem || isExpanded
-                ? { backgroundColor: "#0062ff" }
-                : {}
-            }
-            onMouseEnter={(e) => {
-              if (!(hasActiveSubItem || isExpanded)) {
-                e.currentTarget.style.backgroundColor = "#0062ff";
-                const icon = e.currentTarget.querySelector(
-                  ".sidebar-icon"
-                ) as HTMLElement;
-                const arrow = e.currentTarget.querySelector(
-                  ".sidebar-arrow"
-                ) as HTMLElement;
-                if (icon) icon.style.color = "white";
-                if (arrow) arrow.style.color = "white";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!(hasActiveSubItem || isExpanded)) {
-                e.currentTarget.style.backgroundColor = "white";
-                const icon = e.currentTarget.querySelector(
-                  ".sidebar-icon"
-                ) as HTMLElement;
-                const arrow = e.currentTarget.querySelector(
-                  ".sidebar-arrow"
-                ) as HTMLElement;
-                if (icon) icon.style.color = "#0062ff";
-                if (arrow) arrow.style.color = "#0062ff";
-              }
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="sidebar-icon transition-colors w-6 h-6 flex items-center justify-center"
-                style={{
-                  color: hasActiveSubItem || isExpanded ? "white" : "#0062ff",
-                }}
-              >
-                {item.icon}
-              </div>
-              <span className="font-medium">{item.title}</span>
-            </div>
-            <ChevronDown
-              className={cn(
-                "sidebar-arrow w-5 h-5 transition-transform",
-                isExpanded ? "rotate-180" : "rotate-0"
-              )}
-              style={{
-                color: hasActiveSubItem || isExpanded ? "white" : "#0062ff",
-              }}
-            />
-          </Button>
-
-          {/* Sub Items */}
-          {isExpanded && (
-            <div className="ml-6 space-y-1">
-              {item.subItems.map((subItem) => (
-                <div key={subItem.id}>
-                  {subItem.comingSoon ? (
-                    <div
-                      className={cn(
-                        "flex items-center justify-between w-full px-4 py-2 text-right rounded-md transition-colors",
-                        "text-gray-500 bg-white cursor-not-allowed"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-5 h-5 flex items-center justify-center text-gray-400">
-                          {subItem.icon}
-                        </div>
-                        <span className="font-medium text-sm">
-                          {subItem.title}
-                        </span>
-                      </div>
-                      {subItem.badge && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full"
-                        >
-                          {subItem.badge}
-                        </Badge>
-                      )}
-                    </div>
-                  ) : (
-                    <Link
-                      to={subItem.href!}
-                      onClick={isMobile ? onClose : undefined}
-                    >
-                      <Button
-                        variant="ghost"
-                        className={cn(
-                          "w-full justify-between h-auto px-4 py-2 text-right rounded-md transition-colors group",
-                          isActivePath(subItem.href!)
-                            ? "text-white hover:text-white"
-                            : "bg-white text-gray-900 hover:text-white"
-                        )}
-                        style={
-                          isActivePath(subItem.href!)
-                            ? { backgroundColor: "#0062ff" }
-                            : {}
-                        }
-                        onMouseEnter={(e) => {
-                          if (!isActivePath(subItem.href!)) {
-                            e.currentTarget.style.backgroundColor = "#0062ff";
-                            const icon = e.currentTarget.querySelector(
-                              ".sidebar-subicon"
-                            ) as HTMLElement;
-                            if (icon) icon.style.color = "white";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isActivePath(subItem.href!)) {
-                            e.currentTarget.style.backgroundColor = "white";
-                            const icon = e.currentTarget.querySelector(
-                              ".sidebar-subicon"
-                            ) as HTMLElement;
-                            if (icon) icon.style.color = "#0062ff";
-                          }
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="sidebar-subicon transition-colors w-5 h-5 flex items-center justify-center"
-                            style={{
-                              color: isActivePath(subItem.href!)
-                                ? "white"
-                                : "#0062ff",
-                            }}
-                          >
-                            {subItem.icon}
-                          </div>
-                          <span className="font-medium text-sm">
-                            {subItem.title}
-                          </span>
-                        </div>
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </li>
-      );
-    }
-
-    // Regular item (non-expandable)
-    if (item.comingSoon) {
-      return (
-        <div
-          key={item.id}
-          className={cn(
-            "flex items-center justify-between w-full px-4 py-3 text-right rounded-lg transition-colors",
-            "text-gray-500 bg-white cursor-not-allowed"
-          )}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 flex items-center justify-center text-gray-400">
-              {item.icon}
-            </div>
-            <span className="font-medium">{item.title}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            {item.badge && (
-              <Badge
-                variant="secondary"
-                className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full"
-              >
-                {item.badge}
-              </Badge>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <Link
-        key={item.id}
-        to={item.href!}
-        onClick={isMobile ? onClose : undefined}
-      >
-        <Button
-          variant="ghost"
-          className={cn(
-            "w-full justify-between h-auto px-4 py-3 text-right rounded-lg transition-colors group",
-            isActivePath(item.href!)
-              ? "text-white hover:text-white shadow-sm"
-              : "bg-white text-gray-900 hover:text-white"
-          )}
-          style={isActivePath(item.href!) ? { backgroundColor: "#0062ff" } : {}}
-          onMouseEnter={(e) => {
-            if (!isActivePath(item.href!)) {
-              e.currentTarget.style.backgroundColor = "#0062ff";
-              const icon = e.currentTarget.querySelector(
-                ".sidebar-mainicon"
-              ) as HTMLElement;
-              if (icon) icon.style.color = "white";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isActivePath(item.href!)) {
-              e.currentTarget.style.backgroundColor = "white";
-              const icon = e.currentTarget.querySelector(
-                ".sidebar-mainicon"
-              ) as HTMLElement;
-              if (icon) icon.style.color = "#0062ff";
-            }
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className="sidebar-mainicon transition-colors w-6 h-6 flex items-center justify-center"
-              style={{ color: isActivePath(item.href!) ? "white" : "#0062ff" }}
-            >
-              {item.icon}
-            </div>
-            <span className="font-medium">{item.title}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            {item.badge && !isActivePath(item.href!) && (
-              <Badge
-                variant="secondary"
-                className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
-              >
-                {item.badge}
-              </Badge>
-            )}
-          </div>
-        </Button>
-      </Link>
-    );
-  };
-
   const sidebarContent = (
-    <div className="h-full flex flex-col">
+    <div
+      className="h-full flex flex-col backdrop-blur-sm"
+      style={{
+        background:
+          "linear-gradient(91.81deg, rgba(255, 255, 255, 0.87) 21.24%, rgba(255, 255, 255, 0.87) 109.59%)",
+      }}
+    >
       {/* Mobile Header */}
       {isMobile && (
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-lg font-semibold">القائمة</h2>
+        <div className="flex items-center justify-between p-4 border-b border-white/30">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+              <Menu className="w-4 h-4 text-white" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900">القائمة</h2>
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -513,86 +277,224 @@ function AcademySidebar({
         </div>
       )}
 
-      {/* Mobile Back to Main Site Button */}
-      {isMobile && (
-        <div className="p-4 border-b border-gray-100">
-          <Link to="/" className="block" onClick={onClose}>
-            <Button
-              size="sm"
-              variant="outline"
-              className="w-full justify-center gap-2 h-10 text-sm border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg font-medium"
-            >
-              <Home className="w-4 h-4" />
-              العودة للصفحة الرئيسية
-            </Button>
-          </Link>
-        </div>
-      )}
-
-      <div className="p-5 space-y-4">
-        {/* Back to Main Site Button */}
-        <div className="hidden lg:block">
-          <Link to="/" className="block">
-            <Button
-              size="sm"
-              variant="outline"
-              className="w-full justify-center gap-2 h-10 text-sm border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg font-medium"
-            >
-              <Home className="w-4 h-4" />
-              العودة للصفحة الرئيسية
-            </Button>
-          </Link>
-        </div>
-
-        {/* Profile Section */}
-        <div className="space-y-3">
-          {/* Academy Profile */}
-          <div className="flex items-center gap-3">
-            <Avatar className="w-12 h-12 rounded-lg object-cover shadow-sm">
-              {academy.settings?.logo && (
-                <RemoteImage
-                  src={academy.settings.logo}
-                  alt={academy.academy_name}
-                />
-              )}
-              <AvatarFallback className="bg-primary text-white">
-                {academy.academy_name?.charAt(0) || "A"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 text-base truncate">
-                {academy.academy_name}
-              </h3>
-              <p className="text-xs text-gray-500 truncate">أكاديمية</p>
+      {/* Profile Section & Collapse Button */}
+      <div className={cn("p-4 border-b border-white/30", isCollapsed && "p-2")}>
+        <div className="flex items-center justify-between">
+          {!isCollapsed && (
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center">
+                <Avatar className="h-10 w-10">
+                  {getAcademyDetails(user)?.settings.logo ? (
+                    <RemoteImage
+                      prefix="static"
+                      src={getAcademyDetails(user)?.settings.logo || ""}
+                      alt={getAcademyDetails(user)?.academy_name}
+                      className="!h-10 !w-10 object-cover"
+                    />
+                  ) : (
+                    <AvatarFallback className="bg-primary text-white">
+                      {getAcademyDetails(user)?.academy_name?.charAt(0)}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-900">
+                  {getAcademyDetails(user)?.academy_name}
+                </h3>
+                <p className="text-sm text-gray-600">لوحة التحكم</p>
+              </div>
             </div>
-          </div>
-
-          {/* Visit Academy Button */}
-          <Link
-            to={`/academy/${academy.academy_slug}`}
-            target="_blank"
-            className={`${buttonVariants()} w-full justify-center gap-1.5 h-9 text-xs`}
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10"
+            onClick={() => setIsCollapsed(!isCollapsed)}
           >
-            <svg
-              className="w-3.5 h-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-              />
-            </svg>
-            زيارة صفحة المنصة التعليمية
-          </Link>
+            {isCollapsed ? (
+              <PanelRightClose className="w-5 h-5" />
+            ) : (
+              <PanelLeftClose className="w-5 h-5" />
+            )}
+          </Button>
         </div>
+        {!isCollapsed && user.user_type === UserType.ACADEMY && (
+          <div className="mt-3">
+            <Link
+              to="/academy/simple-arab-code"
+              target="_blank"
+              className="block"
+            >
+              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                <ExternalLink className="w-4 h-4 mr-2" />
+                زيارة الأكاديمية
+              </Button>
+            </Link>
+          </div>
+        )}
+      </div>
 
+      {/* Back to Main Site Button */}
+      <div className={cn("p-4 border-b border-white/30", isCollapsed && "p-2")}>
+        <Link to="/" className="block">
+          <Button
+            variant="outline"
+            className="w-full justify-center gap-2 border-gray-300 hover:bg-white/50"
+          >
+            <Home className="w-4 h-4" />
+            {!isCollapsed && "العودة للرئيسية"}
+          </Button>
+        </Link>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto p-4">
         <nav>
-          <ul className="flex flex-col gap-1">
-            {sidebarItems.map((item) => renderSidebarItem(item))}
+          <ul className="space-y-1">
+            {sidebarItems.map((item) => {
+              if (item.isExpandable && item.subItems) {
+                const isExpanded = expandedItems.includes(item.id);
+                const hasActiveSubItem = item.subItems.some(
+                  (subItem) => subItem.href && isActivePath(subItem.href)
+                );
+
+                return (
+                  <li key={item.id} className="mb-1">
+                    <button
+                      onClick={() => toggleExpanded(item.id)}
+                      className={cn(
+                        "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors duration-200",
+                        hasActiveSubItem || isExpanded
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-700 hover:bg-blue-50 hover:text-blue-600",
+                        isCollapsed && "px-2"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                          {item.icon}
+                        </div>
+                        {!isCollapsed && (
+                          <span className="font-medium text-sm">
+                            {item.title}
+                          </span>
+                        )}
+                      </div>
+                      {!isCollapsed && (
+                        <ChevronDown
+                          className={cn(
+                            "w-4 h-4 transition-transform duration-200",
+                            isExpanded ? "rotate-180" : "rotate-0"
+                          )}
+                        />
+                      )}
+                    </button>
+
+                    {!isCollapsed && isExpanded && (
+                      <div className="mt-1 ml-6 space-y-1 border-l-2 border-blue-100 pl-3">
+                        {item.subItems.map((subItem) => (
+                          <div key={subItem.id}>
+                            {subItem.comingSoon ? (
+                              <div className="flex items-center justify-between px-3 py-2 text-gray-400 cursor-not-allowed">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center">
+                                    {subItem.icon}
+                                  </div>
+                                  <span className="text-sm">
+                                    {subItem.title}
+                                  </span>
+                                </div>
+                                {subItem.badge && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-orange-100 text-orange-600 text-xs"
+                                  >
+                                    {subItem.badge}
+                                  </Badge>
+                                )}
+                              </div>
+                            ) : (
+                              <Link
+                                to={subItem.href!}
+                                onClick={isMobile ? onClose : undefined}
+                              >
+                                <div
+                                  className={cn(
+                                    "flex items-center justify-between px-3 py-2 rounded-md transition-colors duration-200",
+                                    isActivePath(subItem.href!)
+                                      ? "bg-blue-600 text-white"
+                                      : "text-gray-600 hover:bg-blue-50 hover:text-blue-600"
+                                  )}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-6 h-6 rounded-md flex items-center justify-center">
+                                      {subItem.icon}
+                                    </div>
+                                    <span className="text-sm">
+                                      {subItem.title}
+                                    </span>
+                                  </div>
+                                  {subItem.badge &&
+                                    !isActivePath(subItem.href!) && (
+                                      <Badge
+                                        variant="secondary"
+                                        className="bg-blue-100 text-blue-600 text-xs"
+                                      >
+                                        {subItem.badge}
+                                      </Badge>
+                                    )}
+                                </div>
+                              </Link>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                );
+              }
+
+              return (
+                <li key={item.id} className="mb-1">
+                  <Link
+                    to={item.href!}
+                    onClick={isMobile ? onClose : undefined}
+                  >
+                    <div
+                      className={cn(
+                        "flex items-center justify-between px-4 py-3 rounded-lg transition-colors duration-200",
+                        isActivePath(item.href!)
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-700 hover:bg-blue-50 hover:text-blue-600",
+                        isCollapsed && "px-2"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                          {item.icon}
+                        </div>
+                        {!isCollapsed && (
+                          <span className="font-medium text-sm">
+                            {item.title}
+                          </span>
+                        )}
+                      </div>
+                      {!isCollapsed &&
+                        item.badge &&
+                        !isActivePath(item.href!) && (
+                          <Badge
+                            variant="secondary"
+                            className="bg-blue-100 text-blue-600 text-xs"
+                          >
+                            {item.badge}
+                          </Badge>
+                        )}
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       </div>
@@ -625,7 +527,12 @@ function AcademySidebar({
 
   // Desktop Sidebar
   return (
-    <aside className="w-80 bg-white border-l border-gray-200 h-full overflow-y-auto hidden lg:block">
+    <aside
+      className={cn(
+        "border-l border-gray-200 h-full overflow-hidden hidden lg:block transition-all duration-300",
+        isCollapsed ? "w-20" : "w-80"
+      )}
+    >
       {sidebarContent}
     </aside>
   );
