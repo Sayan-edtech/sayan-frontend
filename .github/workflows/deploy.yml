@@ -61,6 +61,31 @@ jobs:
           echo "Build verification successful"
           ls -la dist/
 
+      - name: Setup SSH Key and Fix Format
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          # Check and fix key format
+          if head -1 ~/.ssh/deploy_key | grep -q "BEGIN OPENSSH PRIVATE KEY"; then
+            echo "Converting OpenSSH format to RSA format..."
+            ssh-keygen -p -m PEM -f ~/.ssh/deploy_key -N "" -P ""
+            echo "Key converted successfully"
+          elif head -1 ~/.ssh/deploy_key | grep -q "BEGIN RSA PRIVATE KEY"; then
+            echo "RSA format detected - key is ready"
+          else
+            echo "Unknown key format detected:"
+            head -1 ~/.ssh/deploy_key
+            echo "Attempting to use as-is..."
+          fi
+
+          # Validate key
+          ssh-keygen -l -f ~/.ssh/deploy_key
+
+          # Add host to known_hosts to avoid prompt
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+
       - name: Deploy to cPanel via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
@@ -69,7 +94,13 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           local_path: "./dist/*"
           remote_path: ${{ secrets.REMOTE_PATH }}
-          sftpArgs: "-o ConnectTimeout=5"
+          sftpArgs: "-o ConnectTimeout=10 -o StrictHostKeyChecking=no"
+
+      - name: Cleanup SSH Key
+        if: always()
+        run: |
+          rm -f ~/.ssh/deploy_key
+          echo "SSH key cleaned up"
 
       - name: Health check (optional)
         run: |
