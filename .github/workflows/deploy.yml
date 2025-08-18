@@ -61,37 +61,34 @@ jobs:
           echo "Build verification successful"
           ls -la dist/
 
-      - name: Setup SSH Key and Fix Format (With Passphrase Support)
+      - name: Setup SSH Key (Direct - No Conversion Needed)
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
-          # Check and fix key format with passphrase support
-          if head -1 ~/.ssh/deploy_key | grep -q "BEGIN OPENSSH PRIVATE KEY"; then
-            echo "Converting OpenSSH format to RSA format..."
-            # If key has passphrase, use it; if not, use empty passphrase
-            if [ -n "${{ secrets.SSH_PASSPHRASE }}" ]; then
-              echo "Using provided passphrase for key conversion"
-              ssh-keygen -p -m PEM -f ~/.ssh/deploy_key -N "" -P "${{ secrets.SSH_PASSPHRASE }}"
-            else
-              echo "Attempting conversion without passphrase (key might not be encrypted)"
-              ssh-keygen -p -m PEM -f ~/.ssh/deploy_key -N "" -P "" || {
-                echo "Key appears to be encrypted but no passphrase provided"
-                echo "Please add SSH_PASSPHRASE secret or use an unencrypted key"
-                exit 1
-              }
-            fi
-            echo "Key converted successfully"
-          elif head -1 ~/.ssh/deploy_key | grep -q "BEGIN RSA PRIVATE KEY"; then
-            echo "RSA format detected - key is ready"
+          # Verify key format (should be RSA PEM format)
+          if head -1 ~/.ssh/deploy_key | grep -q "BEGIN RSA PRIVATE KEY"; then
+            echo "✅ RSA PEM format detected - key is ready to use"
           else
-            echo "Unknown key format detected:"
+            echo "⚠️ Unexpected key format:"
             head -1 ~/.ssh/deploy_key
+            echo "Expected: -----BEGIN RSA PRIVATE KEY-----"
           fi
 
-          # Add host to known_hosts
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+          # Validate key
+          ssh-keygen -l -f ~/.ssh/deploy_key
+          echo "✅ SSH key validation successful"
+
+          # Add host to known_hosts to prevent connection prompts
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Test SSH Connection
+        run: |
+          echo "🔗 Testing SSH connection..."
+          ssh -i ~/.ssh/deploy_key -o ConnectTimeout=10 -o BatchMode=yes \
+            ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
+            "echo '✅ SSH connection successful'"
 
       - name: Deploy to cPanel via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
@@ -107,8 +104,9 @@ jobs:
         if: always()
         run: |
           rm -f ~/.ssh/deploy_key
-          echo "SSH key cleaned up"
+          echo "🧹 SSH key cleaned up securely"
 
-      - name: Health check (optional)
+      - name: Health check
         run: |
-          echo "Deployment completed successfully!"
+          echo "🎉 Deployment completed successfully!"
+          echo "📁 Files deployed to: ${{ secrets.REMOTE_PATH }}"
