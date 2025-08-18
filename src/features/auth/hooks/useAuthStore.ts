@@ -5,8 +5,6 @@ import {
   useLogin,
   useSignup,
   useLogout,
-  useRefreshUser,
-  useRefreshTokens,
   useClearAuth,
   useForgotPassword,
   useVerifyAccount,
@@ -22,8 +20,6 @@ export function useAuth() {
   const login = useLogin();
   const signup = useSignup();
   const logout = useLogout();
-  const refreshUser = useRefreshUser();
-  const refreshTokens = useRefreshTokens();
   const clearAuth = useClearAuth();
   const forgotPassword = useForgotPassword();
   const verifyAccount = useVerifyAccount();
@@ -36,8 +32,6 @@ export function useAuth() {
     login,
     signup,
     logout,
-    refreshUser,
-    refreshTokens,
     clearAuth,
     forgotPassword,
     verifyAccount,

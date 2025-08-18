@@ -86,11 +86,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       }));
 
       // Store in cookies
-      authCookies.setAuthData(
-        data.access_token,
-        data.refresh_token,
-        data.user_data
-      );
+      authCookies.setUser(data.user_data);
       return data;
     } catch (error) {
       set(() => ({ isLoading: false }));
@@ -111,11 +107,8 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       }));
 
       // Store in cookies
-      authCookies.setAuthData(
-        response.access_token,
-        response.refresh_token,
-        response.user_data
-      );
+      authCookies.setUser(response.user_data);
+
       return response;
     } catch (error) {
       set(() => ({ isLoading: false }));
@@ -175,10 +168,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     }
 
     try {
-      const response = await authService.refreshToken(refreshToken);
-
+      // const response = await authService.refreshToken(refreshToken);
       // Update tokens in cookies
-      authCookies.setTokens(response.access_token, response.refresh_token);
+      // authCookies.setTokens(response.access_token, response.refresh_token);
     } catch (error) {
       console.error("Failed to refresh tokens:", error);
       // If token refresh fails, clear auth state
@@ -237,11 +229,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       // Store in cookies
       if (response.data.data) {
-        authCookies.setAuthData(
-          response.data.data?.access_token,
-          response.data.data?.refresh_token,
-          response.data.data?.user_data
-        );
+        authCookies.setUser(response.data.data?.user_data);
       }
 
       return response;
