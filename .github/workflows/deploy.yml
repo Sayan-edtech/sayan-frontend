@@ -61,52 +61,69 @@ jobs:
           echo "Build verification successful"
           ls -la dist/
 
-      - name: Setup SSH Key (Direct - No Conversion Needed)
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-
-          # Verify key format (should be RSA PEM format)
-          if head -1 ~/.ssh/deploy_key | grep -q "BEGIN RSA PRIVATE KEY"; then
-            echo "✅ RSA PEM format detected - key is ready to use"
-          else
-            echo "⚠️ Unexpected key format:"
-            head -1 ~/.ssh/deploy_key
-            echo "Expected: -----BEGIN RSA PRIVATE KEY-----"
-          fi
-
-          # Validate key
-          ssh-keygen -l -f ~/.ssh/deploy_key
-          echo "✅ SSH key validation successful"
-
-          # Add host to known_hosts to prevent connection prompts
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
-
-      - name: Test SSH Connection
-        run: |
-          echo "🔗 Testing SSH connection..."
-          ssh -i ~/.ssh/deploy_key -o ConnectTimeout=10 -o BatchMode=yes \
-            ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
-            "echo '✅ SSH connection successful'"
-
       - name: Deploy to cPanel via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh_private_key: |
+            -----BEGIN OPENSSH PRIVATE KEY-----
+            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
+            -----END OPENSSH PRIVATE KEY-----
           local_path: "./dist/*"
           remote_path: ${{ secrets.REMOTE_PATH }}
-          sftpArgs: "-o ConnectTimeout=10 -o StrictHostKeyChecking=no"
+          sftpArgs: "-o ConnectTimeout=5"
 
-      - name: Cleanup SSH Key
-        if: always()
+      - name: Health check (optional)
         run: |
-          rm -f ~/.ssh/deploy_key
-          echo "🧹 SSH key cleaned up securely"
-
-      - name: Health check
-        run: |
-          echo "🎉 Deployment completed successfully!"
-          echo "📁 Files deployed to: ${{ secrets.REMOTE_PATH }}"
+          echo "Deployment completed successfully!"
+          # Optional: Add a simple curl check to your domain
+          # curl -f https://yourdomain.com || exit 1
