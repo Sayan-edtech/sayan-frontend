@@ -6,6 +6,19 @@ import type {
 } from "axios";
 import { authCookies } from "@/lib/cookies";
 
+export interface ApiError {
+  message: string;
+  response?: {
+    status: number;
+    data?: {
+      message?: string;
+      data: unknown;
+    };
+  };
+  config?: {
+    url: string;
+  };
+}
 // Create axios instance
 export const api = axios.create({
   baseURL:

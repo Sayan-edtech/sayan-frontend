@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const links = [
   {
     id: crypto.randomUUID(),

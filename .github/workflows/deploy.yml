@@ -2,7 +2,7 @@ name: Deploy to cPanel/Hostinger
 
 on:
   push:
-    branches: ["main", "master", "dev"]
+    branches: ["main"]
   workflow_dispatch:
 
 concurrency:
@@ -61,30 +61,14 @@ jobs:
           echo "Build verification successful"
           ls -la dist/
 
-      - name: Verify secrets are available
-        run: |
-          if [ -z "${{ secrets.FTP_SERVER }}" ]; then
-            echo "Error: FTP_SERVER secret is not set"
-            exit 1
-          fi
-          if [ -z "${{ secrets.FTP_USERNAME }}" ]; then
-            echo "Error: FTP_USERNAME secret is not set"
-            exit 1
-          fi
-          if [ -z "${{ secrets.FTP_PASSWORD }}" ]; then
-            echo "Error: FTP_PASSWORD secret is not set"
-            exit 1
-          fi
-          echo "All FTP secrets are configured"
-
       - name: Deploy to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          server: ftp.sayan.website
+          username: kareem-mohamed
+          password: FODDB58aiRk3jSxOtc9r
           local-dir: ./dist/
-          server-dir: /htdocs/sayan.website/
+          server-dir: /home/sayan_website/htdocs/sayan.website/
           exclude: |
             **/.git*
             **/.git*/**

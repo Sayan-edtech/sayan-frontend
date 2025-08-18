@@ -1,5 +1,10 @@
-import { useMemo } from 'react';
-import type { Transaction, WalletStats, WalletBalance, WithdrawalRequest } from '@/types/wallet';
+import { useMemo } from "react";
+import type {
+  Transaction,
+  WalletStats,
+  WalletBalance,
+  WithdrawalRequest,
+} from "@/types/wallet";
 
 // Sample transaction data - in a real app, this would come from an API
 const SAMPLE_TRANSACTIONS: Transaction[] = [
@@ -12,8 +17,8 @@ const SAMPLE_TRANSACTIONS: Transaction[] = [
     student: "أحمد محمد علي",
     change: "+850",
     after: "81,000,019.8",
-    status: "مكتمل",
-    amount: 850
+    status: "completed",
+    amount: 850,
   },
   {
     id: "TXN-002",
@@ -24,8 +29,8 @@ const SAMPLE_TRANSACTIONS: Transaction[] = [
     student: "سارة أحمد",
     change: "+320",
     after: "80,999,169.8",
-    status: "مكتمل",
-    amount: 320
+    status: "completed",
+    amount: 320,
   },
   {
     id: "TXN-003",
@@ -36,8 +41,8 @@ const SAMPLE_TRANSACTIONS: Transaction[] = [
     student: "-",
     change: "-5000",
     after: "80,998,849.8",
-    status: "مكتمل",
-    amount: -5000
+    status: "completed",
+    amount: -5000,
   },
   {
     id: "TXN-004",
@@ -48,8 +53,8 @@ const SAMPLE_TRANSACTIONS: Transaction[] = [
     student: "فاطمة علي",
     change: "+1200",
     after: "81,003,849.8",
-    status: "مكتمل",
-    amount: 1200
+    status: "completed",
+    amount: 1200,
   },
   {
     id: "TXN-005",
@@ -60,8 +65,8 @@ const SAMPLE_TRANSACTIONS: Transaction[] = [
     student: "محمد خالد",
     change: "+750",
     after: "81,002,649.8",
-    status: "مكتمل",
-    amount: 750
+    status: "completed",
+    amount: 750,
   },
   {
     id: "TXN-006",
@@ -72,8 +77,8 @@ const SAMPLE_TRANSACTIONS: Transaction[] = [
     student: "نورا سعد",
     change: "+180",
     after: "81,001,899.8",
-    status: "مكتمل",
-    amount: 180
+    status: "completed",
+    amount: 180,
   },
   {
     id: "TXN-007",
@@ -84,8 +89,8 @@ const SAMPLE_TRANSACTIONS: Transaction[] = [
     student: "عبدالله أحمد",
     change: "+950",
     after: "81,001,719.8",
-    status: "مكتمل",
-    amount: 950
+    status: "completed",
+    amount: 950,
   },
   {
     id: "TXN-008",
@@ -96,9 +101,9 @@ const SAMPLE_TRANSACTIONS: Transaction[] = [
     student: "-",
     change: "-50",
     after: "81,000,769.8",
-    status: "مكتمل",
-    amount: -50
-  }
+    status: "completed",
+    amount: -50,
+  },
 ];
 
 // Sample withdrawal requests data
@@ -111,7 +116,7 @@ const SAMPLE_WITHDRAWAL_REQUESTS: WithdrawalRequest[] = [
     requestDate: "٢٠٢٤/٠١/١٣",
   },
   {
-    id: "WR-002", 
+    id: "WR-002",
     status: "completed",
     amount: 5000,
     date: "١٤٤٦/١٢/١٠هـ",
@@ -122,14 +127,15 @@ const SAMPLE_WITHDRAWAL_REQUESTS: WithdrawalRequest[] = [
     id: "WR-003",
     status: "rejected",
     amount: 8500,
-    date: "١٤٤٦/١٢/٠٨هـ", 
+    date: "١٤٤٦/١٢/٠٨هـ",
     requestDate: "٢٠٢٤/٠١/٠٨",
     processedDate: "٢٠٢٤/٠١/٠٩",
-    reason: "الحد الأدنى للسحب لم يتم الوصول إليه. يجب أن يكون المبلغ أقل من 5000 ريال للسحب الأول."
+    reason:
+      "الحد الأدنى للسحب لم يتم الوصول إليه. يجب أن يكون المبلغ أقل من 5000 ريال للسحب الأول.",
   },
   {
     id: "WR-004",
-    status: "completed", 
+    status: "completed",
     amount: 2500,
     date: "١٤٤٦/١٢/٠٥هـ",
     requestDate: "٢٠٢٤/٠١/٠٥",
@@ -140,10 +146,11 @@ const SAMPLE_WITHDRAWAL_REQUESTS: WithdrawalRequest[] = [
     status: "rejected",
     amount: 12000,
     date: "١٤٤٦/١١/٢٨هـ",
-    requestDate: "٢٠٢٣/١٢/٢٨", 
+    requestDate: "٢٠٢٣/١٢/٢٨",
     processedDate: "٢٠٢٣/١٢/٢٩",
-    reason: "بيانات البنك غير مكتملة. يرجى التأكد من صحة رقم الآيبان واسم صاحب الحساب قبل إعادة المحاولة."
-  }
+    reason:
+      "بيانات البنك غير completedة. يرجى التأكد من صحة رقم الآيبان واسم صاحب الحساب قبل إعادة المحاولة.",
+  },
 ];
 
 export function useWalletData() {
@@ -155,14 +162,14 @@ export function useWalletData() {
     const monthlyGrowth = 12.5;
     const totalStudents = 1247;
     const activeCourses = 28;
-    
+
     return {
       totalRevenue,
       totalExpenses,
       netProfit,
       monthlyGrowth,
       totalStudents,
-      activeCourses
+      activeCourses,
     };
   }, []);
 
@@ -173,13 +180,13 @@ export function useWalletData() {
     const withdrawals = 15000;
     const partnershipCommissions = 8500;
     const availableForWithdrawal = total - 10000; // Keep minimum balance
-    
+
     return {
       total,
       monthlyRevenue,
       withdrawals,
       partnershipCommissions,
-      availableForWithdrawal
+      availableForWithdrawal,
     };
   }, []);
 
@@ -189,30 +196,34 @@ export function useWalletData() {
   // Calculate transaction statistics
   const transactionStats = useMemo(() => {
     const totalTransactions = transactions.length;
-    const completedTransactions = transactions.filter(t => t.status === "مكتمل").length;
-    const pendingTransactions = transactions.filter(t => t.status === "معلق").length;
-    
+    const completedTransactions = transactions.filter(
+      (t) => t.status === "completed"
+    ).length;
+    const pendingTransactions = transactions.filter(
+      (t) => t.status === "pending"
+    ).length;
+
     const totalIncome = transactions
-      .filter(t => t.amount && t.amount > 0)
+      .filter((t) => t.amount && t.amount > 0)
       .reduce((sum, t) => sum + (t.amount || 0), 0);
-    
+
     const totalExpenses = transactions
-      .filter(t => t.amount && t.amount < 0)
+      .filter((t) => t.amount && t.amount < 0)
       .reduce((sum, t) => sum + Math.abs(t.amount || 0), 0);
-    
+
     return {
       totalTransactions,
       completedTransactions,
       pendingTransactions,
       totalIncome,
-      totalExpenses
+      totalExpenses,
     };
   }, [transactions]);
 
   // Filter transactions by type
   const getTransactionsByType = useMemo(() => {
     return (type: string) => {
-      return transactions.filter(transaction => transaction.type === type);
+      return transactions.filter((transaction) => transaction.type === type);
     };
   }, [transactions]);
 
@@ -227,22 +238,28 @@ export function useWalletData() {
   // Calculate withdrawal statistics
   const withdrawalStats = useMemo(() => {
     const totalRequests = withdrawalRequests.length;
-    const pendingRequests = withdrawalRequests.filter(r => r.status === "pending").length;
-    const completedRequests = withdrawalRequests.filter(r => r.status === "completed").length;
-    const rejectedRequests = withdrawalRequests.filter(r => r.status === "rejected").length;
-    
+    const pendingRequests = withdrawalRequests.filter(
+      (r) => r.status === "pending"
+    ).length;
+    const completedRequests = withdrawalRequests.filter(
+      (r) => r.status === "completed"
+    ).length;
+    const rejectedRequests = withdrawalRequests.filter(
+      (r) => r.status === "rejected"
+    ).length;
+
     const totalWithdrawnAmount = withdrawalRequests
-      .filter(r => r.status === "completed")
+      .filter((r) => r.status === "completed")
       .reduce((sum, r) => sum + r.amount, 0);
-    
+
     const totalPendingAmount = withdrawalRequests
-      .filter(r => r.status === "pending")
+      .filter((r) => r.status === "pending")
       .reduce((sum, r) => sum + r.amount, 0);
 
     const totalRejectedAmount = withdrawalRequests
-      .filter(r => r.status === "rejected")
+      .filter((r) => r.status === "rejected")
       .reduce((sum, r) => sum + r.amount, 0);
-    
+
     return {
       totalRequests,
       pendingRequests,
@@ -250,7 +267,7 @@ export function useWalletData() {
       rejectedRequests,
       totalWithdrawnAmount,
       totalPendingAmount,
-      totalRejectedAmount
+      totalRejectedAmount,
     };
   }, [withdrawalRequests]);
 
@@ -262,7 +279,7 @@ export function useWalletData() {
     getTransactionsByType,
     recentTransactions,
     withdrawalRequests,
-    withdrawalStats
+    withdrawalStats,
   };
 }
 

@@ -15,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Filter, X, ChevronDown, Search } from "lucide-react";
+import type { Table } from "@tanstack/react-table";
+import type { Trainer } from "@/types/trainer";
 
 interface TrainerFiltersProps {
   selectedSpecialization: string;
@@ -22,7 +24,7 @@ interface TrainerFiltersProps {
   minCoursesCount: number;
   onMinCoursesCountChange: (count: number) => void;
   onClearFilters: () => void;
-  table?: any; // للتحكم في الأعمدة
+  table?: Table<Trainer> | null; // للتحكم في الأعمدة
 }
 
 function TrainerFilters({
@@ -125,8 +127,8 @@ function TrainerFilters({
             <DropdownMenuContent align="end">
               {table
                 .getAllColumns()
-                .filter((column: any) => column.getCanHide())
-                .map((column: any) => {
+                .filter((column) => column.getCanHide())
+                .map((column) => {
                   const columnHeaders = {
                     image: "الصورة",
                     name: "اسم المدرب",

@@ -1,12 +1,22 @@
-import { api } from "@/lib/axios";
+import { api, type ApiError } from "@/lib/axios";
 import { authCookies } from "@/lib/cookies";
-import type { 
-  Transaction, 
-  WalletBalance, 
+import type {
+  Transaction,
+  WalletBalance,
   WithdrawalRequest,
   TransactionFilter,
-  DateRange
+  DateRange,
 } from "@/types/wallet";
+
+// Type guard for axios error
+const isAxiosError = (error: unknown): error is ApiError => {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof (error as { message: unknown }).message === "string"
+  );
+};
 
 // Types for API responses
 export interface TransactionsListResponse {
@@ -60,26 +70,26 @@ export const walletApi = {
   ): Promise<TransactionsListResponse> => {
     // Get tokens for academy
     const tokens = authCookies.getTokens();
-    
+
     // Build query parameters
     const params: Record<string, string> = {};
-    if (filter && filter !== 'all') params.filter = filter;
+    if (filter && filter !== "all") params.filter = filter;
     if (dateRange) params.date_range = dateRange;
     if (searchQuery) params.search = searchQuery;
-    
-    console.log('Fetching transactions with params:', params);
-    console.log('Access token exists:', !!tokens.accessToken);
-    console.log('Refresh token exists:', !!tokens.refreshToken);
-    
+
+    console.log("Fetching transactions with params:", params);
+    console.log("Access token exists:", !!tokens.accessToken);
+    console.log("Refresh token exists:", !!tokens.refreshToken);
+
     // Check if tokens exist
     if (!tokens.accessToken || !tokens.refreshToken) {
-      console.error('Missing authentication tokens');
-      throw new Error('Authentication tokens are required');
+      console.error("Missing authentication tokens");
+      throw new Error("Authentication tokens are required");
     }
-    
+
     try {
-      console.log('Making request to /wallet/transactions');
-      
+      console.log("Making request to /wallet/transactions");
+
       const response = await api.get("/wallet/transactions", {
         params,
         headers: {
@@ -87,15 +97,24 @@ export const walletApi = {
           "X-Academy-Refresh-Token": tokens.refreshToken || "",
         },
       });
-      console.log('API response:', response.data);
+      console.log("API response:", response.data);
       return response.data;
-    } catch (error: any) {
-      console.error('Error fetching transactions:', {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-        url: error.config?.url
-      });
+    } catch (error: unknown) {
+      const errorInfo = isAxiosError(error)
+        ? {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+            url: error.config?.url,
+          }
+        : {
+            message: error instanceof Error ? error.message : "Unknown error",
+            status: undefined,
+            data: undefined,
+            url: undefined,
+          };
+
+      console.error("Error fetching transactions:", errorInfo);
       throw error;
     }
   },
@@ -104,25 +123,34 @@ export const walletApi = {
   getWalletBalance: async (): Promise<WalletBalanceResponse> => {
     // Get tokens for academy
     const tokens = authCookies.getTokens();
-    
+
     try {
-      console.log('Making request to /wallet/balance');
-      
+      console.log("Making request to /wallet/balance");
+
       const response = await api.get("/wallet/balance", {
         headers: {
           "X-Academy-Access-Token": tokens.accessToken || "",
           "X-Academy-Refresh-Token": tokens.refreshToken || "",
         },
       });
-      console.log('Wallet balance response:', response.data);
+      console.log("Wallet balance response:", response.data);
       return response.data;
-    } catch (error: any) {
-      console.error('Error fetching wallet balance:', {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-        url: error.config?.url
-      });
+    } catch (error: unknown) {
+      const errorInfo = isAxiosError(error)
+        ? {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+            url: error.config?.url,
+          }
+        : {
+            message: error instanceof Error ? error.message : "Unknown error",
+            status: undefined,
+            data: undefined,
+            url: undefined,
+          };
+
+      console.error("Error fetching wallet balance:", errorInfo);
       throw error;
     }
   },
@@ -131,25 +159,34 @@ export const walletApi = {
   getWithdrawalRequests: async (): Promise<WithdrawalRequestsResponse> => {
     // Get tokens for academy
     const tokens = authCookies.getTokens();
-    
+
     try {
-      console.log('Making request to /wallet/withdrawal-requests');
-      
+      console.log("Making request to /wallet/withdrawal-requests");
+
       const response = await api.get("/wallet/withdrawal-requests", {
         headers: {
           "X-Academy-Access-Token": tokens.accessToken || "",
           "X-Academy-Refresh-Token": tokens.refreshToken || "",
         },
       });
-      console.log('Withdrawal requests response:', response.data);
+      console.log("Withdrawal requests response:", response.data);
       return response.data;
-    } catch (error: any) {
-      console.error('Error fetching withdrawal requests:', {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-        url: error.config?.url
-      });
+    } catch (error: unknown) {
+      const errorInfo = isAxiosError(error)
+        ? {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+            url: error.config?.url,
+          }
+        : {
+            message: error instanceof Error ? error.message : "Unknown error",
+            status: undefined,
+            data: undefined,
+            url: undefined,
+          };
+
+      console.error("Error fetching withdrawal requests:", errorInfo);
       throw error;
     }
   },
@@ -160,26 +197,35 @@ export const walletApi = {
   ): Promise<WithdrawalRequestResponse> => {
     // Get tokens for academy
     const tokens = authCookies.getTokens();
-    
+
     try {
-      console.log('Making request to /wallet/withdrawal-requests');
-      console.log('Withdrawal request payload:', payload);
-      
+      console.log("Making request to /wallet/withdrawal-requests");
+      console.log("Withdrawal request payload:", payload);
+
       const response = await api.post("/wallet/withdrawal-requests", payload, {
         headers: {
           "X-Academy-Access-Token": tokens.accessToken || "",
           "X-Academy-Refresh-Token": tokens.refreshToken || "",
         },
       });
-      console.log('Create withdrawal request response:', response.data);
+      console.log("Create withdrawal request response:", response.data);
       return response.data;
-    } catch (error: any) {
-      console.error('Error creating withdrawal request:', {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-        url: error.config?.url
-      });
+    } catch (error: unknown) {
+      const errorInfo = isAxiosError(error)
+        ? {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+            url: error.config?.url,
+          }
+        : {
+            message: error instanceof Error ? error.message : "Unknown error",
+            status: undefined,
+            data: undefined,
+            url: undefined,
+          };
+
+      console.error("Error creating withdrawal request:", errorInfo);
       throw error;
     }
   },
