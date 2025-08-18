@@ -61,29 +61,36 @@ jobs:
           echo "Build verification successful"
           ls -la dist/
 
-      - name: Setup SSH Key and Fix Format
+      - name: Setup SSH Key and Fix Format (With Passphrase Support)
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
-          # Check and fix key format
+          # Check and fix key format with passphrase support
           if head -1 ~/.ssh/deploy_key | grep -q "BEGIN OPENSSH PRIVATE KEY"; then
             echo "Converting OpenSSH format to RSA format..."
-            ssh-keygen -p -m PEM -f ~/.ssh/deploy_key -N "" -P ""
+            # If key has passphrase, use it; if not, use empty passphrase
+            if [ -n "${{ secrets.SSH_PASSPHRASE }}" ]; then
+              echo "Using provided passphrase for key conversion"
+              ssh-keygen -p -m PEM -f ~/.ssh/deploy_key -N "" -P "${{ secrets.SSH_PASSPHRASE }}"
+            else
+              echo "Attempting conversion without passphrase (key might not be encrypted)"
+              ssh-keygen -p -m PEM -f ~/.ssh/deploy_key -N "" -P "" || {
+                echo "Key appears to be encrypted but no passphrase provided"
+                echo "Please add SSH_PASSPHRASE secret or use an unencrypted key"
+                exit 1
+              }
+            fi
             echo "Key converted successfully"
           elif head -1 ~/.ssh/deploy_key | grep -q "BEGIN RSA PRIVATE KEY"; then
             echo "RSA format detected - key is ready"
           else
             echo "Unknown key format detected:"
             head -1 ~/.ssh/deploy_key
-            echo "Attempting to use as-is..."
           fi
 
-          # Validate key
-          ssh-keygen -l -f ~/.ssh/deploy_key
-
-          # Add host to known_hosts to avoid prompt
+          # Add host to known_hosts
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Deploy to cPanel via SFTP
@@ -105,5 +112,3 @@ jobs:
       - name: Health check (optional)
         run: |
           echo "Deployment completed successfully!"
-          # Optional: Add a simple curl check to your domain
-          # curl -f https://yourdomain.com || exit 1
