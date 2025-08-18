@@ -61,16 +61,15 @@ jobs:
           echo "Build verification successful"
           ls -la dist/
 
-      - name: Deploy to cPanel via SSH/SFTP
-        uses: easingthemes/ssh-deploy@main
+      - name: Deploy to cPanel via SFTP
+        uses: burnett01/rsync-deployments@6.0.0
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          ARGS: "-rlgoDzvc -i --delete"
-          SOURCE: "dist/"
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: ${{ secrets.REMOTE_PATH }}
-          EXCLUDE: "/dist/, /node_modules/"
+          switches: -avzr --delete
+          path: dist/
+          remote_path: ${{ secrets.REMOTE_PATH }}
+          remote_host: ${{ secrets.REMOTE_HOST }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Health check (optional)
         run: |
