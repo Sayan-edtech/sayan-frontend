@@ -64,12 +64,19 @@ jobs:
       - name: Deploy to cPanel via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          server: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          local_path: './dist/*'
-          remote_path: ${{ secrets.REMOTE_PATH }}
-          sftpArgs: '-o ConnectTimeout=5'
+          server: 45.87.80.38
+          username: kareem-shimes
+          ssh_private_key: |
+            -----BEGIN OPENSSH PRIVATE KEY-----
+            b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+            QyNTUxOQAAACAM0LFGEAEr41hCaDBedgu5Ba+SSrdK9h4n+2YDljQssQAAAJiSX0hakl9I
+            WgAAAAtzc2gtZWQyNTUxOQAAACAM0LFGEAEr41hCaDBedgu5Ba+SSrdK9h4n+2YDljQssQ
+            AAAEDfXQvw6c/R/K7yezddSsgKTH+4vtuIAWzM8B4cUQiPhgzQsUYQASvjWEJoMF52C7kF
+            r5JKt0r2Hif7ZgOWNCyxAAAAE2RpcmVjdC1kZXBsb3lAc2F5YW4BAg==
+            -----END OPENSSH PRIVATE KEY-----
+          local_path: "./dist/*"
+          remote_path: /home/kareem-shimes/
+          sftpArgs: "-o ConnectTimeout=5"
 
       - name: Health check (optional)
         run: |
