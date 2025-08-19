@@ -2,21 +2,19 @@ import { Outlet } from "react-router-dom";
 import DashboardSidebar from "@/components/shared/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/shared/dashboard/DashboardHeader";
 import { useState } from "react";
-import { DashboardLoading } from "@/components/shared/dashboard";
 import { useCurrentUserProfile } from "../profile/hooks";
 import { Button } from "@/components/ui/button";
-import { UserType } from "@/constants/enums";
-import type { User } from "@/types/user";
+import { DashboardLoading } from "@/components/shared/dashboard";
 
-export function DashboardLayout() {
-  const { data: user, isLoading, isError } = useCurrentUserProfile();
+function DashboardLayout() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const { data: user, isPending, isError } = useCurrentUserProfile();
 
-  if (isLoading) {
+  if (isPending) {
     return <DashboardLoading />;
   }
 
-  if (!isLoading && isError) {
+  if (!isPending && isError) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -31,22 +29,25 @@ export function DashboardLayout() {
   }
 
   return (
-    !isLoading &&
+    !isPending &&
     user && (
       <div className="min-h-screen bg-background flex">
-        <DashboardSidebar user={{
-          ...user,
-          user_type: user.user_type as UserType
-        } as User} />
+        {/* Desktop Sidebar */}
         <DashboardSidebar
+          userType={user.user_type}
+          isMobile={false}
+          user={user}
+        />
+
+        {/* Mobile Sidebar */}
+        <DashboardSidebar
+          userType={user.user_type}
           isMobile={true}
           isOpen={isMobileSidebarOpen}
           onClose={() => setIsMobileSidebarOpen(false)}
-          user={{
-            ...user,
-            user_type: user.user_type as UserType
-          } as User}
+          user={user}
         />
+
         <div className="flex-1 flex flex-col">
           <DashboardHeader
             onMobileMenuClick={() => setIsMobileSidebarOpen(true)}
@@ -59,3 +60,5 @@ export function DashboardLayout() {
     )
   );
 }
+
+export default DashboardLayout;
