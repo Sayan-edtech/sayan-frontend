@@ -2,14 +2,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, User } from "lucide-react";
 import { EditUserInfoModal } from "@/components/shared/dashboard/EditUserInfoModal";
 import { useState } from "react";
-import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks/useUserQueries";
-import { useUpdateUserProfile } from "@/features/dashboard/profile/hooks/useUserMutations";
+import { useAuth } from "@/features/auth/hooks/useAuthStore";
+import { useUpdateUserProfile } from "@/features/dashboard/profile/hooks";
 
 function Profile() {
   // Get user profile data from API
-  const { data: userProfile, isLoading, isError } = useCurrentUserProfile();
   const updateProfileMutation = useUpdateUserProfile();
-  
+  const { user, isLoading } = useAuth();
+
   const [coverImage, setCoverImage] = useState<string | undefined>(undefined);
 
   // Function to create full image URL
@@ -61,35 +61,23 @@ function Profile() {
     );
   }
 
-  // Error state
-  if (isError || !userProfile) {
-    return (
-      <div className="space-y-6">
-        <Header />
-        <div className="text-center text-red-600 py-8">
-          حدث خطأ في تحميل بيانات الملف الشخصي
-        </div>
-      </div>
-    );
-  }
-
   // Map API data to component format
   const userInfo = {
-    fname: userProfile.fname,
-    lname: userProfile.lname,
-    name: `${userProfile.fname} ${userProfile.lname}`,
-    email: userProfile.email,
-    phone: userProfile.phone_number,
-    gender: userProfile.gender,
-    avatar: userProfile.avatar, // Keep original path for modal
-    coverImage: userProfile.banner, // Keep original path for modal
+    fname: user?.fname,
+    lname: user?.lname,
+    name: `${user?.fname} ${user?.lname}`,
+    email: user?.email,
+    phone: user?.phone_number,
+    gender: user?.gender,
+    avatar: user?.avatar, // Keep original path for modal
+    coverImage: user?.banner, // Keep original path for modal
   };
 
   // For display purposes, create URLs
   const displayInfo = {
     ...userInfo,
-    avatar: getImageUrl(userProfile.avatar) || coverImage,
-    coverImage: getImageUrl(userProfile.banner) || coverImage,
+    avatar: getImageUrl(user?.avatar) || coverImage,
+    coverImage: getImageUrl(user?.banner) || coverImage,
   };
 
   const handleCoverImageUpload = async (
@@ -102,7 +90,7 @@ function Profile() {
         await updateProfileMutation.mutateAsync({
           banner: file,
         });
-        
+
         // Also update local state for immediate visual feedback
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -116,12 +104,10 @@ function Profile() {
     }
   };
 
-
-
   return (
     <div className="space-y-6">
       <Header />
-      
+
       {/* Cover Image and Profile Section */}
       <div className="rounded-xl shadow-sm overflow-hidden mb-6 relative">
         {/* Cover Image */}
@@ -162,9 +148,9 @@ function Profile() {
         <div className="flex items-end justify-between absolute bottom-0 bg-white w-full pt-10 md:pt-4 pb-4 px-4">
           <div className="flex items-end gap-4">
             <Avatar className="w-24 h-24 border-4 border-white">
-              <AvatarImage 
-                src={displayInfo.avatar || undefined} 
-                alt={displayInfo.name} 
+              <AvatarImage
+                src={displayInfo.avatar || undefined}
+                alt={displayInfo.name}
               />
               <AvatarFallback className="bg-gray-200 text-gray-600 text-2xl">
                 {displayInfo.name?.charAt(0) || "?"}
@@ -231,7 +217,6 @@ function Profile() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -247,9 +232,7 @@ function Header() {
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4">
         <div className="flex items-center gap-2 text-gray-600">
           <User className="w-5 h-5 text-blue-600" />
-          <span className="font-medium text-sm lg:text-base">
-            الملف الشخصي
-          </span>
+          <span className="font-medium text-sm lg:text-base">الملف الشخصي</span>
         </div>
       </div>
     </div>

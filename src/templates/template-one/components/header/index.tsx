@@ -6,10 +6,10 @@ import type { Settings } from "@/types/academy";
 import RemoteImage from "@/components/shared/RemoteImage";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserMenu } from "@/components/shared/dashboard";
-import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks";
+import { useAuth } from "@/features/auth/hooks/useAuthStore";
 
 export default function Header({ settings }: { settings: Settings }) {
-  const { data: user, isPending } = useCurrentUserProfile();
+  const { user, isLoading } = useAuth();
   return (
     <header className="py-8 fixed left-0 w-full top-0 z-50">
       <div className="container">
@@ -32,7 +32,7 @@ export default function Header({ settings }: { settings: Settings }) {
             <MobileMenu links={links} />
             <Navbar />
           </div>
-          {isPending ? (
+          {isLoading ? (
             <Skeleton className="h-10 w-10 rounded-full" />
           ) : user ? (
             <UserMenu />

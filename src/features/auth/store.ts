@@ -8,6 +8,7 @@ import type {
 import { authService } from "./services/authService";
 import { authCookies } from "@/lib/cookies";
 import { Routes, UserType } from "@/constants/enums";
+import { userService } from "../dashboard/profile/services";
 
 interface AuthState {
   // State
@@ -18,7 +19,7 @@ interface AuthState {
   isAuthenticated: boolean;
 
   // Actions
-  setUser: (user: User | null) => void;
+  loadUser: () => void;
   setLoading: (loading: boolean) => void;
   login: (credentials: LoginRequest) => Promise<AuthResponse>;
   signup: (userData: SignupRequest) => Promise<AuthResponse>;
@@ -47,14 +48,13 @@ interface AuthState {
 
 // Initialize authentication state from cookies
 const initializeAuthState = () => {
-  const { accessToken, refreshToken, user } = authCookies.getAuthData();
-
+  const user = authCookies.getUser();
   return {
     user,
-    accessToken,
-    refreshToken,
+    accessToken: null,
+    refreshToken: null,
     isLoading: false,
-    isAuthenticated: Boolean(accessToken && refreshToken && user),
+    isAuthenticated: Boolean(user),
   };
 };
 
@@ -62,12 +62,12 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   // Initial state
   ...initializeAuthState(),
   // Actions
-  setUser: (user) =>
+  loadUser: async () => {
+    const user = await userService.getCurrentUserProfile();
     set(() => ({
       user,
-      isAuthenticated: !!user && !!get().accessToken,
-    })),
-
+    }));
+  },
   setLoading: (loading) =>
     set(() => ({
       isLoading: loading,
@@ -288,3 +288,5 @@ export const useVerifyAccount = () =>
 export const useResnedOtp = () => useAuthStore((state) => state.resendOtp);
 export const useResetPassword = () =>
   useAuthStore((state) => state.resetPasswprd);
+
+export const useLoadUser = () => useAuthStore((state) => state.loadUser);

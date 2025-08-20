@@ -3,13 +3,12 @@ import StatisticsCards from "@/features/dashboard/components/StatisticsCards";
 import StudentDashboard from "@/features/dashboard/components/StudentDashboard";
 import AcademyDashboard from "@/features/dashboard/components/AcademyDashboard";
 import { LayoutDashboard } from "lucide-react";
-import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks";
 import { Loader } from "@/components/shared";
+import { useAuth } from "@/features/auth/hooks/useAuthStore";
 
 function Dashboard() {
-  const { data: user, isPending } = useCurrentUserProfile();
-
-  if (isPending) {
+  const { user, isLoading } = useAuth();
+  if (isLoading) {
     return (
       <div className="element-center">
         <Loader />
@@ -18,7 +17,7 @@ function Dashboard() {
   }
 
   return (
-    !isPending &&
+    !isLoading &&
     user && (
       <div className="space-y-6">
         <Header />

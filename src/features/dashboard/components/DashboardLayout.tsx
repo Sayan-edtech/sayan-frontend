@@ -2,34 +2,18 @@ import { Outlet } from "react-router-dom";
 import DashboardSidebar from "@/components/shared/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/shared/dashboard/DashboardHeader";
 import { useState } from "react";
-import { useCurrentUserProfile } from "../profile/hooks";
-import { Button } from "@/components/ui/button";
 import { DashboardLoading } from "@/components/shared/dashboard";
+import { useAuth } from "@/features/auth/hooks/useAuthStore";
 
 function DashboardLayout() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const { data: user, isPending, isError } = useCurrentUserProfile();
-
-  if (isPending) {
+  const { user, isLoading } = useAuth();
+  if (isLoading) {
     return <DashboardLoading />;
   }
 
-  if (!isPending && isError) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">حدث خطأ</h2>
-          <p className="text-gray-600">لا يمكن تحميل بيانات المستخدم</p>
-          <Button onClick={() => window.location.reload()}>
-            إعادة المحاولة
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    !isPending &&
+    !isLoading &&
     user && (
       <div className="min-h-screen bg-background flex">
         {/* Desktop Sidebar */}

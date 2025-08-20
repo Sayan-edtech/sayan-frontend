@@ -10,6 +10,7 @@ import {
   useVerifyAccount,
   useResnedOtp,
   useResetPassword,
+  useLoadUser,
 } from "@/features/auth/store";
 
 // Main authentication hook that combines all the functionality
@@ -25,6 +26,7 @@ export function useAuth() {
   const verifyAccount = useVerifyAccount();
   const resendOtp = useResnedOtp();
   const resetPassword = useResetPassword();
+  const loadUser = useLoadUser();
   return {
     user,
     isAuthenticated,
@@ -37,5 +39,6 @@ export function useAuth() {
     verifyAccount,
     resendOtp,
     resetPassword,
+    loadUser,
   };
 }

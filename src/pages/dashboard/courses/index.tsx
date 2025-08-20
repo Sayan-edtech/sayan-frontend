@@ -5,15 +5,15 @@ import { Pages, Routes } from "@/constants/enums";
 import { useState } from "react";
 import type { Table as TanstackTable } from "@tanstack/react-table";
 import { useAcademyCourses } from "@/features/dashboard/courses/hooks/useCoursesQueries";
-import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks";
 import { getAcademyDetails } from "@/lib/academy";
 import type { User } from "@/types/user";
 import type { Course } from "@/types/couse";
 import CourseTable from "@/features/dashboard/courses/components/CourseTable";
 import CourseFilters from "@/features/dashboard/courses/components/CourseFilters";
+import { useAuth } from "@/features/auth/hooks/useAuthStore";
 
 function AcademyCourses() {
-  const { data: user } = useCurrentUserProfile();
+  const { user } = useAuth();
   const academy = getAcademyDetails(user as User);
   const academyId = academy?.academy_id || 0; // Provide a default value of 0
   const { data: courses, isPending } = useAcademyCourses(academyId);

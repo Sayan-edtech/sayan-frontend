@@ -11,13 +11,11 @@ import {
 import { User, LogOut, HelpCircle, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Routes } from "@/constants/enums";
-import { useCurrentUserProfile } from "@/features/dashboard/profile/hooks";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
-import { Skeleton } from "@/components/ui/skeleton";
 import RemoteImage from "../RemoteImage";
 
 export function UserMenu({ align }: { align?: "start" | "end" | "center" }) {
-  const { data: user, isLoading } = useCurrentUserProfile();
+  const { user } = useAuth();
   const { logout } = useAuth();
 
   const handleSignOut = async () => {
@@ -27,11 +25,8 @@ export function UserMenu({ align }: { align?: "start" | "end" | "center" }) {
       console.error("Error signing out:", error);
     }
   };
-  if (isLoading) {
-    return <Skeleton className="h-10 w-10 rounded-full" />;
-  }
+
   return (
-    !isLoading &&
     user && (
       <div className="flex items-center gap-4">
         <DropdownMenu dir="rtl">
