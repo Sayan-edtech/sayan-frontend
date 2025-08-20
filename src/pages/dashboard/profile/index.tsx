@@ -1,6 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, User } from "lucide-react";
-import { EditUserInfoModal } from "@/components/shared/dashboard/EditUserInfoModal";
+import {
+  EditUserInfoModal,
+  type UserInfo,
+} from "@/components/shared/dashboard/EditUserInfoModal";
 import { useState } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
 import { useUpdateUserProfile } from "@/features/dashboard/profile/hooks";
@@ -165,7 +168,7 @@ function Profile() {
           </div>
           <div className="absolute top-4 left-4">
             <EditUserInfoModal
-              userInfo={userInfo}
+              userInfo={userInfo as UserInfo}
               onSave={handleSaveUserInfo}
             />
           </div>

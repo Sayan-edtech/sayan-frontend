@@ -18,10 +18,11 @@ import { Camera } from "lucide-react";
 import { toast } from "sonner";
 import { userSchema, type UserFormData } from "@/validations/user";
 
-interface UserInfo {
+export interface UserInfo {
   fname: string;
   lname: string;
   email: string;
+  name: string;
   phone: string;
   gender?: string;
   avatar?: string;
@@ -31,7 +32,7 @@ interface UserInfo {
 interface EditUserInfoModalProps {
   userInfo: UserInfo;
   onSave: (
-    updatedInfo: Omit<UserInfo, "avatar" | "coverImage"> & {
+    updatedInfo: Omit<UserInfo, "avatar" | "coverImage" | "name"> & {
       avatar?: File;
       coverImage?: File;
     }
