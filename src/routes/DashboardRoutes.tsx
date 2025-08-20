@@ -17,6 +17,8 @@ import { templateRoutes } from "./TemplateRoutes";
 import { ProtectedRoute } from "@/components/shared/GuardRoute";
 import ManageCourse from "@/pages/dashboard/courses/mange";
 import DashboardLayout from "@/features/dashboard/components/DashboardLayout";
+import AILearningMaterials from "@/pages/dashboard/ai-learning-materials";
+import ComprehensiveWebDevelopment from "@/pages/dashboard/ai-learning-materials/comprehensive-web-development";
 
 export const dashboardRoutes = (
   <Route
@@ -50,6 +52,14 @@ export const dashboardRoutes = (
       path="affiliate-marketing"
       element={<div>التسويق بالعمولة - قريباً</div>}
     />
+    <Route path="ai-learning-materials">
+      <Route index element={<AILearningMaterials />} />
+      <Route
+        path="comprehensive-web-development"
+        element={<ComprehensiveWebDevelopment />}
+      />
+    </Route>
+
     {templateRoutes}
   </Route>
 );

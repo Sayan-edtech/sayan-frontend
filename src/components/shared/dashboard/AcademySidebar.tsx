@@ -22,7 +22,6 @@ import {
   Wallet,
   PanelRightClose,
   PanelLeftClose,
-  ExternalLink,
   Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,6 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { getAcademyDetails } from "@/lib/academy";
 import type { User } from "@/types/user";
-import { UserType } from "@/constants/enums";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import RemoteImage from "../RemoteImage";
 
@@ -278,7 +276,12 @@ function AcademySidebar({
       )}
 
       {/* Profile Section & Collapse Button */}
-      <div className={cn("p-4 border-b border-white/30", isCollapsed && "p-2")}>
+      <div
+        className={cn(
+          "p-4 pb-0 border-b border-white/30",
+          isCollapsed && "p-2"
+        )}
+      >
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center gap-3">
@@ -319,24 +322,15 @@ function AcademySidebar({
             )}
           </Button>
         </div>
-        {!isCollapsed && user.user_type === UserType.ACADEMY && (
-          <div className="mt-3">
-            <Link
-              to="/academy/simple-arab-code"
-              target="_blank"
-              className="block"
-            >
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                <ExternalLink className="w-4 h-4 mr-2" />
-                زيارة الأكاديمية
-              </Button>
-            </Link>
-          </div>
-        )}
       </div>
 
       {/* Back to Main Site Button */}
-      <div className={cn("p-4 border-b border-white/30", isCollapsed && "p-2")}>
+      <div
+        className={cn(
+          "p-4 pb-0 border-b border-white/30",
+          isCollapsed && "p-2"
+        )}
+      >
         <Link to="/" className="block">
           <Button
             variant="outline"
