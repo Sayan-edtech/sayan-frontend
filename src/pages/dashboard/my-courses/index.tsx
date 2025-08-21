@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BookOpen, Clock, Play, Search, ChevronDown } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 // Dummy course data
@@ -17,7 +17,8 @@ const dummyCourses = [
     title: "البرمجة بـ React للمبتدئين",
     academy: "أكاديمية التقنية المتقدمة",
     academyImage: "/api/placeholder/50/50",
-    image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=240&fit=crop&crop=center",
+    image:
+      "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=240&fit=crop&crop=center",
     progress: 75,
     duration: "12 ساعة",
     level: "مبتدئ",
@@ -27,7 +28,8 @@ const dummyCourses = [
     title: "تطوير تطبيقات الجوال باستخدام Flutter",
     academy: "معهد البرمجة الحديثة",
     academyImage: "/api/placeholder/50/50",
-    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=240&fit=crop&crop=center",
+    image:
+      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=240&fit=crop&crop=center",
     progress: 45,
     duration: "18 ساعة",
     level: "متوسط",
@@ -37,7 +39,8 @@ const dummyCourses = [
     title: "أساسيات التصميم UI/UX",
     academy: "مدرسة التصميم الرقمي",
     academyImage: "/api/placeholder/50/50",
-    image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=240&fit=crop&crop=center",
+    image:
+      "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=240&fit=crop&crop=center",
     progress: 90,
     duration: "8 ساعات",
     level: "مبتدئ",
@@ -47,7 +50,8 @@ const dummyCourses = [
     title: "إدارة قواعد البيانات MySQL",
     academy: "أكاديمية قواعد البيانات",
     academyImage: "/api/placeholder/50/50",
-    image: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=400&h=240&fit=crop&crop=center",
+    image:
+      "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=400&h=240&fit=crop&crop=center",
     progress: 30,
     duration: "15 ساعة",
     level: "متقدم",
@@ -60,8 +64,6 @@ function MyCourses() {
   const [sortBy, setSortBy] = useState("الأحدث");
 
   const sortOptions = ["الأحدث", "الأقدم"];
-
-
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -120,15 +122,18 @@ function MyCourses() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      
+
       {/* Courses Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {dummyCourses.map((course) => (
-          <div key={course.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          <div
+            key={course.id}
+            className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+          >
             {/* Course Image */}
             <div className="relative aspect-[10/6] overflow-hidden">
-              <img 
-                src={course.image} 
+              <img
+                src={course.image}
                 alt={course.title}
                 className="w-full h-full object-cover"
               />
@@ -138,7 +143,11 @@ function MyCourses() {
                 </div>
               </div>
               <div className="absolute top-3 right-3">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(course.level)}`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(
+                    course.level
+                  )}`}
+                >
                   {course.level}
                 </span>
               </div>
@@ -149,14 +158,14 @@ function MyCourses() {
               <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
                 {course.title}
               </h3>
-              
+
               {/* Academy Info */}
-              <div 
+              <div
                 className="flex items-center gap-2 mb-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
                 onClick={() => navigate(`/academy/${course.id}`)}
               >
-                <img 
-                  src={course.academyImage} 
+                <img
+                  src={course.academyImage}
                   alt={course.academy}
                   className="w-8 h-8 rounded-full object-cover"
                 />
@@ -167,10 +176,12 @@ function MyCourses() {
               <div className="mb-3">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-xs text-gray-600">التقدم</span>
-                  <span className="text-xs font-medium text-blue-600">{course.progress}%</span>
+                  <span className="text-xs font-medium text-blue-600">
+                    {course.progress}%
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${course.progress}%` }}
                   ></div>
@@ -186,19 +197,18 @@ function MyCourses() {
               </div>
 
               {/* Action Button */}
-              <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 text-sm font-medium rounded-lg"
+              <Link
+                to={`/dashboard/my-courses/${course.id}`}
+                className={`${buttonVariants()} w-full`}
                 onClick={() => navigate(`/course/${course.id}`)}
               >
                 <Play className="w-4 h-4 mr-2" />
-                المتابعة 
-              </Button>
+                المتابعة
+              </Link>
             </div>
           </div>
         ))}
       </div>
-
-
     </div>
   );
 }
