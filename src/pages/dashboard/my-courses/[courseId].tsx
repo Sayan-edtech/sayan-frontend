@@ -90,7 +90,7 @@ export const chaptersData: Chapter[] = [
 ];
 
 // المكون الرئيسي
-export default function ComprehensiveWebDevelopment() {
+export default function MyCourseDetails() {
   const [chapters, setChapters] = useState(chaptersData);
   const [activeLessonId, setActiveLessonId] = useState<string | null>("l2-1");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

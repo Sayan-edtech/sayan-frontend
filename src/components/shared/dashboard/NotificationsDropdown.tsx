@@ -18,43 +18,7 @@ interface Notification {
 }
 
 // بيانات وهمية للإشعارات
-const mockNotifications: Notification[] = [
-  {
-    id: "1",
-    title: "دورة جديدة متاحة",
-    message: "تم إضافة دورة React المتقدمة إلى منصتك",
-    time: "منذ 5 دقائق",
-    read: false,
-  },
-  {
-    id: "2",
-    title: "تم إكمال التحميل",
-    message: "تم تحميل الفيديو الجديد بنجاح",
-    time: "منذ 15 دقيقة",
-    read: false,
-  },
-  {
-    id: "3",
-    title: "طالب جديد مسجل",
-    message: "انضم طالب جديد إلى دورة JavaScript الأساسية",
-    time: "منذ 30 دقيقة",
-    read: true,
-  },
-  {
-    id: "4",
-    title: "موعد استشارة قريب",
-    message: "لديك موعد استشارة بعد ساعة واحدة",
-    time: "منذ ساعة",
-    read: false,
-  },
-  {
-    id: "5",
-    title: "تقييم جديد",
-    message: "تم إضافة تقييم 5 نجوم لدورة CSS",
-    time: "منذ ساعتين",
-    read: true,
-  },
-];
+const mockNotifications: Notification[] = [];
 
 export function NotificationsDropdown() {
   const [notifications, setNotifications] =
