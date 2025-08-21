@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  ClipboardCheck,
-  CheckCircle,
-  XCircle,
-  Award,
-  Clock,
-} from "lucide-react";
+import { ClipboardCheck, Award, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -32,6 +26,12 @@ type Question =
       type: "qa";
       question: string;
       answer: string;
+    }
+  | {
+      id: number;
+      type: "tf";
+      question: string;
+      correctAnswer: boolean;
     };
 
 interface QuizResults {
@@ -73,6 +73,18 @@ const mockQuizData = {
     },
     {
       id: 4,
+      type: "tf" as const,
+      question: "HTML هو لغة برمجة",
+      correctAnswer: false,
+    },
+    {
+      id: 5,
+      type: "tf" as const,
+      question: "عنصر <br> يستخدم لإنشاء سطر جديد",
+      correctAnswer: true,
+    },
+    {
+      id: 6,
       type: "mcq" as const,
       question: "ما هو العنصر المستخدم لإنشاء قائمة غير مرتبة؟",
       options: ["<ol>", "<ul>", "<li>", "<list>"],
@@ -86,16 +98,14 @@ export function QuizLesson({
   setIsMobileMenuOpen,
 }: QuizLessonProps) {
   const [userAnswers, setUserAnswers] = useState<{
-    [key: number]: string | number;
+    [key: number]: string | number | boolean;
   }>({});
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(
     mockQuizData.timeLimit * 60
   ); // in seconds
 
   const { questions } = mockQuizData;
-  const currentQuestion = questions[currentQuestionIndex];
 
   // Calculate results
   const calculateResults = (): QuizResults => {
@@ -110,6 +120,8 @@ export function QuizLesson({
         userAnswer.toLowerCase().trim() === q.answer.toLowerCase().trim()
       ) {
         correctAnswers++;
+      } else if (q.type === "tf" && userAnswer === q.correctAnswer) {
+        correctAnswers++;
       }
     });
 
@@ -122,20 +134,11 @@ export function QuizLesson({
     };
   };
 
-  const handleAnswerChange = (questionId: number, answer: string | number) => {
+  const handleAnswerChange = (
+    questionId: number,
+    answer: string | number | boolean
+  ) => {
     setUserAnswers((prev) => ({ ...prev, [questionId]: answer }));
-  };
-
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-    }
-  };
-
-  const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex((prev) => prev - 1);
-    }
   };
 
   const handleSubmitQuiz = () => {
@@ -144,7 +147,6 @@ export function QuizLesson({
 
   const resetQuiz = () => {
     setUserAnswers({});
-    setCurrentQuestionIndex(0);
     setShowResults(false);
     setTimeRemaining(mockQuizData.timeLimit * 60);
   };
@@ -157,14 +159,15 @@ export function QuizLesson({
       .padStart(2, "0")}`;
   };
 
-  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+  const answeredCount = Object.keys(userAnswers).length;
+  const progress = (answeredCount / questions.length) * 100;
   const results = showResults ? calculateResults() : null;
 
   // Results view
   if (showResults && results) {
     return (
       <div className="bg-white rounded-xl shadow-sm border-0 h-full">
-        <div className="p-4 lg:p-6 border-b">
+        <div className="p-4 lg:p-6 border-b border-border">
           <div className="flex items-center justify-between">
             <MobileMenuButton
               isMobileMenuOpen={isMobileMenuOpen}
@@ -180,7 +183,7 @@ export function QuizLesson({
         </div>
 
         <div className="p-4 lg:p-6">
-          <Card className="p-6 text-center space-y-6">
+          <Card className="p-6 text-center space-y-6 border-border">
             <div className="space-y-2">
               <div className="text-4xl font-bold text-blue-600">
                 {results.score}%
@@ -239,89 +242,14 @@ export function QuizLesson({
               </Button>
             </div>
           </Card>
-
-          {/* Review answers */}
-          <div className="mt-6 space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              مراجعة الإجابات
-            </h3>
-            {questions.map((q, index) => {
-              const userAnswer = userAnswers[q.id];
-              const isCorrect =
-                q.type === "mcq"
-                  ? userAnswer === q.correctAnswer
-                  : typeof userAnswer === "string" &&
-                    userAnswer.toLowerCase().trim() ===
-                      q.answer.toLowerCase().trim();
-
-              return (
-                <Card key={q.id} className="p-4">
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-2">
-                      {isCorrect ? (
-                        <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
-                      ) : (
-                        <XCircle className="w-5 h-5 text-red-500 mt-0.5" />
-                      )}
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">
-                          السؤال {index + 1}: {q.question}
-                        </h4>
-
-                        {q.type === "mcq" && (
-                          <div className="mt-2 space-y-1">
-                            <p className="text-sm text-gray-600">
-                              إجابتك:{" "}
-                              <span
-                                className={
-                                  isCorrect ? "text-green-600" : "text-red-600"
-                                }
-                              >
-                                {q.options[userAnswer as number] || "لم تجب"}
-                              </span>
-                            </p>
-                            {!isCorrect && (
-                              <p className="text-sm text-green-600">
-                                الإجابة الصحيحة: {q.options[q.correctAnswer]}
-                              </p>
-                            )}
-                          </div>
-                        )}
-
-                        {q.type === "qa" && (
-                          <div className="mt-2 space-y-1">
-                            <p className="text-sm text-gray-600">
-                              إجابتك:{" "}
-                              <span
-                                className={
-                                  isCorrect ? "text-green-600" : "text-red-600"
-                                }
-                              >
-                                {(userAnswer as string) || "لم تجب"}
-                              </span>
-                            </p>
-                            {!isCorrect && (
-                              <p className="text-sm text-green-600">
-                                الإجابة الصحيحة: {q.answer}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border-0 h-full">
-      <div className="p-4 lg:p-6 border-b">
+    <div className="bg-white rounded-xl shadow-sm border-0 border-border h-full">
+      <div className="p-4 lg:p-6 border-b border-border">
         <div className="flex items-center justify-between">
           <MobileMenuButton
             isMobileMenuOpen={isMobileMenuOpen}
@@ -339,7 +267,7 @@ export function QuizLesson({
         <div className="mt-4 space-y-2">
           <div className="flex justify-between items-center text-sm text-gray-600">
             <span>
-              السؤال {currentQuestionIndex + 1} من {questions.length}
+              {answeredCount} / {questions.length} سؤال مجاب
             </span>
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
@@ -350,25 +278,39 @@ export function QuizLesson({
         </div>
       </div>
 
-      <div className="p-4 lg:p-6">
-        <Card className="p-6">
-          <div className="space-y-6">
-            {/* Question */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 text-right mb-4">
-                {currentQuestion.question}
-              </h3>
+      <div className="p-4 lg:p-6 space-y-6">
+        {/* All Questions */}
+        {questions.map((question, index) => (
+          <Card key={question.id} className="p-6 border-border">
+            <div className="space-y-4">
+              {/* Question Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 text-right">
+                  السؤال {index + 1}: {question.question}
+                </h3>
+                <div
+                  className={`w-6 h-6 rounded-full border-2 border-border flex items-center justify-center ${
+                    userAnswers[question.id] !== undefined
+                      ? "border-primary bg-primary"
+                      : "border-gray-300 bg-white"
+                  }`}
+                >
+                  {userAnswers[question.id] !== undefined && (
+                    <div className="w-2 h-2 bg-white rounded-full" />
+                  )}
+                </div>
+              </div>
 
               {/* MCQ Options */}
-              {currentQuestion.type === "mcq" && (
+              {question.type === "mcq" && (
                 <div className="space-y-3">
-                  {currentQuestion.options.map((option, optionIndex) => (
+                  {question.options.map((option, optionIndex) => (
                     <label
                       key={optionIndex}
-                      className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-colors hover:bg-gray-50 ${
-                        userAnswers[currentQuestion.id] === optionIndex
+                      className={`flex items-center gap-3 p-4 border border-border rounded-lg cursor-pointer transition-colors hover:bg-gray-50 ${
+                        userAnswers[question.id] === optionIndex
                           ? "border-blue-500 bg-blue-50"
-                          : "border-gray-200"
+                          : "border-border"
                       }`}
                     >
                       <span className="text-right flex-1 font-medium text-gray-700">
@@ -376,13 +318,11 @@ export function QuizLesson({
                       </span>
                       <input
                         type="radio"
-                        name={`question-${currentQuestion.id}`}
+                        name={`question-${question.id}`}
                         value={optionIndex}
-                        checked={
-                          userAnswers[currentQuestion.id] === optionIndex
-                        }
+                        checked={userAnswers[question.id] === optionIndex}
                         onChange={() =>
-                          handleAnswerChange(currentQuestion.id, optionIndex)
+                          handleAnswerChange(question.id, optionIndex)
                         }
                         className="w-4 h-4 text-blue-600"
                       />
@@ -392,57 +332,76 @@ export function QuizLesson({
               )}
 
               {/* Q&A Input */}
-              {currentQuestion.type === "qa" && (
+              {question.type === "qa" && (
                 <div>
                   <input
                     type="text"
-                    value={(userAnswers[currentQuestion.id] as string) || ""}
+                    value={(userAnswers[question.id] as string) || ""}
                     onChange={(e) =>
-                      handleAnswerChange(currentQuestion.id, e.target.value)
+                      handleAnswerChange(question.id, e.target.value)
                     }
                     placeholder="اكتب إجابتك هنا..."
-                    className="w-full p-4 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-right"
+                    className="w-full p-4 border border-border rounded-lg focus:border-blue-500 focus:outline-none text-right"
                   />
                 </div>
               )}
-            </div>
 
-            {/* Navigation Buttons */}
-            <div className="flex justify-between items-center pt-4 border-t">
-              <div className="flex gap-3">
-                {currentQuestionIndex > 0 && (
-                  <Button variant="outline" onClick={handlePreviousQuestion}>
-                    السؤال السابق
-                  </Button>
-                )}
-
-                {currentQuestionIndex < questions.length - 1 ? (
-                  <Button
-                    onClick={handleNextQuestion}
-                    disabled={userAnswers[currentQuestion.id] === undefined}
-                    className="bg-blue-600 hover:bg-blue-700"
+              {/* True/False Options */}
+              {question.type === "tf" && (
+                <div className="space-y-3">
+                  <label
+                    className={`flex items-center gap-3 p-4 border border-border rounded-lg cursor-pointer transition-colors hover:bg-gray-50 ${
+                      userAnswers[question.id] === true
+                        ? "border-green-500 bg-green-50"
+                        : "border-border"
+                    }`}
                   >
-                    السؤال التالي
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleSubmitQuiz}
-                    disabled={
-                      Object.keys(userAnswers).length < questions.length
-                    }
-                    className="bg-green-600 hover:bg-green-700"
+                    <span className="text-right flex-1 font-medium text-green-700">
+                      صحيح ✓
+                    </span>
+                    <input
+                      type="radio"
+                      name={`question-${question.id}`}
+                      value="true"
+                      checked={userAnswers[question.id] === true}
+                      onChange={() => handleAnswerChange(question.id, true)}
+                      className="w-4 h-4 text-green-600"
+                    />
+                  </label>
+                  <label
+                    className={`flex items-center gap-3 p-4 border border-border rounded-lg cursor-pointer transition-colors hover:bg-gray-50 ${
+                      userAnswers[question.id] === false
+                        ? "border-red-500 bg-red-50"
+                        : "border-border"
+                    }`}
                   >
-                    إرسال الاختبار
-                  </Button>
-                )}
-              </div>
-
-              <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
-                {Object.keys(userAnswers).length} / {questions.length} مجاب
-              </div>
+                    <span className="text-right flex-1 font-medium text-red-700">
+                      خطأ ✗
+                    </span>
+                    <input
+                      type="radio"
+                      name={`question-${question.id}`}
+                      value="false"
+                      checked={userAnswers[question.id] === false}
+                      onChange={() => handleAnswerChange(question.id, false)}
+                      className="w-4 h-4 text-red-600"
+                    />
+                  </label>
+                </div>
+              )}
             </div>
-          </div>
-        </Card>
+          </Card>
+        ))}
+
+        {/* Submit Button */}
+        <div className="flex justify-center pt-6 border-t border-border">
+          <Button
+            onClick={handleSubmitQuiz}
+            disabled={answeredCount < questions.length}
+          >
+            إرسال الاختبار ({answeredCount} / {questions.length})
+          </Button>
+        </div>
       </div>
     </div>
   );

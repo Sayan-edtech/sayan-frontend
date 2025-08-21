@@ -1,20 +1,11 @@
-import {
-  Zap,
-  CheckCircle,
-  CreditCard,
-  RotateCcw,
-  ArrowUp,
-  ArrowDown,
-  Shuffle,
-  Code,
-  Eye,
-} from "lucide-react";
+import { Zap, CheckCircle, RotateCcw, Code, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Lesson } from "@/types/lesson";
 import { MobileMenuButton } from "./MobileMenuButton";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 interface InteractiveLessonProps {
   lesson: Lesson;
@@ -174,7 +165,7 @@ export function InteractiveLesson({
   // Determine tool type from lesson (you can modify this based on your lesson structure)
   // For now, we'll use a simple approach - you can extend this based on your lesson model
   const extendedLesson = lesson as ExtendedLesson;
-  const toolType = extendedLesson.toolType || "colored_card"; // Default to colored_card
+  const toolType = extendedLesson.toolType || "timeline"; // Default to colored_card
 
   const renderToolContent = () => {
     switch (toolType) {
@@ -191,7 +182,7 @@ export function InteractiveLesson({
 
   return (
     <div className="bg-white rounded-xl shadow-sm border-0 h-full">
-      <div className="p-4 lg:p-6 border-b">
+      <div className="p-4 lg:p-6 border-b border-border">
         <div className="flex items-center justify-between">
           <MobileMenuButton
             isMobileMenuOpen={isMobileMenuOpen}
@@ -238,8 +229,6 @@ function ColoredCardTool() {
     setCompletedCards(0);
   };
 
-  const progress = (completedCards / cards.length) * 100;
-
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
@@ -263,124 +252,90 @@ function ColoredCardTool() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+      <div className="flex flex-wrap justify-center gap-6">
         {cards.map((card) => (
-          <Card
+          <div
             key={card.id}
-            className="relative h-48 cursor-pointer transition-all duration-500 transform-gpu"
-            style={{ transformStyle: "preserve-3d" }}
+            className="cursor-pointer transition-all duration-500 ease-in-out hover:shadow-xl"
+            style={{
+              width: "300px",
+              minHeight: "400px",
+              transformStyle: "preserve-3d",
+              transform: card.isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+            }}
             onClick={() => handleFlipCard(card.id)}
           >
-            <div
-              className={`absolute inset-0 w-full h-full rounded-lg transition-transform duration-500 ${
-                card.isFlipped ? "rotate-y-180" : ""
-              }`}
+            {/* Front Face */}
+            <Card
+              className="absolute inset-0 w-full h-full border-border overflow-hidden"
               style={{
-                transformStyle: "preserve-3d",
-                transform: card.isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                backgroundColor: card.color,
+                backfaceVisibility: "hidden",
               }}
             >
-              {/* Front Face */}
-              <div
-                className="absolute inset-0 w-full h-full rounded-lg p-6 flex items-center justify-center text-white font-semibold text-lg text-center"
-                style={{
-                  backgroundColor: card.color,
-                  backfaceVisibility: "hidden",
-                }}
-              >
-                <div className="space-y-2">
-                  <CreditCard className="w-8 h-8 mx-auto" />
-                  <p>{card.title}</p>
-                </div>
-              </div>
-
-              {/* Back Face */}
-              <div
-                className="absolute inset-0 w-full h-full rounded-lg p-6 flex items-center justify-center bg-white border-2 text-gray-800 text-center"
-                style={{
-                  transform: "rotateY(180deg)",
-                  backfaceVisibility: "hidden",
-                  borderColor: card.color,
-                }}
-              >
-                <div className="space-y-2">
-                  <h4
-                    className="font-semibold text-lg"
-                    style={{ color: card.color }}
-                  >
+              <div className="p-6 h-full flex flex-col justify-between text-white">
+                <div className="space-y-4 flex-1 flex items-center justify-center">
+                  <h3 className="text-xl font-bold text-center leading-relaxed">
                     {card.title}
-                  </h4>
-                  <p className="text-sm leading-relaxed">{card.content}</p>
+                  </h3>
+                </div>
+                <div className="text-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-transparent border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:scale-105"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFlipCard(card.id);
+                    }}
+                  >
+                    انقر للمزيد
+                  </Button>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+
+            {/* Back Face */}
+            <Card
+              className="absolute inset-0 w-full h-full border-border overflow-hidden"
+              style={{
+                backgroundColor: card.color,
+                transform: "rotateY(180deg)",
+                backfaceVisibility: "hidden",
+              }}
+            >
+              <div className="p-6 h-full flex flex-col justify-between text-white">
+                <div className="space-y-4 flex-1 flex items-center justify-center">
+                  <h3 className="text-xl font-bold text-center leading-relaxed">
+                    {card.content}
+                  </h3>
+                </div>
+                <div className="text-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-transparent border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:scale-105"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFlipCard(card.id);
+                    }}
+                  >
+                    العودة للعنوان
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
         ))}
       </div>
-
-      {progress === 100 && (
-        <div className="text-center p-6 bg-green-50 rounded-lg border border-green-200">
-          <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-2" />
-          <h4 className="text-lg font-semibold text-green-800 mb-1">
-            أحسنت! تم إكمال جميع البطاقات
-          </h4>
-          <p className="text-green-600">لقد استكشفت جميع عناصر HTML الأساسية</p>
-        </div>
-      )}
     </div>
   );
 }
 
 // Timeline Interactive Tool
 function TimelineTool() {
-  const [cards, setCards] = useState<TimelineCardType[]>(
-    mockToolData.timeline.cards
-  );
-  const [isCompleted, setIsCompleted] = useState(false);
-
-  const moveCard = (cardId: number, direction: "up" | "down") => {
-    setCards((prev) => {
-      const cardIndex = prev.findIndex((c) => c.id === cardId);
-      if (cardIndex === -1) return prev;
-
-      const newCards = [...prev];
-      const targetIndex = direction === "up" ? cardIndex - 1 : cardIndex + 1;
-
-      if (targetIndex >= 0 && targetIndex < newCards.length) {
-        [newCards[cardIndex], newCards[targetIndex]] = [
-          newCards[targetIndex],
-          newCards[cardIndex],
-        ];
-      }
-
-      return newCards;
-    });
-  };
-
-  const shuffleCards = () => {
-    setCards((prev) => {
-      const shuffled = [...prev];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      return shuffled;
-    });
-    setIsCompleted(false);
-  };
-
-  const checkOrder = () => {
-    const isCorrect = cards.every((card, index) => {
-      const expectedOrder = index + 1;
-      return card.order === expectedOrder;
-    });
-    setIsCompleted(isCorrect);
-  };
-
-  const resetOrder = () => {
-    setCards(mockToolData.timeline.cards);
-    setIsCompleted(false);
-  };
+  const [cards] = useState<TimelineCardType[]>(mockToolData.timeline.cards);
+  const [selectedTimelineItem, setSelectedTimelineItem] = useState<number>(0);
 
   return (
     <div className="space-y-6">
@@ -388,93 +343,122 @@ function TimelineTool() {
         <h3 className="text-xl font-semibold text-gray-900">
           {mockToolData.timeline.title}
         </h3>
-        <p className="text-gray-600">رتب البطاقات في الترتيب الصحيح</p>
-        <div className="flex items-center justify-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={shuffleCards}
-            className="flex items-center gap-2"
-          >
-            <Shuffle className="w-4 h-4" />
-            خلط البطاقات
-          </Button>
-          <Button
-            size="sm"
-            onClick={checkOrder}
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
-          >
-            <CheckCircle className="w-4 h-4" />
-            فحص الترتيب
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={resetOrder}
-            className="flex items-center gap-2"
-          >
-            <RotateCcw className="w-4 h-4" />
-            إعادة تعيين
-          </Button>
-        </div>
+        <p className="text-gray-600">اضغط على العناصر لرؤية التفاصيل</p>
       </div>
 
-      <div className="space-y-3">
-        {cards.map((card, index) => (
-          <Card
-            key={card.id}
-            className="p-4 border-l-4 hover:shadow-md transition-shadow"
-            style={{ borderLeftColor: card.color }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                    style={{ backgroundColor: card.color }}
-                  >
-                    {index + 1}
-                  </div>
-                  <h4 className="font-semibold text-gray-900">{card.name}</h4>
-                </div>
-                <p className="text-gray-600 text-sm mr-11">{card.content}</p>
-              </div>
-              <div className="flex flex-col gap-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => moveCard(card.id, "up")}
-                  disabled={index === 0}
-                  className="px-2 py-1"
-                >
-                  <ArrowUp className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => moveCard(card.id, "down")}
-                  disabled={index === cards.length - 1}
-                  className="px-2 py-1"
-                >
-                  <ArrowDown className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+      <motion.div
+        className="py-10 px-5 flex gap-10 max-w-6xl mx-auto"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        {/* Timeline List */}
+        <div className="w-72 relative pr-4 before:content-[''] before:absolute before:right-0 before:top-0 before:w-0.5 before:h-full before:bg-gradient-to-b before:from-gray-300/20 before:via-gray-600/60 before:to-gray-300/20">
+          {cards?.map((card, index) => (
+            <motion.div
+              key={index}
+              className={`p-4 px-6 my-2 cursor-pointer relative transition-all duration-300 ease-in-out rounded-lg hover:shadow-md ${
+                selectedTimelineItem === index ? "shadow-lg" : ""
+              }`}
+              style={{
+                backgroundColor:
+                  selectedTimelineItem === index
+                    ? `${card.color}15`
+                    : selectedTimelineItem === index
+                    ? `${card.color}10`
+                    : "transparent",
+              }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              onClick={() => setSelectedTimelineItem(index)}
+            >
+              {/* Timeline Dot */}
+              <div
+                className={`absolute -right-6 top-1/2 w-4 h-4 rounded-full transform -translate-y-1/2 transition-all duration-300 ease-in-out border-2 border-white shadow-md ${
+                  selectedTimelineItem === index ? "" : "bg-gray-400"
+                }`}
+                style={{
+                  backgroundColor:
+                    selectedTimelineItem === index ? card.color : undefined,
+                }}
+              />
 
-      {isCompleted && (
-        <div className="text-center p-6 bg-green-50 rounded-lg border border-green-200">
-          <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-2" />
-          <h4 className="text-lg font-semibold text-green-800 mb-1">
-            ممتاز! الترتيب صحيح
-          </h4>
-          <p className="text-green-600">
-            لقد رتبت خطوات إنشاء موقع الويب بشكل صحيح
-          </p>
+              {/* Active indicator line */}
+              {selectedTimelineItem === index && (
+                <div
+                  className="absolute -right-4 top-1/2 w-4 h-0.5 transform -translate-y-1/2"
+                  style={{ backgroundColor: card.color }}
+                />
+              )}
+
+              {/* Timeline Title */}
+              <div
+                className={`text-base transition-colors duration-300 ease-in-out ${
+                  selectedTimelineItem === index
+                    ? "font-semibold"
+                    : "text-gray-500"
+                }`}
+                style={{
+                  color:
+                    selectedTimelineItem === index ? card.color : undefined,
+                }}
+              >
+                {card.name}
+              </div>
+            </motion.div>
+          ))}
         </div>
-      )}
+
+        {/* Timeline Details */}
+        <motion.div
+          className={`flex-1 transition-all duration-300 ease-in-out ${
+            selectedTimelineItem !== null
+              ? "opacity-100 translate-x-0"
+              : "opacity-0 translate-x-5"
+          }`}
+          initial={false}
+          animate={{
+            opacity: selectedTimelineItem !== null ? 1 : 0,
+            x: selectedTimelineItem !== null ? 0 : 20,
+          }}
+          transition={{ duration: 0.3 }}
+        >
+          {selectedTimelineItem !== null && (
+            <motion.div
+              className="bg-white rounded-2xl p-6 shadow-lg border-t-4"
+              style={{ borderTopColor: cards[selectedTimelineItem].color }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Card Year/Order */}
+              <div
+                className="text-lg font-medium mb-4 w-8 h-8 element-center rounded-full"
+                style={{
+                  color: cards[selectedTimelineItem].color,
+                  background: `${cards[selectedTimelineItem].color}15`,
+                }}
+              >
+                {cards[selectedTimelineItem].order}
+              </div>
+
+              {/* Card Title */}
+              <div
+                className="text-xl font-medium mb-2"
+                style={{ color: cards[selectedTimelineItem].color }}
+              >
+                {cards[selectedTimelineItem].name}
+              </div>
+
+              {/* Card Description */}
+              <div className="text-base text-gray-500 leading-relaxed">
+                {cards[selectedTimelineItem].content}
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

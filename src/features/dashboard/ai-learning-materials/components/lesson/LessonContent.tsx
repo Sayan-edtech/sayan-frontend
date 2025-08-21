@@ -3,6 +3,7 @@ import { VideoLesson } from "./VideoLesson";
 import { QuizLesson } from "./QuizLesson";
 import { InteractiveLesson } from "./InteractiveLesson";
 import { EmptyLessonState } from "./EmptyLessonState";
+import Exam from "@/features/dashboard/courses/components/couse-content/manage/Exam";
 
 interface LessonContentProps {
   activeLessonId: string | null;
@@ -44,11 +45,12 @@ export function LessonContent({
 
     case "quiz":
       return (
-        <QuizLesson
-          lesson={activeLesson}
-          isMobileMenuOpen={isMobileMenuOpen}
-          setIsMobileMenuOpen={setIsMobileMenuOpen}
-        />
+        // <QuizLesson
+        //   lesson={activeLesson}
+        //   isMobileMenuOpen={isMobileMenuOpen}
+        //   setIsMobileMenuOpen={setIsMobileMenuOpen}
+        // />
+        <Exam />
       );
 
     case "interactive":
