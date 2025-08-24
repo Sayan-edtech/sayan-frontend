@@ -61,10 +61,7 @@ function Footer() {
           </p>
           <div className="flex gap-2 md:gap-4 flex-wrap justify-center">
             <Link to="/terms" target="_blank" className={linkStyles}>
-              الشروط والأحكام
-            </Link>
-            <Link to="/privacy" target="_blank" className={linkStyles}>
-              سياسة الخصوصية
+              الشروط والاحكام
             </Link>
             <Link to="/updates" target="_blank" className={linkStyles}>
               تحديثات المنصة
