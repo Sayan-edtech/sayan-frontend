@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,13 +9,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, Settings, LogOut, HelpCircle, ShoppingCart, Eye } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { User, Settings, LogOut, HelpCircle, ShoppingCart, Eye, CreditCard } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Routes } from "@/constants/enums";
 import { NotificationsDropdown } from "./NotificationsDropdown";
+import { LiveStreamDropdown } from "./LiveStreamDropdown";
 import { AddItemModal } from "./AddItemModal";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function UserMenu() {
+  const { lang, t } = useLanguage();
   const location = useLocation();
   
   const handleSignOut = () => {
@@ -28,7 +39,7 @@ export function UserMenu() {
 
   return (
     <div className="flex items-center gap-2">
-      <DropdownMenu dir="rtl">
+      <DropdownMenu dir={lang === 'ar' ? 'rtl' : 'ltr'}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-8 w-8">
@@ -37,7 +48,7 @@ export function UserMenu() {
                 alt="User"
               />
               <AvatarFallback className="bg-green-100 text-green-700 text-sm">
-                ك
+                {lang === 'ar' ? 'ك' : 'K'}
               </AvatarFallback>
             </Avatar>
           </Button>
@@ -59,18 +70,18 @@ export function UserMenu() {
           <DropdownMenuItem asChild>
             <Link to={Routes.DASHBOARD_PROFILE} className="cursor-pointer">
               <User className="mr-2 h-4 w-4" />
-              <span>الملف الشخصي</span>
+              <span>{t('user.profile')}</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link to={Routes.DASHBOARD_SETTINGS} className="cursor-pointer">
               <Settings className="mr-2 h-4 w-4" />
-              <span>الإعدادات</span>
+              <span>{t('user.settings')}</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
             <HelpCircle className="mr-2 h-4 w-4" />
-            <span>المساعدة والدعم</span>
+            <span>{t('user.help')}</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -78,7 +89,7 @@ export function UserMenu() {
             onClick={handleSignOut}
           >
             <LogOut className="mr-2 h-4 w-4" />
-            <span>تسجيل الخروج</span>
+            <span>{t('user.logout')}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -93,11 +104,23 @@ export function UserMenu() {
       {/* زر العين - ينقل لصفحة الأكاديمية ويظهر فقط في صفحة الأكاديمية */}
       {isAcademyPage && (
         <Link to="/template/preview">
-          <Button variant="ghost" size="sm" className="relative" title="معاينة الأكاديمية">
+          <Button variant="ghost" size="sm" className="relative" title={t('user.preview')}>
             <Eye className="w-5 h-5" />
           </Button>
         </Link>
       )}
+      
+      {/* زر باقات الاشتراك - يظهر فقط في صفحة الأكاديمية */}
+      {isAcademyPage && (
+        <Link to="/dashboard/subscription-packages">
+          <Button variant="ghost" size="sm" className="relative" title="باقات الاشتراك">
+            <CreditCard className="w-5 h-5" />
+          </Button>
+        </Link>
+      )}
+      
+      {/* زر البث المباشر - يظهر فقط في صفحة الأكاديمية */}
+      {isAcademyPage && <LiveStreamDropdown />}
       
       {/* زر الإضافة - يظهر في صفحات الأكاديمية */}
       {isAcademyPage && <AddItemModal />}

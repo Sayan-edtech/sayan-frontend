@@ -10,7 +10,7 @@ import { LoadingButton } from "@/components/shared/Loader";
 import { toast } from "sonner";
 import { UserType } from "@/constants/enums";
 import { useAuth } from "@/features/auth/hooks/useAuthStore";
-import { useAuthStore } from "../store";
+import { useAuthStore } from "@/features/auth/store";
 import useFormFields from "../hooks/useFormFields";
 import useFormValidations from "../hooks/useFormValidations";
 

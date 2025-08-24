@@ -27,7 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MoreHorizontal, Eye, Edit, Trash2, Calendar, Clock, Users } from "lucide-react";
-import { SessionAppointment } from "@/types/session";
+import type { SessionAppointment } from "@/types/session";
 
 interface AppointmentTableProps {
   appointments: SessionAppointment[];

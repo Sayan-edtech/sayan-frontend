@@ -3,9 +3,11 @@ import DashboardSidebar from "@/components/shared/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/shared/dashboard/DashboardHeader";
 import { useState } from "react";
 import { UserType } from "@/constants/enums";
-import { useUser } from "@/templates/template-one/features/auth/store";
+import { useUser } from "@/features/auth/store";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 function DashboardLayout() {
+  const { lang } = useLanguage();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const user = useUser();
@@ -20,7 +22,7 @@ function DashboardLayout() {
   console.log("DashboardLayout userType:", userType);
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <DashboardSidebar 
         userType={userType}
         isCollapsed={isCollapsed}

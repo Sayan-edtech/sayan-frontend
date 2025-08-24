@@ -32,12 +32,13 @@ export const courseSchema = z.object({
 
   image: z
     .any()
+    .optional()
     .refine(
       (file) => {
-        if (!file) return false;
+        if (!file) return true; // Make image optional
         return file instanceof File;
       },
-      { message: "صورة المادة مطلوبة" }
+      { message: "صورة المادة غير صحيحة" }
     )
     .refine(
       (file) => {
@@ -64,31 +65,11 @@ export const courseSchema = z.object({
     .any()
     .refine(
       (file) => {
-        if (!file) return false;
+        if (!file) return false; // Video is required
         return file instanceof File;
       },
       { message: "فيديو المادة مطلوب" }
     )
-    .refine(
-      (file) => {
-        if (!file) return true;
-        return file.size <= 100 * 1024 * 1024; // 100MB max
-      },
-      { message: "حجم الفيديو يجب أن يكون أقل من 100 ميجابايت" }
-    )
-    .refine(
-      (file) => {
-        if (!file) return true;
-        const allowedTypes = [
-          "video/mp4",
-          "video/avi",
-          "video/mov",
-          "video/wmv",
-        ];
-        return allowedTypes.includes(file.type);
-      },
-      { message: "نوع الفيديو يجب أن يكون MP4 أو AVI أو MOV أو WMV" }
-    ),
 });
 
 export type ICourseForm = z.infer<typeof courseSchema>;

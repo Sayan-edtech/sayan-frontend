@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { ShoppingCart, Heart, Share2, ChevronUp, BookOpen, Play, Clock, Award, MessageSquare } from "lucide-react";
+import { ShoppingCart, Heart, Share2, ChevronUp, BookOpen, Play, Clock, Award, MessageSquare, Calendar, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Course {
   price: number;
   insteadOf?: number;
+  sessionsCount?: number;
+  level?: string;
+  deliveryType?: "live-online" | "in-person" | "recorded-online";
+  location?: string;
 }
 
 interface MobileFloatingSectionProps {
@@ -44,14 +48,33 @@ export default function MobileFloatingSection({ courseData }: MobileFloatingSect
               {/* Course Features */}
               <div className="bg-white rounded-lg p-4 border border-gray-200">
                 <h3 className="font-bold text-sm mb-3 text-gray-900">معلومات الدورة</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { icon: BookOpen, label: "مستوى مبتدئ" },
-                    { icon: Play, label: "3 دروس تعليمية" },
-                    { icon: Clock, label: "مشاهدة في أي وقت" },
-                    { icon: Award, label: "شهادة حضور" },
-                    { icon: MessageSquare, label: "معززة بالذكاء الاصطناعي" }
-                  ].map((feature, index) => (
+                <div className="grid grid-cols-1 gap-2">
+                  {(() => {
+                    if (courseData.deliveryType === "in-person") {
+                      return [
+                        { icon: MapPin, label: courseData.location || "مقر الأكاديمية" },
+                        { icon: Calendar, label: "تاريخ البداية: 15 فبراير 2024" },
+                        { icon: Users, label: "دورة حضورية في مقر الأكاديمية" },
+                        { icon: MapPin, label: "8 مقعد متبقي" },
+                        { icon: BookOpen, label: `مستوى ${courseData.level || 'متقدم'}` },
+                        { icon: Calendar, label: `${courseData.sessionsCount || 12} جلسة تدريبية` },
+                        { icon: Clock, label: "حضور مباشر مع التفاعل الكامل" },
+                        { icon: Award, label: "شهادة حضور معتمدة" }
+                      ];
+                    } else {
+                      // Live online course features
+                      return [
+                        { icon: Calendar, label: "تاريخ البداية: 15 فبراير 2024" },
+                        { icon: Play, label: "مادة تعليمية مباشرة أون لاين" },
+                        { icon: MapPin, label: "8 مقعد متبقي" },
+                        { icon: BookOpen, label: `مستوى ${courseData.level || 'متقدم'}` },
+                        { icon: Calendar, label: `${courseData.sessionsCount || 12} جلسة مباشرة` },
+                        { icon: Clock, label: "تسجل لاحقا ويمكنك متابعتها في اي وقت" },
+                        { icon: Award, label: "شهادة حضور" },
+                        { icon: MessageSquare, label: "معززة بالذكاء الاصطناعي" }
+                      ];
+                    }
+                  })().map((feature, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <div className="p-1 bg-blue-50 rounded">
                         <feature.icon className="w-3 h-3 text-blue-600" />
@@ -85,7 +108,7 @@ export default function MobileFloatingSection({ courseData }: MobileFloatingSect
               {/* Subscribe Button - Main Action */}
               <Button size="sm" className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 px-4 py-2 text-sm font-semibold">
                 <ShoppingCart className="w-4 h-4 ml-1" />
-                اشترك الآن
+                احجز مقعدك الآن
               </Button>
 
               {/* Favorite Button */}

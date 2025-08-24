@@ -1,4 +1,4 @@
-import { Plus, Users } from "lucide-react";
+import { Plus, Users, MapPin, Video } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import CourseTable from "@/features/courses/components/CourseTable";
 import CourseStats from "@/features/courses/components/CourseStats";
@@ -102,13 +102,29 @@ function AcademyCourses() {
         icon={Users}
         title="الدورات التدريبية"
         actions={
-          <Link
-            to={`${Routes.DASHBOARD}/${Pages.COURSES}/${Pages.NEW}`}
-            className={buttonVariants()}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            إضافة دورة جديدة
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              to={`${Routes.DASHBOARD}/${Pages.COURSES}/${Pages.NEW}`}
+              className={buttonVariants()}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              إضافة دورة جديدة
+            </Link>
+            <Link
+              to={`${Routes.DASHBOARD}/physical-courses/new`}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <MapPin className="w-4 h-4 mr-2" />
+              الدورات الحضورية
+            </Link>
+            <Link
+              to={`${Routes.DASHBOARD}/live-courses/new`}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <Video className="w-4 h-4 mr-2" />
+              الدورات المباشرة
+            </Link>
+          </div>
         }
       />
       <CourseStats courses={filteredCourses} />

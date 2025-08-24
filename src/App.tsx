@@ -1,7 +1,7 @@
 import { RouterProvider } from "react-router-dom";
 import { Toaster } from "sonner";
 import { ReactQueryProvider } from "@/lib/react-query";
-import { router } from "./routes/AppRoutes";
+import { router } from "@/routes/AppRoutes";
 
 function App() {
   return (

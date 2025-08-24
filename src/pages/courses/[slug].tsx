@@ -31,7 +31,7 @@ export default function CourseDetails() {
     category: "تصميم",
     slug: "ui-ux",
     insteadOf: 699,
-    level: "من المبتدئ إلى المتقدم",
+    level: "متقدم",
     learningPoints: [
       "أساسيات تصميم واجهات المستخدم",
       "مبادئ تجربة المستخدم",

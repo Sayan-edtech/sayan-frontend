@@ -10,13 +10,18 @@ import {
   Trash2,
   MessageSquare,
   BookOpen,
-  Code2
+  Code2,
+  RadioIcon as Radio,
+  Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface LearningMaterial {
   id: string;
@@ -32,6 +37,89 @@ interface LearningMaterial {
   chatMessages: number;
   fileSize: string;
 }
+
+// إضافة واجهة جديدة للمواد الحضورية
+interface PhysicalAttendanceMaterial {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  duration: string;
+  location: string;
+  instructor: string;
+  maxAttendees: number;
+  currentAttendees: number;
+  price: number;
+  isSubscribed: boolean;
+  ticketGenerated: boolean;
+  ticketUrl?: string;
+  qrCode?: string;
+  status: 'upcoming' | 'ongoing' | 'completed';
+  requirements: string[];
+  materials: string[];
+}
+
+// إضافة مواد حضورية تجريبية
+const physicalMaterials: PhysicalAttendanceMaterial[] = [
+  {
+    id: "phys-001",
+    title: "ورشة تطوير تطبيقات الويب المتقدمة",
+    description: "ورشة عملية مكثفة لتطوير تطبيقات ويب متقدمة باستخدام React وNode.js مع تطبيقات عملية",
+    date: "2024-02-15",
+    time: "09:00",
+    duration: "6 ساعات",
+    location: "مقر الأكاديمية - قاعة التطوير المتقدم",
+    instructor: "الأستاذ أحمد محمد",
+    maxAttendees: 25,
+    currentAttendees: 18,
+    price: 299,
+    isSubscribed: false,
+    ticketGenerated: false,
+    status: 'upcoming',
+    requirements: ["لابتوب شخصي", "معرفة أساسية بـ JavaScript", "Node.js مثبت"],
+    materials: ["دليل الورشة PDF", "الكود المصدري", "شهادة حضور"]
+  },
+  {
+    id: "phys-002", 
+    title: "دورة الذكاء الاصطناعي التطبيقي",
+    description: "دورة مكثفة لتعلم تطبيقات الذكاء الاصطناعي في الواقع العملي مع مشاريع حقيقية",
+    date: "2024-02-20",
+    time: "14:00",
+    duration: "8 ساعات",
+    location: "مقر الأكاديمية - مختبر الذكاء الاصطناعي",
+    instructor: "الدكتورة سارة أحمد",
+    maxAttendees: 20,
+    currentAttendees: 12,
+    price: 399,
+    isSubscribed: true,
+    ticketGenerated: true,
+    ticketUrl: "/tickets/ai-workshop-ticket-001.pdf",
+    qrCode: "qr-code-001",
+    status: 'upcoming',
+    requirements: ["لابتوب شخصي", "Python مثبت", "معرفة أساسية بالبرمجة"],
+    materials: ["دليل الدورة PDF", "ملفات البيانات", "شهادة حضور معتمدة"]
+  }
+  ,
+  {
+    id: "phys-003",
+    title: "محاضرة الأمن السيبراني للحضور",
+    description: "محاضرة حضورية تفاعلية تغطي أساسيات الأمن السيبراني وطرق الحماية العملية",
+    date: "2024-03-01",
+    time: "18:00",
+    duration: "3 ساعات",
+    location: "مقر الأكاديمية - القاعة الرئيسية",
+    instructor: "المهندس خالد علي",
+    maxAttendees: 50,
+    currentAttendees: 0,
+    price: 199,
+    isSubscribed: false,
+    ticketGenerated: false,
+    status: 'upcoming',
+    requirements: ["كمبيوتر محمول (اختياري)", "معرفة أساسية بالشبكات"],
+    materials: ["عرض تقديمي PDF", "روابط أدوات مجانية", "شهادة حضور"]
+  }
+];
 
 const mockMaterials: LearningMaterial[] = [
   {
@@ -285,12 +373,158 @@ function MaterialItem({ material, onDelete }: {
   );
 }
 
+// مكون بطاقة المادة الحضورية
+function PhysicalMaterialCard({ 
+  material, 
+  onSubscribe, 
+  onGenerateTicket, 
+  onDownloadTicket 
+}: { 
+  material: PhysicalAttendanceMaterial;
+  onSubscribe: (id: string) => void;
+  onGenerateTicket: (id: string) => void;
+  onDownloadTicket: (id: string) => void;
+}) {
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'upcoming':
+        return <Badge className="bg-blue-100 text-blue-800 font-noto">قادم</Badge>;
+      case 'ongoing':
+        return <Badge className="bg-green-100 text-green-800 font-noto">جاري الآن</Badge>;
+      case 'completed':
+        return <Badge className="bg-gray-100 text-gray-800 font-noto">مكتمل</Badge>;
+      default:
+        return <Badge className="bg-gray-100 text-gray-800 font-noto">غير معروف</Badge>;
+    }
+  };
+
+  const isFull = material.currentAttendees >= material.maxAttendees;
+  const availableSpots = material.maxAttendees - material.currentAttendees;
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-sm border-0">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2 font-noto">{material.title}</h3>
+          <p className="text-sm text-gray-600 mb-3 font-noto">{material.description}</p>
+          <div className="flex items-center gap-2 mb-2">
+            {getStatusBadge(material.status)}
+            <Badge variant="outline" className="text-xs font-noto">
+              {material.duration}
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      {/* تفاصيل المادة */}
+      <div className="space-y-3 mb-4">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Clock className="w-4 h-4" />
+          <span className="font-noto">{material.date} في {material.time}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="w-4 h-4" />
+          <span className="font-noto">{material.location}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="w-4 h-4" />
+          <span className="font-noto">المدرب: {material.instructor}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="w-4 h-4" />
+          <span className="font-noto">
+            الحضور: {material.currentAttendees}/{material.maxAttendees}
+            {isFull && <span className="text-red-600 mr-1">(مكتمل)</span>}
+          </span>
+        </div>
+      </div>
+
+      {/* المتطلبات والمواد */}
+      <div className="mb-4">
+        <h4 className="text-sm font-medium text-gray-900 mb-2 font-noto">المتطلبات:</h4>
+        <ul className="text-sm text-gray-600 space-y-1">
+          {material.requirements.map((req, index) => (
+            <li key={index} className="font-noto">• {req}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mb-4">
+        <h4 className="text-sm font-medium text-gray-900 mb-2 font-noto">المحتويات:</h4>
+        <ul className="text-sm text-gray-600 space-y-1">
+          {material.materials.map((item, index) => (
+            <li key={index} className="font-noto">• {item}</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* السعر والأزرار */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-2xl font-bold text-gray-900">
+          {material.price} <span className="text-sm font-normal text-gray-600">ريال</span>
+        </div>
+        <div className="text-sm text-gray-600">
+          {availableSpots} مقاعد متاحة
+        </div>
+      </div>
+
+      {/* الأزرار */}
+      <div className="flex items-center gap-2">
+        {!material.isSubscribed ? (
+          <Button 
+            size="sm" 
+            className="font-noto"
+            onClick={() => onSubscribe(material.id)}
+            disabled={isFull}
+          >
+            اشترك الآن
+          </Button>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Badge className="bg-green-100 text-green-800 font-noto">
+              مشترك
+            </Badge>
+            {!material.ticketGenerated ? (
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => onGenerateTicket(material.id)}
+                className="font-noto"
+              >
+                إنشاء تذكرة
+              </Button>
+            ) : (
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => onDownloadTicket(material.id)}
+                className="font-noto"
+              >
+                تحميل التذكرة
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function AILearningMaterials() {
   const [materials, setMaterials] = useState<LearningMaterial[]>(mockMaterials);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [physicalList, setPhysicalList] = useState<PhysicalAttendanceMaterial[]>(physicalMaterials);
+  const [isSubscribeDialogOpen, setIsSubscribeDialogOpen] = useState(false);
+  const [selectedPhysicalId, setSelectedPhysicalId] = useState<string | null>(null);
+  const [studentForm, setStudentForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    notes: "",
+  });
 
   // فلترة المواد
   const filteredMaterials = materials.filter(material => {
@@ -368,6 +602,91 @@ function AILearningMaterials() {
     }
   };
 
+  // فتح نموذج الاشتراك
+  const openSubscribeDialog = (id: string) => {
+    setSelectedPhysicalId(id);
+    setIsSubscribeDialogOpen(true);
+  };
+
+  // تحديث نموذج الطالب
+  const updateStudentField = (field: keyof typeof studentForm, value: string) => {
+    setStudentForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  // تأكيد الاشتراك بعد تعبئة البيانات
+  const submitSubscription = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPhysicalId) return;
+    if (!studentForm.fullName.trim() || !studentForm.email.trim() || !studentForm.phone.trim()) {
+      alert('يرجى تعبئة الاسم والبريد والهاتف');
+      return;
+    }
+    handleSubscribe(selectedPhysicalId);
+    setIsSubscribeDialogOpen(false);
+    setStudentForm({ fullName: "", email: "", phone: "", notes: "" });
+    alert('تم الاشتراك بنجاح! يمكنك الآن إنشاء/تحميل التذكرة.');
+  };
+
+  // اشتراك في مادة حضورية
+  const handleSubscribe = (id: string) => {
+    setPhysicalList(prev => prev.map(m => {
+      if (m.id !== id) return m;
+      const isFull = m.currentAttendees >= m.maxAttendees;
+      if (isFull || m.isSubscribed) return m;
+      return {
+        ...m,
+        isSubscribed: true,
+        currentAttendees: Math.min(m.currentAttendees + 1, m.maxAttendees)
+      };
+    }));
+  };
+
+  // إنشاء تذكرة حضور (ملف نصي بسيط يحتوي تفاصيل التذكرة)
+  const handleGenerateTicket = (id: string) => {
+    setPhysicalList(prev => prev.map(m => {
+      if (m.id !== id) return m;
+      const ticketNumber = `${id}-${Date.now()}`;
+      const content = `تذكرة حضور\n\nالعنوان: ${m.title}\nالتاريخ: ${m.date} ${m.time}\nالموقع: ${m.location}\nالمدرب: ${m.instructor}\nرقم التذكرة: ${ticketNumber}\n\nيرجى إظهار هذه التذكرة عند الدخول.`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      return {
+        ...m,
+        ticketGenerated: true,
+        ticketUrl: url
+      };
+    }));
+  };
+
+  // تنزيل التذكرة
+  const handleDownloadTicket = (id: string) => {
+    const material = physicalList.find(m => m.id === id);
+    if (!material) return;
+    if (!material.ticketGenerated || !material.ticketUrl) {
+      // أنشئ التذكرة محلياً ثم قم بالتنزيل مباشرة باستخدام الرابط المحلي
+      const ticketNumber = `${id}-${Date.now()}`;
+      const content = `تذكرة حضور\n\nالعنوان: ${material.title}\nالتاريخ: ${material.date} ${material.time}\nالموقع: ${material.location}\nالمدرب: ${material.instructor}\nرقم التذكرة: ${ticketNumber}\n\nيرجى إظهار هذه التذكرة عند الدخول.`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      setPhysicalList(prev => prev.map(m => m.id === id ? { ...m, ticketGenerated: true, ticketUrl: url } : m));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ticket-${id}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      return;
+    }
+
+    const a = document.createElement('a');
+    a.href = material.ticketUrl;
+    a.download = `ticket-${id}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(material.ticketUrl!), 2000);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header البسيط */}
@@ -409,10 +728,22 @@ function AILearningMaterials() {
               إنشاء تحدي
             </Button>
           </Link>
+          <Link to="/dashboard/ai-learning-materials/live-stream/new">
+            <Button variant="outline" className="font-noto">
+              <Radio className="w-4 h-4 mr-2" />
+              بث مباشر
+            </Button>
+          </Link>
           <Link to="/dashboard/ai-learning-materials/add">
             <Button className="font-noto">
               <Plus className="w-4 h-4 mr-2" />
               إضافة مادة
+            </Button>
+          </Link>
+          <Link to="/dashboard/physical-courses/new">
+            <Button variant="outline" className="font-noto">
+              <Calendar className="w-4 h-4 mr-2" />
+              إنشاء دورة حضورية
             </Button>
           </Link>
         </div>
@@ -428,6 +759,143 @@ function AILearningMaterials() {
         selectedStatus={selectedStatus}
         setSelectedStatus={setSelectedStatus}
       />
+
+      {/* المواد الحضورية */}
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Clock className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-semibold text-gray-900 font-noto">المواد الحضورية</h3>
+          </div>
+        </div>
+        {physicalList.length === 0 ? (
+          <p className="text-sm text-gray-600 font-noto">لا توجد مواد حضورية حالياً.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {physicalList.map((m) => (
+              <PhysicalMaterialCard
+                key={m.id}
+                material={m}
+                onSubscribe={openSubscribeDialog}
+                onGenerateTicket={handleGenerateTicket}
+                onDownloadTicket={handleDownloadTicket}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* مودال اشتراك الطالب */}
+      <Dialog open={isSubscribeDialogOpen} onOpenChange={setIsSubscribeDialogOpen}>
+        <DialogContent className="sm:max-w-xl border-0 rounded-2xl shadow-xl" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="font-noto text-xl">تأكيد الاشتراك في المادة الحضورية</DialogTitle>
+            <DialogDescription className="font-noto">يرجى تعبئة بياناتك لإتمام الاشتراك.</DialogDescription>
+          </DialogHeader>
+          {/* معلومات المادة المحددة */}
+          {selectedPhysicalId && (
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              {(() => {
+                const mat = physicalList.find(m => m.id === selectedPhysicalId);
+                if (!mat) return null;
+                return (
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div>
+                      <h4 className="text-base font-semibold text-gray-900 font-noto">{mat.title}</h4>
+                      <p className="text-sm text-gray-600 font-noto mt-1">{mat.location}</p>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        <span className="font-noto">{mat.date} • {mat.time}</span>
+                      </div>
+                      <div className="hidden md:block w-px h-4 bg-gray-200" />
+                      <span className="font-noto">المدرب: {mat.instructor}</span>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+          <form onSubmit={submitSubscription} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="font-noto">الاسم الكامل</Label>
+                <Input id="fullName" value={studentForm.fullName} onChange={(e) => updateStudentField('fullName', e.target.value)} required className="font-noto" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="font-noto">رقم الجوال</Label>
+                <Input id="phone" value={studentForm.phone} onChange={(e) => updateStudentField('phone', e.target.value)} required className="font-noto" />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="email" className="font-noto">البريد الإلكتروني</Label>
+                <Input id="email" type="email" value={studentForm.email} onChange={(e) => updateStudentField('email', e.target.value)} required className="font-noto" />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="notes" className="font-noto">ملاحظات (اختياري)</Label>
+                <Textarea id="notes" rows={3} value={studentForm.notes} onChange={(e) => updateStudentField('notes', e.target.value)} className="font-noto" />
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => setIsSubscribeDialogOpen(false)} className="font-noto">إلغاء</Button>
+              <Button type="submit" className="font-noto">تأكيد الاشتراك</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* البثوث المباشرة النشطة */}
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-red-200">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+              <h3 className="text-lg font-semibold text-gray-900 font-noto">البثوث المباشرة النشطة</h3>
+            </div>
+            <Badge variant="secondary" className="bg-red-100 text-red-700">
+              مباشر
+            </Badge>
+          </div>
+          <Link to="/dashboard/ai-learning-materials/live-stream/new">
+            <Button size="sm" className="bg-red-600 hover:bg-red-700 font-noto">
+              <Radio className="w-4 h-4 mr-2" />
+              بدء بث جديد
+            </Button>
+          </Link>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* بث تجريبي نشط */}
+          <Link to="/dashboard/ai-learning-materials/live-stream/demo">
+            <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium text-red-600 font-noto">مباشر الآن</span>
+                <Badge variant="outline" className="text-xs">
+                  25 مشاهد
+                </Badge>
+              </div>
+              <h4 className="font-medium text-gray-900 mb-1 font-noto">ورشة تطوير التطبيقات</h4>
+              <p className="text-sm text-gray-600 font-noto">مع الأستاذ أحمد محمد</p>
+              <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                <Clock className="w-3 h-3" />
+                <span>بدأ منذ 15 دقيقة</span>
+              </div>
+            </div>
+          </Link>
+          
+          {/* إضافة المزيد من البثوث هنا */}
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center text-center">
+            <Radio className="w-8 h-8 text-gray-400 mb-2" />
+            <p className="text-sm text-gray-500 font-noto">لا توجد بثوث أخرى نشطة</p>
+            <Button size="sm" variant="outline" className="mt-2 font-noto" asChild>
+              <Link to="/dashboard/ai-learning-materials/live-stream/new">
+                بدء بث جديد
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {/* قائمة المواد */}
       {filteredMaterials.length === 0 ? (

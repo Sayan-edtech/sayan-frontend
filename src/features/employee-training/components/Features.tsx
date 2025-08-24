@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import { Settings, BarChart3, Shield, Zap, CheckCircle, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Settings, BarChart3, Shield, Zap, CheckCircle } from "lucide-react";
 
 function Features() {
   const features = [
@@ -12,6 +11,16 @@ function Features() {
         "إدارة المستخدمين والصلاحيات", 
         "تتبع التقدم في الوقت الفعلي",
         "تقارير شاملة ومخصصة"
+      ]
+    },
+    {
+      icon: BarChart3,
+      title: "تحليلات متقدمة",
+      description: "احصائيات دقيقة لقياس فعالية التدريب وتحسين النتائج",
+      benefits: [
+        "مؤشرات أداء رئيسية (KPIs)",
+        "تحليل الفجوات في المهارات", 
+        "توقعات الأداء المستقبلي"
       ]
     },
     {
@@ -117,13 +126,12 @@ function Features() {
                 احصل على عرض توضيحي مخصص لاحتياجات شركتك واكتشف كيف يمكن لمنصة سيان تحويل برامج التدريب لديك
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="px-8 py-3 text-lg bg-white text-blue-600 hover:bg-gray-50">
-                  شاهد العرض التوضيحي
-                  <ArrowLeft className="w-5 h-5 mr-2" />
-                </Button>
-                <Button size="lg" className="px-8 py-3 text-lg bg-[#00ffcc] text-blue-600 border-[#00ffcc] hover:bg-white hover:text-blue-600 hover:border-[#00ffcc] transition-all duration-200">
+                <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                  احجز عرض توضيحي
+                </button>
+                <button className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
                   تحدث مع خبير
-                </Button>
+                </button>
               </div>
             </div>
           </motion.div>

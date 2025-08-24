@@ -1,5 +1,5 @@
 import { Star, ShoppingCart, GlobeLockIcon } from "lucide-react";
-import type { Course } from "@/types/couse";
+import type { Course } from "@/types/course";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import Icon from "@/components/shared/Icon";

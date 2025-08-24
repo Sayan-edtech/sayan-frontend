@@ -1,5 +1,5 @@
 import { Calendar, Clock, Users, CheckCircle } from "lucide-react";
-import { SessionAppointment } from "@/types/session";
+import type { SessionAppointment } from "@/types/session";
 
 interface StatCardProps {
   title: string;
@@ -82,14 +82,6 @@ function AppointmentStats({ appointments }: AppointmentStatsProps) {
         icon={<Clock className="h-6 w-6 text-orange-600" />}
         change={`${bookedAppointments} محجوز`}
         changeType="neutral"
-      />
-      
-      <StatCard
-        title="إجمالي المشاركين"
-        value={totalParticipants}
-        icon={<Users className="h-6 w-6 text-green-600" />}
-        change={`في ${bookedAppointments + completedAppointments} موعد`}
-        changeType="positive"
       />
       
       <StatCard

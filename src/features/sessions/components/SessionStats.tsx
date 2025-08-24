@@ -3,16 +3,10 @@ import { Calendar, Users, Clock, DollarSign, TrendingUp } from "lucide-react";
 interface Session {
   id: number;
   title: string;
-  type: string;
   duration: number;
   price: number;
   instructor: string;
-  date: string;
   time: string;
-  status: 'available' | 'booked' | 'completed';
-  maxParticipants: number;
-  currentParticipants: number;
-  category: string;
 }
 
 interface SessionStatsProps {
@@ -53,17 +47,9 @@ function StatCard({ title, value, icon, change, changeType }: StatCardProps) {
 
 function SessionStats({ sessions }: SessionStatsProps) {
   const totalSessions = sessions.length;
-  const availableSessions = sessions.filter(session => session.status === 'available').length;
-  const totalParticipants = sessions.reduce(
-    (sum, session) => sum + session.currentParticipants,
-    0
-  );
-  const totalRevenue = sessions
-    .filter(session => session.status === 'completed')
-    .reduce(
-      (sum, session) => sum + session.price * session.currentParticipants,
-      0
-    );
+  const freeSessions = sessions.filter(session => session.price === 0).length;
+  const paidSessions = sessions.filter(session => session.price > 0).length;
+  const averagePrice = sessions.length > 0 ? sessions.reduce((sum, session) => sum + session.price, 0) / sessions.length : 0;
 
   const stats = [
     {
@@ -74,24 +60,17 @@ function SessionStats({ sessions }: SessionStatsProps) {
       changeType: "positive" as const,
     },
     {
-      title: "الجلسات المتاحة",
-      value: availableSessions,
+      title: "الجلسات المجانية",
+      value: freeSessions,
       icon: <Clock className="w-8 h-8" />,
-      change: "متاح للحجز",
+      change: "جلسات مجانية",
       changeType: "positive" as const,
     },
     {
-      title: "إجمالي المشاركين",
-      value: totalParticipants.toLocaleString(),
+      title: "الجلسات المدفوعة",
+      value: paidSessions,
       icon: <Users className="w-8 h-8" />,
-      change: "+15% من الشهر الماضي",
-      changeType: "positive" as const,
-    },
-    {
-      title: "إجمالي الإيرادات",
-      value: `${totalRevenue.toLocaleString()} ر.س`,
-      icon: <DollarSign className="w-8 h-8" />,
-      change: "+22% من الشهر الماضي",
+      change: "جلسات مدفوعة",
       changeType: "positive" as const,
     },
   ];

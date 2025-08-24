@@ -13,7 +13,7 @@ import type {
   SortingState,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Edit, Trash2, Download, BarChart3, Star, DollarSign } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,14 +24,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type { DigitalProduct } from "@/types/digital-product";
 
 interface DigitalProductTableProps {
@@ -39,13 +31,14 @@ interface DigitalProductTableProps {
   onTableReady?: (table: any) => void;
   onEdit?: (product: DigitalProduct) => void;
   onDelete?: (product: DigitalProduct) => void;
+  onDownload?: (product: DigitalProduct) => void;
   onStatusChange?: (product: DigitalProduct, status: 'published' | 'draft') => void;
 }
 
 const columns: ColumnDef<DigitalProduct>[] = [
   {
     accessorKey: "title",
-    header: "المنتج",
+    header: "العنوان",
     cell: ({ row }) => {
       const product = row.original;
       return (
@@ -77,31 +70,6 @@ const columns: ColumnDef<DigitalProduct>[] = [
     ),
   },
   {
-    accessorKey: "price",
-    header: "السعر",
-    cell: ({ row }) => {
-      const product = row.original;
-      return (
-        <div className="flex flex-col">
-          {product.discountPrice ? (
-            <>
-              <span className="text-green-600 font-semibold">
-                ${product.discountPrice}
-              </span>
-              <span className="text-gray-400 line-through text-sm">
-                ${product.price}
-              </span>
-            </>
-          ) : (
-            <span className="text-gray-900 font-semibold">
-              ${product.price}
-            </span>
-          )}
-        </div>
-      );
-    },
-  },
-  {
     accessorKey: "status",
     header: "الحالة",
     cell: ({ row }) => {
@@ -121,29 +89,17 @@ const columns: ColumnDef<DigitalProduct>[] = [
     },
   },
   {
-    accessorKey: "downloads",
-    header: "التحميلات",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-1 text-gray-600">
-        <Download className="w-4 h-4" />
-        <span>{row.getValue("downloads")}</span>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "rating",
-    header: "التقييم",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-1">
-        <Star className="w-4 h-4 text-yellow-500 fill-current" />
-        <span className="text-gray-900 font-medium">
-          {row.getValue("rating")}
-        </span>
-        <span className="text-gray-500 text-sm">
-          ({row.original.reviews})
-        </span>
-      </div>
-    ),
+    accessorKey: "price",
+    header: "السعر",
+    cell: ({ row }) => {
+      const product = row.original;
+      const displayPrice = product.discountPrice || product.price;
+      return (
+        <div className="font-semibold text-gray-900">
+          ${displayPrice}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "createdAt",
@@ -164,40 +120,35 @@ const columns: ColumnDef<DigitalProduct>[] = [
   {
     id: "actions",
     header: "الإجراءات",
-    cell: ({ row }) => {
+    enableHiding: false,
+    cell: ({ row, table }) => {
       const product = row.original;
+      const tableProps = (table.options.meta as any) || {};
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">فتح القائمة</span>
-              <BarChart3 className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>الإجراءات</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
-              <Edit className="mr-2 h-4 w-4" />
-              تعديل
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              <Download className="mr-2 h-4 w-4" />
-              تحميل الملف
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer text-red-600">
-              <Trash2 className="mr-2 h-4 w-4" />
-              حذف
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+            onClick={() => tableProps.onEdit?.(product)}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+            onClick={() => tableProps.onDelete?.(product)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       );
     },
   },
 ];
 
-function DigitalProductTable({ products, onTableReady }: DigitalProductTableProps) {
+function DigitalProductTable({ products, onTableReady, onEdit, onDelete, onDownload }: DigitalProductTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -217,6 +168,11 @@ function DigitalProductTable({ products, onTableReady }: DigitalProductTableProp
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    meta: {
+      onEdit,
+      onDelete,
+      onDownload,
+    },
     state: {
       sorting,
       columnFilters,
@@ -236,62 +192,145 @@ function DigitalProductTable({ products, onTableReady }: DigitalProductTableProp
     }
   }, [table, onTableReady]);
 
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-      <div className="p-6">
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} className="text-right">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="hover:bg-gray-50"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="text-right">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    لا توجد منتجات.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+  // Mobile card view component
+  const MobileProductCard = ({ product }: { product: DigitalProduct }) => {
+    const displayPrice = product.discountPrice || product.price;
+    
+    return (
+      <div className="bg-white rounded-lg border-0 shadow-sm p-4 space-y-3">
+        <div className="flex items-start gap-3">
+          <img
+            src={product.image}
+            alt={product.title}
+            className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <h3 className="font-medium text-sm leading-5 line-clamp-2 text-right">
+              {product.title}
+            </h3>
+            <p className="text-xs text-gray-500 mt-1 text-right">
+              {product.description.substring(0, 60)}...
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-blue-600"
+              onClick={() => onEdit?.(product)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-red-600"
+              onClick={() => onDelete?.(product)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
+
+        <div className="flex flex-wrap gap-2 justify-end">
+          <Badge
+            className={`text-xs ${
+              product.status === "published"
+                ? "bg-green-100 text-green-800 border-green-200"
+                : "bg-yellow-100 text-yellow-800 border-yellow-200"
+            }`}
+          >
+            {product.status === "published" ? "منشور" : "مسودة"}
+          </Badge>
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs">
+            {product.category}
+          </Badge>
+        </div>
+
+        <div className="flex justify-between items-center pt-2 border-t">
+          <div className="text-sm font-medium text-gray-900">
+            ${displayPrice}
+          </div>
+          <div className="text-sm text-gray-600">
+            {new Date(product.createdAt).toLocaleDateString("ar-SA")}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="w-full">
+      {/* Mobile Card View */}
+      <div className="block lg:hidden space-y-4">
+        {table.getRowModel().rows?.length ? (
+          table.getRowModel().rows.map((row) => {
+            const product = row.original;
+            return <MobileProductCard key={row.id} product={product} />;
+          })
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            لا توجد منتجات.
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block rounded-lg border-0 shadow-sm bg-white overflow-hidden">
+        <Table>
+          <TableHeader className="bg-gray-50">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead 
+                      key={header.id} 
+                      className="text-right font-semibold text-gray-700 py-4"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="py-4 text-right">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-gray-500"
+                >
+                  لا توجد منتجات.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
         
-        <div className="flex items-center justify-between space-x-2 py-4">
+        <div className="flex items-center justify-between space-x-2 py-4 px-6">
           <div className="flex-1 text-sm text-muted-foreground">
             {table.getFilteredSelectedRowModel().rows.length} من{" "}
             {table.getFilteredRowModel().rows.length} صف محدد.

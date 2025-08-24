@@ -29,7 +29,6 @@ function Purchases() {
 }
 
 export default Purchases;
-
 function Header() {
   return (
     <div className="flex flex-col sm:space-y-0 sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 lg:p-6 rounded-xl shadow-sm border border-gray-100">
@@ -44,3 +43,4 @@ function Header() {
     </div>
   );
 }
+

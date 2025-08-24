@@ -47,11 +47,10 @@ export interface AppointmentFormData {
 export interface SessionFormData {
   title: string;
   description: string;
-  type: string;
-  category: string;
+  instructor: string;
   duration: number;
   price: number;
-  maxParticipants: number;
-  instructor: string;
-  location: string;
+  date: string;
+  time: string;
+  image: string;
 }

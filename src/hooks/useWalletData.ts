@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Transaction, WalletStats, WalletBalance, WithdrawalRequest } from '@/types/wallet';
+import type { Transaction, WalletStats, WalletBalance, WithdrawalRequest } from '@/types/wallet';
 
 // Sample transaction data - in a real app, this would come from an API
 const SAMPLE_TRANSACTIONS: Transaction[] = [

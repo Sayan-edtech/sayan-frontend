@@ -70,22 +70,22 @@ function Stats() {
     {
       target: 1000,
       suffix: "+",
-      title: "أكاديمية نشطة",
+      title: "أكاديمية متنوعة",
     },
     {
-      target: 50,
+      target: 2,
       suffix: "K+",
-      title: "ريال تم تحقيقها شهرياً",
+      title: "ساعة تعليمية",
     },
     {
-      target: 15,
+      target: 4,
       suffix: "K+",
-      title: "دورة تم إنشاؤها",
+      title: "دورة مباعة",
     },
     {
-      target: 100,
+      target: 10,
       suffix: "K+",
-      title: "طالب يتعلم",
+      title: "طالب مسجل",
     },
   ];
 
@@ -104,10 +104,10 @@ function Stats() {
               />
             </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
-              <span className="text-primary">نجاحات</span> منشئي الأكاديميات
+              <span className="text-primary">إنجازاتنا</span> في أرقام
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              انضم إلى آلاف منشئي المحتوى الذين حولوا خبراتهم إلى دخل شهري مستدام عبر منصة سيان.
+              في منصة سيان، نفخر بإنجازاتنا المتميزة التي حققناها مع شركائنا ومستخدمينا.
             </p>
           </div>
 

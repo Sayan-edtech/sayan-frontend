@@ -1,6 +1,8 @@
 import AddBlogForm from "@/features/blogs/components/AddBlogForm";
-import { Plus } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
+import { FileText, ArrowLeft } from "lucide-react";
+import { useNavigate, Link } from 'react-router-dom';
+import { buttonVariants } from "@/components/ui/button";
+import DashboardPageHeader from "@/components/shared/dashboard/DashboardPageHeader";
 
 export interface IBlogForm {
   title: string;
@@ -28,8 +30,20 @@ function AddNewBlog() {
 
   return (
     <div className="space-y-6">
-      <Header />
-
+      <DashboardPageHeader
+        icon={FileText}
+        title="إضافة مقال جديد"
+        actions={
+          <Link
+            to="/dashboard/blogs"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            <ArrowLeft className="w-4 h-4 ml-2" />
+            العودة للمقالات
+          </Link>
+        }
+      />
+      
       {/* Form */}
       <AddBlogForm onSubmit={handleSubmit} onCancel={handleCancel} />
     </div>
@@ -38,17 +52,3 @@ function AddNewBlog() {
 
 export default AddNewBlog;
 
-function Header() {
-  return (
-    <div className="flex flex-col sm:space-y-0 sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 lg:p-6 rounded-xl shadow-sm border-0">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4">
-        <div className="flex items-center gap-2 text-gray-600">
-          <Plus className="w-5 h-5 text-blue-600" />
-          <span className="font-medium text-sm lg:text-base">
-            إضافة مقال جديد
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}

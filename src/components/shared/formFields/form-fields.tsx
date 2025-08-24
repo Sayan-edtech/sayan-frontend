@@ -24,7 +24,7 @@ const FormFields = (props: Props) => {
   const { type } = props;
 
   const renderField = (): React.ReactNode => {
-    if (type === InputTypes.EMAIL || type === InputTypes.TEXT) {
+    if (type === InputTypes.EMAIL || type === InputTypes.TEXT || type === "number") {
       return <TextField {...props} />;
     }
 

@@ -1,6 +1,6 @@
 import { buttonVariants } from "@/components/ui/button";
 import BlogTable from "@/features/blogs/components/BlogTable";
-import { BlogStats } from "@/features/blogs/components/BlogStats";
+import { BlogStats } from "@/features/blogs/components";
 import BlogFilters from "@/features/blogs/components/BlogFilters";
 import DashboardPageHeader from "@/components/shared/dashboard/DashboardPageHeader";
 import { Link } from "react-router-dom";

@@ -14,6 +14,7 @@ interface AddDigitalProductFormProps {
   onCancel?: () => void;
   isLoading?: boolean;
   initialData?: Partial<IDigitalProductForm>;
+  defaultValues?: Partial<IDigitalProductForm>;
   isEditing?: boolean;
 }
 
@@ -22,6 +23,7 @@ const AddDigitalProductForm: React.FC<AddDigitalProductFormProps> = ({
   onCancel,
   isLoading = false,
   initialData,
+  defaultValues,
   isEditing = false,
 }) => {
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -47,21 +49,23 @@ const AddDigitalProductForm: React.FC<AddDigitalProductFormProps> = ({
       category: "",
       status: "draft",
       ...initialData,
+      ...defaultValues,
     },
   });
 
   const watchedFields = watch();
 
   useEffect(() => {
-    if (initialData) {
-      Object.entries(initialData).forEach(([key, value]) => {
+    const dataToUse = defaultValues || initialData;
+    if (dataToUse) {
+      Object.entries(dataToUse).forEach(([key, value]) => {
         setValue(key as keyof IDigitalProductForm, value);
       });
-      if (initialData.image) {
-        setImagePreview(initialData.image);
+      if (dataToUse.image) {
+        setImagePreview(dataToUse.image);
       }
     }
-  }, [initialData, setValue]);
+  }, [initialData, defaultValues, setValue]);
 
   const onSubmitForm = (data: IDigitalProductForm) => {
     if (!data.image) {
@@ -298,17 +302,26 @@ const AddDigitalProductForm: React.FC<AddDigitalProductFormProps> = ({
                     <div className="space-y-2">
                       <Upload className="w-12 h-12 text-gray-400 mx-auto" />
                       <div className="text-gray-600">
-                        <p className="font-medium">اضغط لرفع صورة المنتج</p>
+                        <p className="font-medium">رفع صورة المنتج</p>
                         <p className="text-sm">PNG, JPG, GIF حتى 5MB</p>
                       </div>
                     </div>
                   )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => imageInputRef.current?.click()}
+                  >
+                    <Upload className="w-4 h-4 ml-2" />
+                    رفع صورة
+                  </Button>
                   <input
                     ref={imageInputRef}
                     type="file"
                     accept="image/*"
                     onChange={handleImageUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    className="hidden"
                   />
                 </div>
                 {errors.image && (
@@ -343,16 +356,25 @@ const AddDigitalProductForm: React.FC<AddDigitalProductFormProps> = ({
                     <div className="space-y-2">
                       <Download className="w-12 h-12 text-gray-400 mx-auto" />
                       <div className="text-gray-600">
-                        <p className="font-medium">اضغط لرفع ملف المنتج</p>
+                        <p className="font-medium">رفع ملف المنتج</p>
                         <p className="text-sm">جميع أنواع الملفات حتى 100MB</p>
                       </div>
                     </div>
                   )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="w-4 h-4 ml-2" />
+                    رفع ملف
+                  </Button>
                   <input
                     ref={fileInputRef}
                     type="file"
                     onChange={handleFileUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    className="hidden"
                   />
                 </div>
                 {errors.downloadFile && (

@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/table";
 
 import type { Blog } from "@/types/blog";
+import BlogStatsModal from "./BlogStatsModal";
 
 interface BlogTableProps {
   blogs: Blog[];
@@ -38,151 +39,6 @@ interface BlogTableProps {
   onStatusChange?: (blog: Blog, status: 'published' | 'draft') => void;
 }
 
-const columns: ColumnDef<Blog>[] = [
-  {
-    accessorKey: "title",
-    header: "العنوان",
-    cell: ({ row }) => {
-      const blog = row.original;
-      return (
-        <div className="flex items-center gap-3">
-          <img
-            src={blog.image}
-            alt={blog.title}
-            className="w-12 h-12 rounded-lg object-cover"
-          />
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900 line-clamp-2">
-              {blog.title}
-            </span>
-            <span className="text-sm text-gray-500">
-              {blog.excerpt.substring(0, 60)}...
-            </span>
-          </div>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "category",
-    header: "التصنيف",
-    cell: ({ row }) => {
-      const category = row.getValue("category") as string;
-      const categoryColors = {
-        "تقنية": "bg-blue-100 text-blue-800 border-blue-200",
-        "تعليم": "bg-green-100 text-green-800 border-green-200",
-        "أعمال": "bg-purple-100 text-purple-800 border-purple-200",
-        "صحة": "bg-red-100 text-red-800 border-red-200",
-        "رياضة": "bg-orange-100 text-orange-800 border-orange-200",
-        "سفر": "bg-cyan-100 text-cyan-800 border-cyan-200",
-        "طبخ": "bg-yellow-100 text-yellow-800 border-yellow-200",
-        "فن": "bg-pink-100 text-pink-800 border-pink-200",
-      };
-      return (
-        <Badge
-          className={`${
-            categoryColors[category as keyof typeof categoryColors] ||
-            "bg-gray-100 text-gray-800 border-gray-200"
-          }`}
-        >
-          {category}
-        </Badge>
-      );
-    },
-  },
-  {
-    accessorKey: "status",
-    header: "الحالة",
-    cell: ({ row }) => {
-      const status = row.getValue("status") as string;
-      
-      return (
-        <Badge
-          className={`${
-            status === "published"
-              ? "bg-green-100 text-green-800 border-green-200"
-              : "bg-yellow-100 text-yellow-800 border-yellow-200"
-          }`}
-        >
-          {status === "published" ? "منشور" : "مسودة"}
-        </Badge>
-      );
-    },
-  },
-  {
-    accessorKey: "author",
-    header: "الكاتب",
-    cell: ({ row }) => {
-      const author = row.getValue("author") as string;
-      return <div className="font-medium">{author}</div>;
-    },
-  },
-  {
-    accessorKey: "views",
-    header: "المشاهدات",
-    cell: ({ row }) => {
-      const views = row.getValue("views") as number;
-      return (
-        <div className="flex items-center gap-1">
-          <Eye className="w-4 h-4 text-gray-500" />
-          <span>{views?.toLocaleString() || 0}</span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "createdAt",
-    header: "تاريخ الإنشاء",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdAt"));
-      return (
-        <div className="text-sm text-gray-600">
-          {date.toLocaleDateString("ar-SA")}
-        </div>
-      );
-    },
-  },
-  {
-    id: "actions",
-    header: "الإجراءات",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const blog = row.original;
-
-      return (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-50"
-            onClick={() => console.log(`عرض إحصائيات المقال ${blog.id}`)}
-          >
-            <BarChart3 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-            asChild
-          >
-            <Link to={`/dashboard/blogs/edit/${blog.id}`}>
-              <Edit className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-            onClick={() => console.log(`حذف المقال ${blog.id}`)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      );
-    },
-  },
-];
-
 function BlogTable({ blogs, onTableReady }: BlogTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -191,6 +47,158 @@ function BlogTable({ blogs, onTableReady }: BlogTableProps) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [isStatsModalOpen, setIsStatsModalOpen] = React.useState(false);
+  const [selectedBlog, setSelectedBlog] = React.useState<Blog | null>(null);
+
+  const handleViewStats = (blog: Blog) => {
+    setSelectedBlog(blog);
+    setIsStatsModalOpen(true);
+  };
+
+  const columns: ColumnDef<Blog>[] = [
+    {
+      accessorKey: "title",
+      header: "العنوان",
+      cell: ({ row }) => {
+        const blog = row.original;
+        return (
+          <div className="flex items-center gap-3">
+            <img
+              src={blog.image}
+              alt={blog.title}
+              className="w-12 h-12 rounded-lg object-cover"
+            />
+            <div className="flex flex-col">
+              <span className="font-medium text-gray-900 line-clamp-2">
+                {blog.title}
+              </span>
+              <span className="text-sm text-gray-500">
+                {blog.excerpt.substring(0, 60)}...
+              </span>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "category",
+      header: "التصنيف",
+      cell: ({ row }) => {
+        const category = row.getValue("category") as string;
+        const categoryColors = {
+          "تقنية": "bg-blue-100 text-blue-800 border-blue-200",
+          "تعليم": "bg-green-100 text-green-800 border-green-200",
+          "أعمال": "bg-purple-100 text-purple-800 border-purple-200",
+          "صحة": "bg-red-100 text-red-800 border-red-200",
+          "رياضة": "bg-orange-100 text-orange-800 border-orange-200",
+          "سفر": "bg-cyan-100 text-cyan-800 border-cyan-200",
+          "طبخ": "bg-yellow-100 text-yellow-800 border-yellow-200",
+          "فن": "bg-pink-100 text-pink-800 border-pink-200",
+        };
+        return (
+          <Badge
+            className={`${
+              categoryColors[category as keyof typeof categoryColors] ||
+              "bg-gray-100 text-gray-800 border-gray-200"
+            }`}
+          >
+            {category}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessorKey: "status",
+      header: "الحالة",
+      cell: ({ row }) => {
+        const status = row.getValue("status") as string;
+        
+        return (
+          <Badge
+            className={`${
+              status === "published"
+                ? "bg-green-100 text-green-800 border-green-200"
+                : "bg-yellow-100 text-yellow-800 border-yellow-200"
+            }`}
+          >
+            {status === "published" ? "منشور" : "مسودة"}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessorKey: "author",
+      header: "الكاتب",
+      cell: ({ row }) => {
+        const author = row.getValue("author") as string;
+        return <div className="font-medium">{author}</div>;
+      },
+    },
+    {
+      accessorKey: "views",
+      header: "المشاهدات",
+      cell: ({ row }) => {
+        const views = row.getValue("views") as number;
+        return (
+          <div className="flex items-center gap-1">
+            <Eye className="w-4 h-4 text-gray-500" />
+            <span>{views?.toLocaleString() || 0}</span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "createdAt",
+      header: "تاريخ الإنشاء",
+      cell: ({ row }) => {
+        const date = new Date(row.getValue("createdAt"));
+        return (
+          <div className="text-sm text-gray-600">
+            {date.toLocaleDateString("ar-SA")}
+          </div>
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: "الإجراءات",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const blog = row.original;
+
+        return (
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-50"
+              onClick={() => handleViewStats(blog)}
+            >
+              <BarChart3 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+              asChild
+            >
+              <Link to={`/dashboard/blogs/edit/${blog.id}`}>
+                <Edit className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+              onClick={() => console.log(`حذف المقال ${blog.id}`)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
 
   const table = useReactTable({
     data: blogs,
@@ -256,7 +264,7 @@ function BlogTable({ blogs, onTableReady }: BlogTableProps) {
                       variant="ghost"
                       size="sm"
                       className="h-8 w-8 p-0 text-green-600"
-                      onClick={() => console.log(`عرض إحصائيات المقال ${blog.id}`)}
+                      onClick={() => handleViewStats(blog)}
                     >
                       <BarChart3 className="h-4 w-4" />
                     </Button>
@@ -408,6 +416,18 @@ function BlogTable({ blogs, onTableReady }: BlogTableProps) {
           </Button>
         </div>
       </div>
+
+      {/* Blog Statistics Modal */}
+      {selectedBlog && (
+        <BlogStatsModal
+          isOpen={isStatsModalOpen}
+          onClose={() => {
+            setIsStatsModalOpen(false);
+            setSelectedBlog(null);
+          }}
+          blog={selectedBlog}
+        />
+      )}
     </div>
   );
 }

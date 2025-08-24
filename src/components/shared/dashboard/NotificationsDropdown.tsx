@@ -8,6 +8,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Bell, Dot } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Notification {
   id: string;
@@ -17,47 +18,40 @@ interface Notification {
   read: boolean;
 }
 
-// بيانات وهمية للإشعارات
-const mockNotifications: Notification[] = [
+// بيانات وهمية للإشعارات (يتم تكييفها لغوياً في وقت العرض)
+const baseNotifications: Omit<Notification, "title" | "message" | "time">[] = [
   {
     id: "1",
-    title: "دورة جديدة متاحة",
-    message: "تم إضافة دورة React المتقدمة إلى منصتك",
-    time: "منذ 5 دقائق",
     read: false,
   },
   {
     id: "2",
-    title: "تم إكمال التحميل",
-    message: "تم تحميل الفيديو الجديد بنجاح",
-    time: "منذ 15 دقيقة",
     read: false,
   },
   {
     id: "3",
-    title: "طالب جديد مسجل",
-    message: "انضم طالب جديد إلى دورة JavaScript الأساسية",
-    time: "منذ 30 دقيقة",
     read: true,
   },
   {
     id: "4",
-    title: "موعد استشارة قريب",
-    message: "لديك موعد استشارة بعد ساعة واحدة",
-    time: "منذ ساعة",
     read: false,
   },
   {
     id: "5",
-    title: "تقييم جديد",
-    message: "تم إضافة تقييم 5 نجوم لدورة CSS",
-    time: "منذ ساعتين",
     read: true,
   },
 ];
 
 export function NotificationsDropdown() {
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const { lang, t } = useLanguage();
+  const localized: Notification[] = [
+    { id: "1", title: t('notif.course'), message: t('notif.course.msg'), time: t('time.5m'), read: false },
+    { id: "2", title: t('notif.upload'), message: t('notif.upload.msg'), time: t('time.15m'), read: false },
+    { id: "3", title: t('notif.student'), message: t('notif.student.msg'), time: t('time.30m'), read: true },
+    { id: "4", title: t('notif.appointment'), message: t('notif.appointment.msg'), time: t('time.1h'), read: false },
+    { id: "5", title: t('notif.review'), message: t('notif.review.msg'), time: t('time.2h'), read: true },
+  ];
+  const [notifications, setNotifications] = useState<Notification[]>(localized);
   const [activeTab, setActiveTab] = useState("all");
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -84,17 +78,17 @@ export function NotificationsDropdown() {
         !notification.read ? "bg-blue-50/30" : ""
       }`}
       onClick={() => !notification.read && markAsRead(notification.id)}
-      dir="rtl"
+      dir={lang === 'ar' ? 'rtl' : 'ltr'}
     >
       <div className="flex items-start gap-3">
-        <div className="flex-1 min-w-0 text-right">
-          <h4 className={`text-sm mb-1.5 text-right ${!notification.read ? "font-semibold text-gray-900" : "font-medium text-gray-700"}`}>
+        <div className={`flex-1 min-w-0 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
+          <h4 className={`text-sm mb-1.5 ${lang === 'ar' ? 'text-right' : 'text-left'} ${!notification.read ? "font-semibold text-gray-900" : "font-medium text-gray-700"}`}>
             {notification.title}
           </h4>
-          <p className="text-xs text-gray-600 mb-2 line-clamp-2 text-right leading-relaxed">
+          <p className={`text-xs text-gray-600 mb-2 line-clamp-2 ${lang === 'ar' ? 'text-right' : 'text-left'} leading-relaxed`}>
             {notification.message}
           </p>
-          <span className="text-xs text-gray-500 text-right block">{notification.time}</span>
+          <span className={`text-xs text-gray-500 ${lang === 'ar' ? 'text-right' : 'text-left'} block`}>{notification.time}</span>
         </div>
         {!notification.read && (
           <Dot className="w-4 h-4 text-blue-500 mt-1 flex-shrink-0" />
@@ -104,7 +98,7 @@ export function NotificationsDropdown() {
   );
 
   return (
-    <DropdownMenu dir="rtl">
+    <DropdownMenu dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="relative">
           <Bell className="w-5 h-5" />
@@ -117,9 +111,9 @@ export function NotificationsDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80 p-0 shadow-lg" align="start">
         {/* هيدر الإشعارات */}
-        <div className="p-4 bg-white" dir="rtl">
+        <div className="p-4 bg-white" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900">الإشعارات</h3>
+            <h3 className="font-semibold text-gray-900">{t('notifications.title')}</h3>
             {unreadCount > 0 && (
               <Button
                 variant="ghost"
@@ -127,7 +121,7 @@ export function NotificationsDropdown() {
                 onClick={markAllAsRead}
                 className="text-blue-600 hover:text-blue-700 text-xs h-auto p-1 hover:bg-blue-50 rounded-lg"
               >
-                تعيين الكل كمقروء
+                {t('notifications.markAll')}
               </Button>
             )}
           </div>
@@ -135,12 +129,12 @@ export function NotificationsDropdown() {
         
         {/* التبويبات */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 m-0 rounded-none bg-gray-50/50 h-12" dir="rtl">
+          <TabsList className="grid w-full grid-cols-2 m-0 rounded-none bg-gray-50/50 h-12" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
             <TabsTrigger value="all" className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              الكل ({allNotifications.length})
+              {t('notifications.tab.all')} ({allNotifications.length})
             </TabsTrigger>
             <TabsTrigger value="read" className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              المقروء ({readNotifications.length})
+              {t('notifications.tab.read')} ({readNotifications.length})
             </TabsTrigger>
           </TabsList>
           
@@ -153,9 +147,9 @@ export function NotificationsDropdown() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 text-gray-400" dir="rtl">
+              <div className="text-center py-16 text-gray-400" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
                 <Bell className="w-10 h-10 mx-auto mb-3 opacity-50" />
-                <p className="text-sm font-medium">لا توجد إشعارات</p>
+                <p className="text-sm font-medium">{t('notifications.empty')}</p>
               </div>
             )}
           </TabsContent>
@@ -169,9 +163,9 @@ export function NotificationsDropdown() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 text-gray-400" dir="rtl">
+              <div className="text-center py-16 text-gray-400" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
                 <Bell className="w-10 h-10 mx-auto mb-3 opacity-50" />
-                <p className="text-sm font-medium">لا توجد إشعارات مقروءة</p>
+                <p className="text-sm font-medium">{t('notifications.emptyRead')}</p>
               </div>
             )}
           </TabsContent>

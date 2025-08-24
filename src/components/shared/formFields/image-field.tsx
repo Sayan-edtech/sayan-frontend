@@ -15,7 +15,7 @@ interface Props extends IFormField {
   /** أخطاء التحقق من صحة النموذج */
   errors: FieldErrors;
   /** التحكم في النموذج (اختياري) - يستخدم عندما يكون المكون خارج FormProvider */
-  control?: Control<FieldValues>;
+  control?: Control<any>;
 }
 
 /**

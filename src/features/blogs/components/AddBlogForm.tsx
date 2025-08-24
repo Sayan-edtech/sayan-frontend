@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,11 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowRight, Save, Trash2, X, Plus, Upload, Type, Hash, FolderOpen, Image, AlignLeft, FileText } from "lucide-react";
-import RichTextToolbar from './RichTextToolbar';
-import LinkModal from './LinkModal';
-import ImageUrlModal from './ImageUrlModal';
+import { ArrowRight, Save, Trash2, X, Plus, Type, Hash, FolderOpen, AlignLeft, FileText } from "lucide-react";
+import FlowbiteTextEditor from '@/components/ui/FlowbiteTextEditor';
 import { enhancedToast } from "@/components/ui/enhanced-toast";
+import HeadingTextEditor from "../../../components/ui/HeadingTextEditor";
+import ImageUploader from "@/components/ui/ImageUploader";
 
 interface IBlogForm {
   title: string;
@@ -67,12 +67,8 @@ function AddBlogForm({
 }: AddBlogFormProps) {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [editorContent, setEditorContent] = useState<string>("");
-  const [showLinkModal, setShowLinkModal] = useState(false);
-  const [showImageUrlModal, setShowImageUrlModal] = useState(false);
-  const editorRef = useRef<HTMLDivElement>(null);
 
   const {
     register,
@@ -126,19 +122,7 @@ function AddBlogForm({
     }
   }, [setValue, initialData, isEditing]);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setImagePreview(result);
-        setValue("image", result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // Removed: handled by ImageUploader
 
   const addKeyword = () => {
     if (keywordInput.trim() && !keywords.includes(keywordInput.trim())) {
@@ -189,12 +173,8 @@ function AddBlogForm({
     reset();
     setKeywords([]);
     setKeywordInput("");
-    setSelectedImage(null);
     setImagePreview("");
     setEditorContent("");
-    if (editorRef.current) {
-      editorRef.current.innerHTML = "";
-    }
     if (!isEditing) {
       clearLocalStorage(FORM_DATA_KEY);
     }
@@ -203,87 +183,9 @@ function AddBlogForm({
     });
   };
 
-  const executeCommand = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
-    if (editorRef.current) {
-      setEditorContent(editorRef.current.innerHTML);
-      setValue("content", editorRef.current.innerHTML);
-    }
-  };
-
-  const handleEditorChange = () => {
-    if (editorRef.current) {
-      const content = editorRef.current.innerHTML;
-      setEditorContent(content);
-      setValue("content", content);
-    }
-  };
-
-  const insertImage = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const imageUrl = event.target?.result as string;
-          executeCommand('insertImage', imageUrl);
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-    input.click();
-  };
-
-  const insertImageFromUrl = () => {
-    setShowImageUrlModal(true);
-  };
-
-  const handleImageUrlInsert = (url: string, alt: string) => {
-    executeCommand('insertHTML', `<img src="${url}" alt="${alt}" style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" />`);
-  };
-
-  const insertLink = () => {
-    setShowLinkModal(true);
-  };
-
-  const handleLinkInsert = (url: string, text: string) => {
-    executeCommand('insertHTML', `<a href="${url}" target="_blank" style="color: #3b82f6; text-decoration: underline;">${text}</a>`);
-  };
-
-  const changeFontSize = (size: string) => executeCommand("fontSize", size);
-  const changeTextColor = (color: string) => executeCommand("foreColor", color);
-  const changeBackgroundColor = (color: string) => executeCommand("backColor", color);
-  const insertHeading = (level: number) => executeCommand('formatBlock', `h${level}`);
-  const insertQuote = () => executeCommand('formatBlock', 'blockquote');
-  const insertCode = () => executeCommand('formatBlock', 'pre');
-  const undoAction = () => executeCommand('undo');
-  const redoAction = () => executeCommand('redo');
-  const strikeThrough = () => executeCommand('strikeThrough');
-  const insertHorizontalRule = () => executeCommand('insertHorizontalRule');
-
-  const insertTable = () => {
-    const rows = prompt('عدد الصفوف:');
-    const cols = prompt('عدد الأعمدة:');
-    if (rows && cols) {
-      let tableHTML = '<table border="1" style="border-collapse: collapse; width: 100%;">';
-      for (let i = 0; i < parseInt(rows); i++) {
-        tableHTML += '<tr>';
-        for (let j = 0; j < parseInt(cols); j++) {
-          tableHTML += '<td style="padding: 8px; border: 1px solid #ccc;">خلية</td>';
-        }
-        tableHTML += '</tr>';
-      }
-      tableHTML += '</table>';
-      executeCommand('insertHTML', tableHTML);
-    }
-  };
-
+  
   useEffect(() => {
-    if (initialData?.content && editorRef.current) {
-      editorRef.current.innerHTML = initialData.content;
+    if (initialData?.content) {
       setEditorContent(initialData.content);
     }
   }, [initialData?.content]);
@@ -291,72 +193,42 @@ function AddBlogForm({
   const categories = ["تقنية", "تعليم", "أعمال", "صحة", "رياضة", "سفر", "طبخ", "فن"];
 
   return (
-    <div className="w-full min-h-screen bg-gray-50">
-      <form onSubmit={handleSubmit(onSubmitForm)} className="p-6 space-y-6">
+    <div className="w-full">
+      <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg p-6 shadow-sm">
             <div className="space-y-6">
               <div className="space-y-2">
                 <Label className="text-sm font-medium flex items-center gap-2">
-                  <Image className="w-4 h-4 text-orange-600" />
                   صورة المقال *
                 </Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                  {imagePreview ? (
-                    <div className="space-y-3">
-                      <img
-                        src={imagePreview}
-                        alt="معاينة الصورة"
-                        className="mx-auto max-h-32 rounded-lg"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          setSelectedImage(null);
-                          setImagePreview("");
-                          setValue("image", "");
-                        }}
-                        className="text-red-600 hover:bg-red-50"
-                      >
-                        <X className="w-4 h-4 mr-2" />
-                        إزالة الصورة
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <Upload className="mx-auto h-8 w-8 text-gray-400" />
-                      <div>
-                        <Label
-                          htmlFor="image-upload"
-                          className="cursor-pointer inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700"
-                        >
-                          <Upload className="w-4 h-4 ml-2" />
-                          اختر صورة
-                        </Label>
-                        <Input
-                          id="image-upload"
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500">PNG, JPG, GIF حتى 10MB</p>
-                    </div>
-                  )}
-                </div>
+                <ImageUploader
+                  value={imagePreview}
+                  onChange={(val) => {
+                    setImagePreview(val || "");
+                    setValue("image", val || "");
+                  }}
+                  placeholder="اضغط لرفع صورة المقال"
+                  maxSizeMb={10}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="title" className="text-sm font-medium flex items-center gap-2">
                   <Type className="w-4 h-4 text-blue-600" />
                   عنوان المقال *
                 </Label>
-                <Input
-                  id="title"
+                {/* Hidden input to keep react-hook-form validation and value binding */}
+                <input
+                  type="hidden"
                   {...register("title", { required: "عنوان المقال مطلوب" })}
-                  placeholder="أدخل عنوان المقال"
-                  className={`${errors.title ? "border-red-500" : ""} h-12 focus:outline-none focus:ring-0 focus:border-gray-300`}
+                  value={watchedValues.title}
+                  readOnly
+                />
+                <HeadingTextEditor
+                  tag="h1"
+                  value={watchedValues.title}
+                  onChange={(html: string) => setValue("title", html, { shouldValidate: true, shouldDirty: true })}
+                  placeholder="اكتب عنوان المقال هنا..."
                 />
                 {errors.title && (
                   <p className="text-sm text-red-500">{errors.title.message}</p>
@@ -451,140 +323,18 @@ function AddBlogForm({
                 <FileText className="w-4 h-4 text-slate-600" />
                 محتوى المقال *
               </Label>
-              <RichTextToolbar
-                onBold={() => executeCommand("bold")}
-                onItalic={() => executeCommand("italic")}
-                onUnderline={() => executeCommand("underline")}
-                onStrikethrough={strikeThrough}
-                onHeading={insertHeading}
-                onFontSize={changeFontSize}
-                onTextColor={changeTextColor}
-                onBackgroundColor={changeBackgroundColor}
-                onAlignment={(alignment: 'left' | 'right' | 'center' | 'justify') => {
-                  if (alignment === 'right') executeCommand("justifyRight");
-                  else if (alignment === 'center') executeCommand("justifyCenter");
-                  else if (alignment === 'justify') executeCommand("justifyFull");
+              <FlowbiteTextEditor
+                value={editorContent}
+                onChange={(html) => {
+                  setEditorContent(html);
+                  setValue('content', html);
                 }}
-                onList={(type: 'ul' | 'ol') => {
-                  if (type === 'ul') executeCommand("insertUnorderedList");
-                  else if (type === 'ol') executeCommand("insertOrderedList");
-                }}
-                onQuote={insertQuote}
-                onCode={insertCode}
-                onTable={insertTable}
-                onHorizontalRule={insertHorizontalRule}
-                onLink={insertLink}
-                onImage={insertImage}
-                editorRef={editorRef as React.RefObject<HTMLDivElement>}
+                label={undefined}
+                placeholder="ابدأ في كتابة محتوى المقال هنا..."
+                error={Boolean(errors.content)}
+                className=""
+                name="content"
               />
-
-              <div className="relative border border-gray-300 rounded-b-lg bg-white focus-within:border-blue-400 transition-colors duration-200">
-                <style>{`
-                  .editor-content h1 {
-                    font-size: 2.5rem;
-                    font-weight: bold;
-                    margin: 1.5rem 0;
-                    color: #1f2937;
-                    border-bottom: 2px solid #e5e7eb;
-                    padding-bottom: 0.5rem;
-                  }
-                  .editor-content h2 {
-                    font-size: 2rem;
-                    font-weight: bold;
-                    margin: 1.25rem 0;
-                    color: #374151;
-                  }
-                  .editor-content h3 {
-                    font-size: 1.5rem;
-                    font-weight: bold;
-                    margin: 1rem 0;
-                    color: #4b5563;
-                  }
-                  .editor-content blockquote {
-                    border-right: 4px solid #3b82f6;
-                    background: #f8fafc;
-                    padding: 1rem 1.5rem;
-                    margin: 1rem 0;
-                    font-style: italic;
-                    color: #64748b;
-                    border-radius: 0.5rem;
-                  }
-                  .editor-content pre {
-                    background: #1f2937;
-                    color: #f9fafb;
-                    padding: 1rem;
-                    border-radius: 0.5rem;
-                    overflow-x: auto;
-                    font-family: 'Courier New', monospace;
-                    margin: 1rem 0;
-                  }
-                  .editor-content table {
-                    border-collapse: collapse;
-                    width: 100%;
-                    margin: 1rem 0;
-                    border-radius: 0.5rem;
-                    overflow: hidden;
-                    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-                  }
-                  .editor-content table td, .editor-content table th {
-                    border: 1px solid #d1d5db;
-                    padding: 0.75rem;
-                    text-align: right;
-                  }
-                  .editor-content table th {
-                    background: #f3f4f6;
-                    font-weight: bold;
-                  }
-                  .editor-content img {
-                    max-width: 100%;
-                    height: auto;
-                    border-radius: 0.5rem;
-                    margin: 1rem 0;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-                  }
-                  .editor-content ul, .editor-content ol {
-                    margin: 1rem 0;
-                    padding-right: 2rem;
-                  }
-                  .editor-content li {
-                    margin: 0.5rem 0;
-                  }
-                  .editor-content hr {
-                    border: none;
-                    height: 2px;
-                    background: linear-gradient(to left, #3b82f6, #8b5cf6);
-                    margin: 2rem 0;
-                    border-radius: 1px;
-                  }
-                  .editor-content a {
-                    color: #3b82f6;
-                    text-decoration: underline;
-                    transition: color 0.2s;
-                  }
-                  .editor-content a:hover {
-                    color: #1d4ed8;
-                  }
-                `}</style>
-                <div
-                  ref={editorRef}
-                  contentEditable
-                  onInput={handleEditorChange}
-                  className={`editor-content min-h-[600px] p-4 prose prose-lg max-w-none focus:outline-none ${errors.content ? "border-red-500" : ""}`}
-                  style={{
-                    outline: 'none',
-                    direction: 'rtl',
-                    textAlign: 'right',
-                    lineHeight: '1.8',
-                    fontSize: '16px'
-                  }}
-                  suppressContentEditableWarning={true}
-                />
-                {!editorContent && (
-                  <div className="absolute top-4 right-4 text-gray-400 pointer-events-none text-base select-none">
-                    ابدأ في كتابة محتوى المقال هنا... يمكنك استخدام أدوات التحرير أعلاه لتنسيق النص وإضافة الصور والجداول
-                  </div>
-                )}
-              </div>
               
               {errors.content && (
                 <p className="text-sm text-red-500">{errors.content.message}</p>
@@ -640,18 +390,6 @@ function AddBlogForm({
           </div>
         </div>
       </form>
-
-      <LinkModal
-        isOpen={showLinkModal}
-        onClose={() => setShowLinkModal(false)}
-        onInsert={handleLinkInsert}
-      />
-      
-      <ImageUrlModal
-        isOpen={showImageUrlModal}
-        onClose={() => setShowImageUrlModal(false)}
-        onInsert={handleImageUrlInsert}
-      />
     </div>
   );
 }

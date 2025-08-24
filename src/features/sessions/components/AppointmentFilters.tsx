@@ -11,7 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, X, Download, Calendar } from "lucide-react";
 import type { Table } from "@tanstack/react-table";
-import { SessionAppointment } from "@/types/session";
+import type { SessionAppointment } from "@/types/session";
 
 interface AppointmentFiltersProps {
   selectedStatus: string;
@@ -21,6 +21,8 @@ interface AppointmentFiltersProps {
   onClearFilters: () => void;
   table?: Table<SessionAppointment> | null;
   onExportData?: () => void;
+  searchTerm: string;
+  onSearchChange: (term: string) => void;
 }
 
 function AppointmentFilters({
@@ -31,12 +33,13 @@ function AppointmentFilters({
   onClearFilters,
   table,
   onExportData,
+  searchTerm,
+  onSearchChange,
 }: AppointmentFiltersProps) {
-  const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
   const handleSearch = (value: string) => {
-    setSearchTerm(value);
+    onSearchChange(value);
     // Search in appointment notes or session title if available
     table?.getColumn("notes")?.setFilterValue(value);
   };
@@ -143,7 +146,7 @@ function AppointmentFilters({
                 variant="outline"
                 onClick={() => {
                   onClearFilters();
-                  setSearchTerm("");
+                  onSearchChange("");
                   handleSearch("");
                 }}
                 className="w-full flex items-center gap-2"
@@ -185,7 +188,7 @@ function AppointmentFilters({
                   <X 
                     className="h-3 w-3 cursor-pointer" 
                     onClick={() => {
-                      setSearchTerm("");
+                      onSearchChange("");
                       handleSearch("");
                     }}
                   />

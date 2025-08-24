@@ -32,6 +32,9 @@ export enum Pages {
   APPOINTMENTS = "appointments",
   NEW = "new",
   TRAINERS = "trainers",
+  STUDENT_QUESTIONS = "student-questions",
+  STUDENT_CHAT = "student-chat",
+  SUBSCRIPTION_PACKAGES = "subscription-packages",
 }
 
 export enum InputTypes {
@@ -110,4 +113,7 @@ export enum Environments {
 export enum UserType {
   STUDENT = "STUDENT",
   ACADEMY = "ACADEMY",
+  MANAGER = "MANAGER",
+  MARKETING_MANAGER = "MARKETING_MANAGER",
+  TRAINER = "TRAINER",
 }

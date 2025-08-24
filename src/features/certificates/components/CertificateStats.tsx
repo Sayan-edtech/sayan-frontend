@@ -39,7 +39,7 @@ interface CertificateStatsProps {
   certificates: CourseCertificate[];
 }
 
-export function CertificateStats({ certificates }: CertificateStatsProps) {
+function CertificateStats({ certificates }: CertificateStatsProps) {
   const stats = useMemo(() => {
     if (!certificates || certificates.length === 0) {
       return {
@@ -105,3 +105,5 @@ export function CertificateStats({ certificates }: CertificateStatsProps) {
     </div>
   );
 }
+
+export { CertificateStats };

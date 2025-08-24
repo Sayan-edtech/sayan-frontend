@@ -2,6 +2,7 @@ import { useState } from "react";
 import WebBuilderLayout from "@/components/shared/WebBuilderLayout";
 import CustomCSSProvider from "./CustomCSSProvider";
 import HomePreview from "@/templates/template-one/pages/preview";
+import AcademyMainSettingsForm from "./AcademyMainSettingsForm";
 
 function MainSettings() {
   const [canUndo] = useState(false);
@@ -31,13 +32,15 @@ function MainSettings() {
         onRedo={handleRedo}
         canUndo={canUndo}
         canRedo={canRedo}
-        showBuilderControls={true}
+        showBuilderControls={false}
         previewComponent={
           <div className="w-full h-full bg-white">
             <HomePreview />
           </div>
         }
-      />
+      >
+        <AcademyMainSettingsForm />
+      </WebBuilderLayout>
     </CustomCSSProvider>
   );
 }

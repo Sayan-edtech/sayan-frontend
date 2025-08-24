@@ -62,13 +62,6 @@ const AddCourseForm = ({
   onCancel,
   isLoading = false,
 }: AddCourseFormProps) => {
-  // Get saved step from localStorage or default to 1
-  const [currentStep, setCurrentStep] = useState(() => {
-    const savedStep = getFromLocalStorage(FORM_STEP_KEY);
-    return savedStep || 1;
-  });
-  const totalSteps = 2;
-
   // Get saved form data from localStorage
   const getSavedFormData = useCallback(() => {
     const savedData = getFromLocalStorage(FORM_DATA_KEY);
@@ -76,7 +69,7 @@ const AddCourseForm = ({
       savedData || {
         title: "",
         category: "",
-        type: "",
+        type: "تفاعلية", // Default value
         instructor: "",
         level: "",
         price: 0,
@@ -92,7 +85,6 @@ const AddCourseForm = ({
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-    trigger,
     watch,
     reset,
   } = useForm<ICourseForm>({
@@ -121,8 +113,8 @@ const AddCourseForm = ({
 
   // Save current step to localStorage whenever it changes
   useEffect(() => {
-    saveToLocalStorage(FORM_STEP_KEY, currentStep);
-  }, [currentStep]);
+    saveToLocalStorage(FORM_STEP_KEY, 1); // Always step 1 since we removed steps
+  }, []);
 
   // Check for saved draft on component mount
   useEffect(() => {
@@ -191,186 +183,73 @@ const AddCourseForm = ({
     if (confirm("هل تريد حذف المسودة المحفوظة وبدء من جديد؟")) {
       clearDraftData();
       reset(getSavedFormData());
-      setCurrentStep(1);
       enhancedToast.success("تم حذف المسودة بنجاح", {
-        description: "يمكنك الآن بدء إنشاء مادة جديدة"
+        description: "يمكنك الآن بدء إنشاء دورة جديدة"
       });
     }
   };
 
-  const nextStep = async () => {
-    const fieldsToValidate = getFieldsForStep(currentStep);
-    const isValid = await trigger(fieldsToValidate);
-
-    if (isValid && currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const getFieldsForStep = (step: number): (keyof ICourseForm)[] => {
-    switch (step) {
-      case 1:
-        return ["image", "video", "title", "category", "type", "instructor", "level", "price"];
-      case 2:
-        return ["description", "shortContent", "skills", "requirements"];
-      default:
-        return [];
-    }
-  };
-
-  const getStepTitle = () => {
-    switch (currentStep) {
-      case 1:
-        return "المعلومات الأساسية والوسائط";
-      case 2:
-        return "محتوى المادة";
-      default:
-        return "";
-    }
-  };
-
-  const getStepDescription = () => {
-    switch (currentStep) {
-      case 1:
-        return "أضف الوسائط والمعلومات الأساسية للمادة التعليمية";
-      case 2:
-        return "أضف محتوى المادة والمعلومات التفصيلية";
-      default:
-        return "";
-    }
-  };
-
   return (
-    <div className="space-y-8">
-      {/* Progress Steps */}
-      <div className="flex items-center justify-center mb-8">
-        {Array.from({ length: totalSteps }, (_, index) => (
-          <div key={index + 1} className="flex items-center">
-            <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
-                currentStep >= index + 1
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {index + 1}
-            </div>
-            {index < totalSteps - 1 && (
-              <div
-                className={`w-16 h-1 mx-2 ${
-                  currentStep > index + 1 ? "bg-primary" : "bg-muted"
-                }`}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Step Title */}
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold text-foreground">{getStepTitle()}</h2>
-        <p className="text-muted-foreground">{getStepDescription()}</p>
-
-        {/* Draft indicator */}
-        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span>يتم حفظ البيانات تلقائياً</span>
-        </div>
-      </div>
-
-      {/* Form */}
-      <Card className="p-8 border-0 shadow-sm">
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-          {currentStep === 1 ? (
+    <div className="w-full">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column - Basic Information */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">المعلومات الأساسية</h3>
             <div className="space-y-6">
-              {/* الصف الأول: الوسائط */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <FormFields 
-                    name="image"
-                    label="صورة المادة التعليمية"
-                    type="file"
-                    placeholder="اختر صورة للمادة التعليمية"
-                    fileType="image"
-                    accept="image/*"
-                    maxSize={5}
-                    allowedTypes={["image/jpeg", "image/png", "image/jpg", "image/webp"]}
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
-                <div>
-                  <FormFields 
-                    name="video"
-                    label="فيديو تعريفي للمادة"
-                    type="file"
-                    placeholder="اختر فيديو تعريفي للمادة"
-                    fileType="video"
-                    accept="video/*"
-                    maxSize={100}
-                    allowedTypes={["video/mp4", "video/avi", "video/mov", "video/wmv"]}
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
+              {/* Course Image (Optional) */}
+              <div>
+                <FormFields 
+                  name="image"
+                  label="صورة الدورة (اختياري)"
+                  type="file"
+                  placeholder="اختر صورة للدورة (اختياري)"
+                  fileType="image"
+                  accept="image/*"
+                  maxSize={5}
+                  allowedTypes={["image/jpeg", "image/png", "image/jpg", "image/webp"]}
+                  control={control} 
+                  errors={errors} 
+                />
               </div>
-              
-              {/* الصفوف التالية: المعلومات الأساسية */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <FormFields 
-                    name="title"
-                    label="عنوان المادة التعليمية"
-                    type="text"
-                    placeholder="أدخل عنوان المادة التعليمية"
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
-                <div>
-                  <FormFields 
-                    name="category"
-                    label="الفئة"
-                    type="select"
-                    placeholder="اختر فئة المادة"
-                    options={[
-                      { label: "برمجة", value: "برمجة" },
-                      { label: "تصميم", value: "تصميم" },
-                      { label: "تسويق", value: "تسويق" },
-                      { label: "أعمال", value: "أعمال" },
-                      { label: "تطوير شخصي", value: "تطوير شخصي" },
-                    ]}
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
+
+              {/* Course Title */}
+              <div>
+                <FormFields 
+                  name="title"
+                  label="عنوان الدورة *"
+                  type="text"
+                  placeholder="أدخل عنوان الدورة"
+                  control={control} 
+                  errors={errors} 
+                />
               </div>
-              
-              {/* صف نوع المادة والمدرب والمستوى */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <FormFields 
-                    name="type"
-                    label="نوع المادة"
-                    type="select"
-                    placeholder="اختر نوع المادة"
-                    options={[
-                      { label: "تفاعلية", value: "تفاعلية" },
-                    ]}
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
+
+              {/* Category */}
+              <div>
+                <FormFields 
+                  name="category"
+                  label="الفئة *"
+                  type="select"
+                  placeholder="اختر فئة الدورة"
+                  options={[
+                    { label: "برمجة", value: "برمجة" },
+                    { label: "تصميم", value: "تصميم" },
+                    { label: "تسويق", value: "تسويق" },
+                    { label: "أعمال", value: "أعمال" },
+                    { label: "تطوير شخصي", value: "تطوير شخصي" },
+                  ]}
+                  control={control} 
+                  errors={errors} 
+                />
+              </div>
+
+              {/* Instructor and Level */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <FormFields 
                     name="instructor"
-                    label="المدرب"
+                    label="المدرب *"
                     type="select"
                     placeholder="اختر المدرب"
                     options={[
@@ -388,7 +267,7 @@ const AddCourseForm = ({
                 <div>
                   <FormFields 
                     name="level"
-                    label="مستوى الطالب المطلوب"
+                    label="مستوى الطالب المطلوب *"
                     type="select"
                     placeholder="اختر مستوى الطالب"
                     options={[
@@ -401,140 +280,137 @@ const AddCourseForm = ({
                   />
                 </div>
               </div>
-              
-              {/* صف السعر */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <FormFields 
-                    name="price"
-                    label="السعر (ريال سعودي)"
-                    type="number"
-                    placeholder="0"
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
-              </div>
-            </div>
-          ) : currentStep === 2 ? (
-            <div className="space-y-6">
-              {/* الصف الأول: الوصف التفصيلي والمحتوى المختصر */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <FormFields 
-                    name="description"
-                    label="الوصف التفصيلي للمادة"
-                    type="textarea"
-                    placeholder="اكتب وصفاً شاملاً للمادة التعليمية وما سيتعلمه الطلاب..."
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
-                <div>
-                  <FormFields 
-                    name="shortContent"
-                    label="المحتوى المختصر"
-                    type="textarea"
-                    placeholder="ملخص قصير عن محتوى المادة..."
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
-              </div>
-              
-              {/* الصف الثاني: المهارات المكتسبة والمتطلبات الأساسية */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <FormFields 
-                    name="skills"
-                    label="المهارات المكتسبة"
-                    type="textarea"
-                    placeholder="اذكر المهارات التي سيكتسبها الطلاب من هذه المادة..."
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
-                <div>
-                  <FormFields 
-                    name="requirements"
-                    label="المتطلبات الأساسية"
-                    type="textarea"
-                    placeholder="اذكر المتطلبات والمعرفة المسبقة المطلوبة..."
-                    control={control} 
-                    errors={errors} 
-                  />
-                </div>
-              </div>
-            </div>
-          ) : null}
 
-          {/* Form Actions */}
-          <div className="flex items-center justify-between pt-6 border-t">
-            <div className="flex gap-4">
+              {/* Price */}
+              <div>
+                <FormFields 
+                  name="price"
+                  label="السعر (ريال سعودي) *"
+                  type="number"
+                  placeholder="0"
+                  control={control} 
+                  errors={errors} 
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Content and Media */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">محتوى الدورة</h3>
+            <div className="space-y-6">
+              {/* Video (Required) */}
+              <div>
+                <FormFields 
+                  name="video"
+                  label="فيديو تعريفي للدورة *"
+                  type="file"
+                  placeholder="اختر فيديو تعريفي للدورة"
+                  fileType="video"
+                  accept="video/*"
+                  maxSize={100}
+                  allowedTypes={["video/mp4", "video/avi", "video/mov", "video/wmv"]}
+                  control={control} 
+                  errors={errors} 
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <FormFields 
+                  name="description"
+                  label="الوصف التفصيلي للدورة *"
+                  type="textarea"
+                  placeholder="اكتب وصفاً شاملاً للدورة وما سيتعلمه الطلاب..."
+                  control={control} 
+                  errors={errors} 
+                />
+              </div>
+
+              {/* Short Content */}
+              <div>
+                <FormFields 
+                  name="shortContent"
+                  label="المحتوى المختصر *"
+                  type="textarea"
+                  placeholder="ملخص قصير عن محتوى الدورة..."
+                  control={control} 
+                  errors={errors} 
+                />
+              </div>
+
+              {/* Skills */}
+              <div>
+                <FormFields 
+                  name="skills"
+                  label="المهارات المكتسبة *"
+                  type="textarea"
+                  placeholder="اذكر المهارات التي سيكتسبها الطلاب من هذه الدورة..."
+                  control={control} 
+                  errors={errors} 
+                />
+              </div>
+
+              {/* Requirements */}
+              <div>
+                <FormFields 
+                  name="requirements"
+                  label="المتطلبات الأساسية *"
+                  type="textarea"
+                  placeholder="اذكر المتطلبات والمعرفة المسبقة المطلوبة..."
+                  control={control} 
+                  errors={errors} 
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Form Actions */}
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <div className="flex flex-wrap gap-4 justify-between">
+            <div className="flex gap-3">
               {onCancel && (
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleCancel}
                   disabled={formLoading}
+                  className="gap-2"
                 >
+                  <ArrowRight className="w-4 h-4" />
                   إلغاء
                 </Button>
               )}
-
-              {/* Clear draft button */}
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 onClick={handleClearDraft}
                 disabled={formLoading}
-                className="text-destructive hover:text-destructive"
+                className="gap-2 text-red-600 hover:bg-red-50"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                حذف المسودة
+                <Trash2 className="w-4 h-4" />
+                مسح النموذج
               </Button>
-
-              {currentStep > 1 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={prevStep}
-                  disabled={formLoading}
-                >
-                  السابق
-                </Button>
-              )}
             </div>
-
-            <div className="flex space-x-4 rtl:space-x-reverse">
-              {currentStep < totalSteps ? (
-                <Button
-                  type="button"
-                  onClick={nextStep}
-                  disabled={formLoading}
-                  className="flex items-center gap-2"
-                >
-                  التالي
-                  <ArrowRight className="w-4 h-4 rotate-180" />
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  disabled={formLoading}
-                  className="flex items-center gap-2"
-                >
-                  {formLoading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4" />
-                  )}
-                  إنشاء المادة التعليمية
-                </Button>
-              )}
+            
+            <div className="flex gap-3">
+              <Button
+                type="submit"
+                disabled={formLoading}
+                className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {formLoading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                إنشاء الدورة
+              </Button>
             </div>
           </div>
-        </form>
-      </Card>
+        </div>
+      </form>
     </div>
   );
 };

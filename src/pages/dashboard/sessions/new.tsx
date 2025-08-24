@@ -12,21 +12,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Calendar, Clock, Users, DollarSign } from "lucide-react";
+import { ArrowRight, Calendar, Clock, DollarSign, FileText } from "lucide-react";
 import { Routes, Pages } from "@/constants/enums";
+import ImageUploader from "@/components/ui/ImageUploader";
 
 interface SessionFormData {
   title: string;
   description: string;
-  type: string;
-  category: string;
+  instructor: string;
   duration: number;
   price: number;
-  maxParticipants: number;
-  instructor: string;
   date: string;
   time: string;
-  location: string;
+  image: string;
 }
 
 function NewSession() {
@@ -34,15 +32,12 @@ function NewSession() {
   const [formData, setFormData] = useState<SessionFormData>({
     title: "",
     description: "",
-    type: "",
-    category: "",
+    instructor: "",
     duration: 60,
     price: 0,
-    maxParticipants: 1,
-    instructor: "",
     date: "",
     time: "",
-    location: "",
+    image: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -96,189 +91,135 @@ function NewSession() {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Basic Information */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-blue-600" />
-                  المعلومات الأساسية
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">عنوان الجلسة *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange("title", e.target.value)}
-                    placeholder="أدخل عنوان الجلسة"
-                    required
-                  />
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Right Column - Basic Information */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="space-y-6">
+              {/* Session Image */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  صورة الجلسة
+                </Label>
+                <ImageUploader
+                  value={formData.image}
+                  onChange={(val) => handleInputChange("image", val || "")}
+                  placeholder="اضغط لرفع صورة الجلسة"
+                  maxSizeMb={10}
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="description">وصف الجلسة</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange("description", e.target.value)}
-                    placeholder="أدخل وصف مفصل للجلسة"
-                    rows={4}
-                  />
-                </div>
+              {/* Session Title */}
+              <div className="space-y-2">
+                <Label htmlFor="title" className="text-sm font-medium flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-blue-600" />
+                  عنوان الجلسة *
+                </Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  placeholder="أدخل عنوان الجلسة"
+                  required
+                />
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="type">نوع الجلسة *</Label>
-                    <Select value={formData.type} onValueChange={(value) => handleInputChange("type", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر نوع الجلسة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="فردية">فردية</SelectItem>
-                        <SelectItem value="جماعية">جماعية</SelectItem>
-                        <SelectItem value="ورشة عمل">ورشة عمل</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="category">الفئة *</Label>
-                    <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر الفئة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="استشارات تقنية">استشارات تقنية</SelectItem>
-                        <SelectItem value="استشارات أعمال">استشارات أعمال</SelectItem>
-                        <SelectItem value="تطوير شخصي">تطوير شخصي</SelectItem>
-                        <SelectItem value="تصميم">تصميم</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="instructor">المدرب *</Label>
-                  <Input
-                    id="instructor"
-                    value={formData.instructor}
-                    onChange={(e) => handleInputChange("instructor", e.target.value)}
-                    placeholder="أدخل اسم المدرب"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="location">المكان</Label>
-                  <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) => handleInputChange("location", e.target.value)}
-                    placeholder="أدخل مكان انعقاد الجلسة"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+              {/* Instructor */}
+              <div className="space-y-2">
+                <Label htmlFor="instructor" className="text-sm font-medium">
+                  المدرب *
+                </Label>
+                <Input
+                  id="instructor"
+                  value={formData.instructor}
+                  onChange={(e) => handleInputChange("instructor", e.target.value)}
+                  placeholder="أدخل اسم المدرب"
+                  required
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Session Details */}
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-blue-600" />
-                  تفاصيل الجلسة
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="duration">المدة (بالدقائق) *</Label>
-                  <Input
-                    id="duration"
-                    type="number"
-                    value={formData.duration}
-                    onChange={(e) => handleInputChange("duration", parseInt(e.target.value) || 0)}
-                    placeholder="60"
-                    min="15"
-                    max="480"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="price" className="flex items-center gap-1">
-                    <DollarSign className="w-4 h-4" />
-                    السعر (ر.س) *
-                  </Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange("price", parseInt(e.target.value) || 0)}
-                    placeholder="0"
-                    min="0"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="maxParticipants" className="flex items-center gap-1">
-                    <Users className="w-4 h-4" />
-                    الحد الأقصى للمشاركين *
-                  </Label>
-                  <Input
-                    id="maxParticipants"
-                    type="number"
-                    value={formData.maxParticipants}
-                    onChange={(e) => handleInputChange("maxParticipants", parseInt(e.target.value) || 1)}
-                    placeholder="1"
-                    min="1"
-                    max="100"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="date">التاريخ *</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => handleInputChange("date", e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="time">الوقت *</Label>
-                  <Input
-                    id="time"
-                    type="time"
-                    value={formData.time}
-                    onChange={(e) => handleInputChange("time", e.target.value)}
-                    required
-                  />
-                </div>
-              </CardContent>
-            </Card>
+          {/* Left Column - Session Details */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="space-y-4">
+              <Label className="text-sm font-medium flex items-center gap-2">
+                <FileText className="w-4 h-4 text-slate-600" />
+                وصف الجلسة
+              </Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => handleInputChange("description", e.target.value)}
+                placeholder="أدخل وصف مفصل للجلسة"
+                rows={8}
+                className="min-h-[200px]"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-end gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate(`${Routes.DASHBOARD}/${Pages.SESSIONS}`)}
-          >
-            إلغاء
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "جاري الحفظ..." : "حفظ الجلسة"}
-          </Button>
+        {/* Basic Information Section */}
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <div className="mb-6">
+            <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-blue-600" />
+              المعلومات الأساسية
+            </h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="duration" className="text-sm font-medium flex items-center gap-2">
+                <Clock className="w-4 h-4 text-purple-600" />
+                المدة (بالدقائق) *
+              </Label>
+              <Input
+                id="duration"
+                type="number"
+                value={formData.duration}
+                onChange={(e) => handleInputChange("duration", parseInt(e.target.value) || 0)}
+                placeholder="60"
+                min="15"
+                max="480"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="price" className="text-sm font-medium flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-green-600" />
+                السعر (ر.س) *
+              </Label>
+              <Input
+                id="price"
+                type="number"
+                value={formData.price}
+                onChange={(e) => handleInputChange("price", parseInt(e.target.value) || 0)}
+                placeholder="0"
+                min="0"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Submit Buttons */}
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <div className="flex justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate(`${Routes.DASHBOARD}/${Pages.SESSIONS}`)}
+              className="gap-2"
+            >
+              <ArrowRight className="w-4 h-4" />
+              إلغاء
+            </Button>
+            
+            <Button type="submit" disabled={isSubmitting} className="gap-2">
+              {isSubmitting ? "جاري الحفظ..." : "حفظ الجلسة"}
+            </Button>
+          </div>
         </div>
       </form>
     </div>

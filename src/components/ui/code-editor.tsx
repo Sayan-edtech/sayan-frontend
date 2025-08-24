@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Label } from './label';
 import { cn } from '@/lib/utils';
 import { Play, Copy, RotateCcw, CheckCircle, AlertCircle } from 'lucide-react';
@@ -46,18 +46,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const [copied, setCopied] = useState(false);
 
   // تمييز الأكواد البسيط
-  const highlightCode = (code: string) => {
-    const keywords = {
-      javascript: ['function', 'const', 'let', 'var', 'if', 'else', 'for', 'while', 'return', 'class', 'import', 'export'],
-      python: ['def', 'class', 'import', 'from', 'if', 'else', 'elif', 'for', 'while', 'return', 'True', 'False'],
-      html: ['div', 'span', 'p', 'h1', 'h2', 'h3', 'body', 'head', 'html'],
-      css: ['color', 'background', 'margin', 'padding', 'border', 'width', 'height'],
-      java: ['public', 'private', 'class', 'interface', 'extends', 'implements', 'if', 'else', 'for', 'while'],
-      cpp: ['int', 'char', 'bool', 'void', 'class', 'namespace', 'using', 'if', 'else', 'for', 'while']
-    };
-
-    return keywords[language] || keywords.javascript;
-  };
+  // Reserved for future syntax highlighting
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (!readOnly && onChange) {

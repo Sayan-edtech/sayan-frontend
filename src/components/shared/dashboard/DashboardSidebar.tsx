@@ -27,18 +27,24 @@ import {
   ClipboardCheck,
   Award,
   MessageSquare,
+  MessageCircle,
   Database,
   Wallet,
   ExternalLink,
   Brain,
   PanelLeftClose,
-  PanelRightClose
+  PanelRightClose,
+  Ticket,
+  Link2,
+  Bell,
+  TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { UserType } from "@/constants/enums";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SidebarSubItem {
   id: string;
@@ -77,6 +83,7 @@ function DashboardSidebar({
   isCollapsed,
   setIsCollapsed,
 }: DashboardSidebarProps) {
+  const { lang, t } = useLanguage();
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
@@ -91,130 +98,158 @@ function DashboardSidebar({
   const academySidebarItems: SidebarItem[] = [
     {
       id: "content-management",
-      title: "ادارة المحتوى",
+      title: t("sidebar.content-management", "ادارة المحتوى"),
       icon: <FileText className="w-5 h-5" />,
       isExpandable: true,
       subItems: [
         {
           id: "courses",
-          title: "الدورات التدريبية",
+          title: t("sidebar.courses", "الدورات التدريبية"),
           href: "/dashboard/courses",
           icon: <GraduationCap className="w-4 h-4" />,
         },
 
         {
           id: "sessions",
-          title: "الجلسات الحضورية",
+          title: t("sidebar.sessions", "الجلسات الخصوصية"),
           href: "/dashboard/sessions",
           icon: <Calendar className="w-4 h-4" />,
         },
         {
-          id: "appointments",
-          title: "إدارة المواعيد",
-          href: "/dashboard/appointments",
-          icon: <Clock className="w-4 h-4" />,
-        },
-        {
           id: "certificates-editing",
-          title: "تحرير الشهادات",
+          title: t("sidebar.certificates-editing", "تحرير الشهادات"),
           href: "/dashboard/certificates-editing",
           icon: <Award className="w-4 h-4" />,
         },
         {
           id: "content-digital-products",
-          title: "المنتجات الرقمية",
+          title: t("sidebar.digital-products", "المنتجات الرقمية"),
           href: "/dashboard/digital-products",
           icon: <Package className="w-4 h-4" />,
         },
         {
           id: "product-packages",
-          title: "حزم المنتجات",
+          title: t("sidebar.product-packages", "حزم المنتجات"),
           href: "/dashboard/product-packages",
           icon: <Layers className="w-4 h-4" />,
-          badge: "قريباً",
-          comingSoon: true,
         },
         {
           id: "blogs",
-          title: "المدونات",
+          title: t("sidebar.blogs", "المدونات"),
           href: "/dashboard/blogs",
           icon: <Edit3 className="w-4 h-4" />,
         },
       ],
     },
     {
+      id: "marketing-tools",
+      title: t("sidebar.marketing-tools", "ادوات التسويق"),
+      icon: <TrendingUp className="w-5 h-5" />,
+      isExpandable: true,
+      subItems: [
+        {
+          id: "coupons",
+          title: t("sidebar.coupons", "كوبونات الخصم"),
+          href: "/dashboard/coupons",
+          icon: <Ticket className="w-4 h-4" />,
+        },
+        {
+          id: "affiliate-links",
+          title: t("sidebar.affiliate-links", "روابط التسويق بالعمولة"),
+          href: "/dashboard/affiliate-links",
+          icon: <Link2 className="w-4 h-4" />,
+        },
+        {
+          id: "affiliate-applications",
+          title: t("sidebar.affiliate-applications", "طلبات التسويق بالعمولة"),
+          href: "/dashboard/affiliate-applications",
+          icon: <Users className="w-4 h-4" />,
+        },
+        {
+          id: "offers",
+          title: t("sidebar.offers", "العروض والخصومات"),
+          href: "/dashboard/offers",
+          icon: <Star className="w-4 h-4" />,
+        },
+      ],
+    },
+    {
       id: "student-information",
-      title: "معلومات الطلاب",
+      title: t("sidebar.student-information", "معلومات الطلاب"),
       icon: <Database className="w-5 h-5" />,
       isExpandable: true,
       subItems: [
         {
-          id: "student-data",
-          title: "بيانات الطلاب",
-          href: "/dashboard/student-data",
+          id: "student-notifications",
+          title: t("sidebar.student-notifications", "بيانات الطلاب"),
+          href: "/dashboard/student-notifications",
           icon: <Users className="w-4 h-4" />,
-          badge: "قريباً",
-          comingSoon: true,
         },
         {
-          id: "exams",
-          title: "الاختبارات",
-          href: "/dashboard/exams",
+          id: "exam-statistics",
+          title: t("sidebar.exam-statistics", "إحصائيات الاختبارات"),
+          href: "/dashboard/exam-statistics",
           icon: <ClipboardCheck className="w-4 h-4" />,
-          badge: "قريباً",
-          comingSoon: true,
-        },
-        {
-          id: "certificates-management",
-          title: "الشهادات",
-          href: "/dashboard/certificates-management",
-          icon: <Award className="w-4 h-4" />,
-          badge: "قريباً",
-          comingSoon: true,
         },
         {
           id: "comments",
-          title: "التعليقات",
+          title: t("sidebar.comments", "التعليقات"),
           href: "/dashboard/comments",
           icon: <MessageSquare className="w-4 h-4" />,
-          badge: "قريباً",
-          comingSoon: true,
+        },
+        {
+          id: "student-certificates",
+          title: t("sidebar.student-certificates", "شهادات الطلاب"),
+          href: "/dashboard/student-certificates",
+          icon: <Award className="w-4 h-4" />,
+        },
+        {
+          id: "student-questions",
+          title: t("sidebar.student-questions", "أسئلة الطلاب"),
+          href: "/dashboard/student-questions",
+          icon: <MessageCircle className="w-4 h-4" />,
+        },
+        {
+          id: "student-chat",
+          title: t("sidebar.student-chat", "محادثات الطلاب"),
+          href: "/dashboard/student-chat",
+          icon: <MessageSquare className="w-4 h-4" />,
         },
       ],
     },
     {
       id: "academy-interface-editing",
-      title: "تعديل واجهات الأكاديمية",
+      title: t("sidebar.academy-interface-editing", "تعديل واجهات الأكاديمية"),
       icon: <Palette className="w-5 h-5" />,
       isExpandable: true,
       subItems: [
         {
           id: "template",
-          title: "الاعدادات الرئيسية",
+          title: t("sidebar.template", "الاعدادات الرئيسية"),
           href: "/dashboard/template",
           icon: <Settings className="w-4 h-4" />,
         },
         {
           id: "main-menu",
-          title: "القسم الرئيسي",
+          title: t("sidebar.main-menu", "القسم الرئيسي"),
           href: "/dashboard/template/main-menu",
           icon: <List className="w-4 h-4" />,
         },
         {
           id: "about",
-          title: "قسم من نحن",
+          title: t("sidebar.about", "قسم من نحن"),
           href: "/dashboard/template/about",
           icon: <Info className="w-4 h-4" />,
         },
         {
           id: "student-reviews",
-          title: "تقييمات الطلاب",
+          title: t("sidebar.student-reviews", "تقييمات الطلاب"),
           href: "/dashboard/template/student-reviews",
           icon: <Star className="w-4 h-4" />,
         },
         {
           id: "faqs",
-          title: "الأسئلة الشائعة",
+          title: t("sidebar.faqs", "الأسئلة الشائعة"),
           href: "/dashboard/template/faqs",
           icon: <HelpCircle className="w-4 h-4" />,
         },
@@ -222,55 +257,55 @@ function DashboardSidebar({
     },
     {
       id: "ai-learning-materials",
-      title: "المواد التعليمية الذكية",
+      title: t("sidebar.ai-learning-materials", "المواد التعليمية الذكية"),
       href: "/dashboard/ai-learning-materials",
       icon: <Brain className="w-5 h-5" />,
       badge: "AI",
     },
     {
       id: "wallet",
-      title: "المحفظة",
+      title: t("sidebar.wallet", "المحفظة"),
       href: "/dashboard/wallet",
       icon: <Wallet className="w-5 h-5" />,
     },
     {
-      id: "trainers",
-      title: "ادارة المدربين",
-      href: "/dashboard/trainers",
+      id: "users",
+      title: t("sidebar.users", "إدارة المستخدمين"),
+      href: "/dashboard/users",
       icon: <UserCheck className="w-5 h-5" />,
     },
   ];
   const studentSidebarItems: SidebarItem[] = [
     {
       id: "students-bag",
-      title: "حقيبة الطلاب",
+      title: t("sidebar.students-bag", "حقيبة الطلاب"),
       icon: <Briefcase className="w-5 h-5" />,
       isExpandable: true,
       subItems: [
         {
           id: "courses",
-          title: "المواد التعليمية",
+          title: t("sidebar.materials", "المواد التعليمية"),
           href: "/dashboard/courses",
           icon: <BookOpen className="w-4 h-4" />,
         },
 
         {
           id: "digital-products",
-          title: "المنتجات الرقمية",
+          title: t("sidebar.digital-products", "المنتجات الرقمية"),
           href: "/dashboard/digital-products",
           icon: <Package className="w-4 h-4" />,
         },
         {
           id: "certificates",
-          title: "الشهادات",
+          title: t("sidebar.certificates", "الشهادات"),
           href: "/dashboard/certificates",
           icon: <GraduationCap className="w-4 h-4" />,
-          badge: "قريباً",
+          badge: t("chip.soon", "قريباً"),
           comingSoon: true,
         },
         {
           id: "favorites",
-          title: "قائمة المفضلة",
+          title: t("sidebar.favorites", "قائمة المفضلة"),
           href: "/dashboard/favorites",
           icon: <Heart className="w-4 h-4" />,
         },
@@ -278,20 +313,20 @@ function DashboardSidebar({
     },
     {
       id: "ai-learning-materials",
-      title: "المواد التعليمية الذكية", 
+      title: t("sidebar.ai-learning-materials", "المواد التعليمية الذكية"), 
       href: "/dashboard/ai-learning-materials",
       icon: <Brain className="w-5 h-5" />,
       badge: "AI",
     },
     {
       id: "purchases",
-      title: "المشتريات",
+      title: t("sidebar.purchases", "المشتريات"),
       href: "/dashboard/purchases",
       icon: <Menu className="w-5 h-5" />,
     },
     {
       id: "shopping-cart",
-      title: "عربة التسوق",
+      title: t("sidebar.shopping-cart", "عربة التسوق"),
       href: "/dashboard/shopping-cart",
       icon: <ShoppingCart className="w-5 h-5" />,
     },
@@ -300,13 +335,13 @@ function DashboardSidebar({
   const baseSidebarItems: SidebarItem[] = [
     {
       id: "dashboard",
-      title: "لوحة التحكم",
+      title: t("sidebar.dashboard", "لوحة التحكم"),
       href: "/dashboard",
       icon: <Home className="w-5 h-5" />,
     },
     {
       id: "profile",
-      title: "الملف الشخصي",
+      title: t("sidebar.profile", "الملف الشخصي"),
       href: "/dashboard/profile",
       icon: <User className="w-5 h-5" />,
     },
@@ -320,9 +355,9 @@ function DashboardSidebar({
   ];
 
   // Debug log to see the userType value
-  console.log("DashboardSidebar userType:", userType);
-  console.log("UserType.ACADEMY:", UserType.ACADEMY);
-  console.log("Is Academy?", userType === UserType.ACADEMY);
+  // console.log("DashboardSidebar userType:", userType);
+  // console.log("UserType.ACADEMY:", UserType.ACADEMY);
+  // console.log("Is Academy?", userType === UserType.ACADEMY);
 
   const isActivePath = (href: string) => {
     if (href === "/dashboard") {
@@ -333,149 +368,7 @@ function DashboardSidebar({
     return location.pathname.startsWith(href);
   };
 
-  const renderSidebarItem = (item: SidebarItem) => {
-    if (item.isExpandable && item.subItems) {
-      const isExpanded = expandedItems.includes(item.id);
-      const hasActiveSubItem = item.subItems.some(
-        (subItem) => subItem.href && isActivePath(subItem.href)
-      );
-
-      return (
-        <li key={item.id} className="mb-1">
-          {/* Parent Item */}
-          <button
-            onClick={() => toggleExpanded(item.id)}
-            className={cn(
-              "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors duration-200",
-              hasActiveSubItem || isExpanded
-                ? "bg-blue-600 text-white"
-                : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <div className={cn(
-                "w-8 h-8 rounded-lg flex items-center justify-center",
-                hasActiveSubItem || isExpanded
-                  ? "text-white"
-                  : "text-blue-600"
-              )}>
-                {item.icon}
-              </div>
-              <span className="font-medium text-sm">{item.title}</span>
-            </div>
-            <ChevronDown
-              className={cn(
-                "w-4 h-4 transition-transform duration-200",
-                isExpanded ? "rotate-180" : "rotate-0"
-              )}
-            />
-          </button>
-
-          {/* Sub Items */}
-          {isExpanded && (
-            <div className="mt-1 ml-6 space-y-1 border-l-2 border-blue-100 pl-3">
-              {item.subItems.map((subItem) => (
-                <div key={subItem.id}>
-                  {subItem.comingSoon ? (
-                    <div className="flex items-center justify-between px-3 py-2 text-gray-400 cursor-not-allowed">
-                      <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center">
-                          {subItem.icon}
-                        </div>
-                        <span className="text-sm">{subItem.title}</span>
-                      </div>
-                      {subItem.badge && (
-                        <Badge variant="secondary" className="bg-orange-100 text-orange-600 text-xs">
-                          {subItem.badge}
-                        </Badge>
-                      )}
-                    </div>
-                  ) : (
-                    <Link to={subItem.href!} onClick={isMobile ? onClose : undefined}>
-                      <div className={cn(
-                        "flex items-center justify-between px-3 py-2 rounded-md transition-colors duration-200",
-                        isActivePath(subItem.href!)
-                          ? "bg-blue-600 text-white"
-                          : "text-gray-600 hover:bg-blue-50 hover:text-blue-600"
-                      )}>
-                        <div className="flex items-center gap-3">
-                          <div className={cn(
-                            "w-6 h-6 rounded-md flex items-center justify-center",
-                            isActivePath(subItem.href!)
-                              ? "text-white"
-                              : "text-blue-600"
-                          )}>
-                            {subItem.icon}
-                          </div>
-                          <span className="text-sm">{subItem.title}</span>
-                        </div>
-                        {subItem.badge && !isActivePath(subItem.href!) && (
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-600 text-xs">
-                            {subItem.badge}
-                          </Badge>
-                        )}
-                      </div>
-                    </Link>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </li>
-      );
-    }
-
-    // Regular item (non-expandable)
-    if (item.comingSoon) {
-      return (
-        <li key={item.id} className="mb-1">
-          <div className="flex items-center justify-between px-4 py-3 rounded-lg text-gray-400 cursor-not-allowed">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-                {item.icon}
-              </div>
-              <span className="font-medium text-sm">{item.title}</span>
-            </div>
-            {item.badge && (
-              <Badge variant="secondary" className="bg-orange-100 text-orange-600 text-xs">
-                {item.badge}
-              </Badge>
-            )}
-          </div>
-        </li>
-      );
-    }
-
-    return (
-      <li key={item.id} className="mb-1">
-        <Link to={item.href!} onClick={isMobile ? onClose : undefined}>
-          <div className={cn(
-            "flex items-center justify-between px-4 py-3 rounded-lg transition-colors duration-200",
-            isActivePath(item.href!)
-              ? "bg-blue-600 text-white"
-              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-          )}>
-            <div className="flex items-center gap-3">
-              <div className={cn(
-                "w-8 h-8 rounded-lg flex items-center justify-center",
-                isActivePath(item.href!)
-                  ? "text-white"
-                  : "text-blue-600"
-              )}>
-                {item.icon}
-              </div>
-              <span className="font-medium text-sm">{item.title}</span>
-            </div>
-            {item.badge && !isActivePath(item.href!) && (
-              <Badge variant="secondary" className="bg-blue-100 text-blue-600 text-xs">
-                {item.badge}
-              </Badge>
-            )}
-          </div>
-        </Link>
-      </li>
-    );
-  };
+  // Note: renderSidebarItem was removed (unused)
 
   const sidebarContent = (
     <div 
@@ -487,12 +380,12 @@ function DashboardSidebar({
     >
       {/* Mobile Header */}
       {isMobile && (
-        <div className="flex items-center justify-between p-4 border-b border-white/30">
+        <div className="flex items-center justify-between p-4 border-b border-white/30" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
               <Menu className="w-4 h-4 text-white" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">القائمة</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('sidebar.menu', 'القائمة')}</h2>
           </div>
           <Button
             variant="ghost"
@@ -506,20 +399,20 @@ function DashboardSidebar({
       )}
 
       {/* Profile Section & Collapse Button */}
-      <div className={cn("p-4 border-b border-white/30", isCollapsed && "p-2")}>
+      <div className={cn("p-4 border-b border-white/30", isCollapsed && "p-2")} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-between">
           {!isCollapsed && (
              <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center">
                   <img
                     src="https://avatars.githubusercontent.com/u/87553297?v=4"
-                    alt="أكاديمية سيان"
+                    alt={lang === 'ar' ? "أكاديمية" : "Academy"}
                     className="w-10 h-10 rounded-lg object-cover"
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900">أكاديمية سيان</h3>
-                  <p className="text-sm text-gray-600">لوحة التحكم</p>
+                  <h3 className="font-semibold text-gray-900">{lang === 'ar' ? 'أكاديمية سيان' : 'Siyan Academy'}</h3>
+                  <p className="text-sm text-gray-600">{t('dashboard.title', 'لوحة التحكم')}</p>
                 </div>
               </div>
           )}
@@ -537,7 +430,7 @@ function DashboardSidebar({
              <Link to="/academy/simple-arab-code" target="_blank" className="block">
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                   <ExternalLink className="w-4 h-4 mr-2" />
-                  زيارة الأكاديمية
+                  {t('sidebar.visit-academy')}
                 </Button>
               </Link>
            </div>
@@ -545,14 +438,14 @@ function DashboardSidebar({
       </div>
 
       {/* Back to Main Site Button */}
-      <div className={cn("p-4 border-b border-white/30", isCollapsed && "p-2")}>
+      <div className={cn("p-4 border-b border-white/30", isCollapsed && "p-2")} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
         <Link to="/" className="block">
           <Button 
             variant="outline"
             className="w-full justify-center gap-2 border-gray-300 hover:bg-white/50"
           >
             <Home className="w-4 h-4" />
-            {!isCollapsed && "العودة للرئيسية"}
+            {!isCollapsed && t('sidebar.back-home')}
           </Button>
         </Link>
       </div>

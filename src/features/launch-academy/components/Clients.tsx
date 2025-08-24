@@ -7,37 +7,48 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 function Clients() {
-  // Partners logos data
-  const partners = [
+  // Client logos data - Update these paths with actual logo files
+  const clients = [
     {
       id: 1,
-      name: "شريك النجاح الأول",
-      logo: "/assets/images/partners/Logo-Files-02.png",
+      name: "Durar Al Safia",
+      logo: "https://sayan.pro/assets/SayanLogo-D89UIoGs.png",
     },
     {
       id: 2,
-      name: "شريك النجاح الثاني",
-      logo: "/assets/images/partners/Asset 1@2x.png",
+      name: "Pupil Optical",
+      logo: "https://sayan.pro/assets/SayanLogo-D89UIoGs.png",
     },
     {
       id: 3,
-      name: "شريك النجاح الثالث",
-      logo: "/assets/images/partners/Screenshot_20250522_171933_Samsung-Internet-750x395-1.jpg",
+      name: "سيانتاليزر",
+      logo: "https://sayan.pro/assets/SayanLogo-D89UIoGs.png",
     },
     {
       id: 4,
-      name: "شريك النجاح الرابع",
-      logo: "/assets/images/partners/Logo-Files-02.png",
+      name: "الجونه للأعمال",
+      logo: "https://sayan.pro/assets/SayanLogo-D89UIoGs.png",
     },
     {
       id: 5,
-      name: "شريك النجاح الخامس",
-      logo: "/assets/images/partners/Asset 1@2x.png",
+      name: "ميفاد",
+      logo: "https://sayan.pro/assets/SayanLogo-D89UIoGs.png",
     },
     {
       id: 6,
-      name: "شريك النجاح السادس",
-      logo: "/assets/images/partners/Screenshot_20250522_171933_Samsung-Internet-750x395-1.jpg",
+      name: "Palm Tree",
+      logo: "https://sayan.pro/assets/SayanLogo-D89UIoGs.png",
+    },
+    // Duplicate for continuous scroll effect
+    {
+      id: 7,
+      name: "Pupil Optical 2",
+      logo: "https://sayan.pro/assets/SayanLogo-D89UIoGs.png",
+    },
+    {
+      id: 8,
+      name: "Durar Al Safia 2",
+      logo: "https://sayan.pro/assets/SayanLogo-D89UIoGs.png",
     },
   ];
 
@@ -47,10 +58,11 @@ function Clients() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            <span className="text-primary">شركاء</span> النجاح
+            <span className="text-primary">عملاء</span> نفتخر بهم
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            نفتخر بشراكتنا مع رواد الأعمال والمؤسسات الرائدة في المملكة العربية السعودية
+            نتشرف بثقة عملائنا وشركائنا الذين اختاروا منصة سيان لتطوير أعمالهم
+            التعليمية
           </p>
         </div>
 
@@ -93,13 +105,13 @@ function Clients() {
             }}
             className="clients-swiper pb-16"
           >
-            {partners.map((partner) => (
-              <SwiperSlide key={partner.id}>
+            {clients.map((client) => (
+              <SwiperSlide key={client.id}>
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 group">
                   <div className="flex items-center justify-center h-20">
                     <img
-                      src={partner.logo}
-                      alt={partner.name}
+                      src={client.logo}
+                      alt={client.name}
                       className="max-h-full max-w-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300 group-hover:scale-110"
                       loading="lazy"
                     />

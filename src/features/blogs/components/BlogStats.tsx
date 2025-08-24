@@ -37,7 +37,7 @@ const StatCard = ({ title, value, icon, change, changeType }: StatCardProps) => 
   );
 }
 
-export function BlogStats({ blogs }: BlogStatsProps) {
+function BlogStats({ blogs }: BlogStatsProps) {
   const totalBlogs = blogs.length;
   const publishedBlogs = blogs.filter(blog => blog.status === 'published').length;
   const draftBlogs = blogs.filter(blog => blog.status === 'draft').length;
@@ -82,3 +82,5 @@ export function BlogStats({ blogs }: BlogStatsProps) {
     </div>
   );
 }
+
+export { BlogStats };

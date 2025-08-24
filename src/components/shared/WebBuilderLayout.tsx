@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Eye, Settings, Save, Undo2, Redo2, Maximize2, Minimize2 } from "lucide-react";
+import { Eye, Settings, Save, Undo2, Redo2, Maximize2, Minimize2, Monitor, Tablet, Smartphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import WebBuilderControls from "./WebBuilderControls";
 
@@ -29,6 +29,7 @@ export default function WebBuilderLayout({
 }: WebBuilderLayoutProps) {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
   const handleSettingsChange = (settings: any) => {
     console.log("Settings changed:", settings);
@@ -70,6 +71,34 @@ export default function WebBuilderLayout({
           </div>
 
           <div className="flex items-center gap-3">
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-1">
+              <Button
+                variant={viewMode === 'desktop' ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode('desktop')}
+                className="p-2"
+              >
+                <Monitor className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'tablet' ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode('tablet')}
+                className="p-2"
+              >
+                <Tablet className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'mobile' ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode('mobile')}
+                className="p-2"
+              >
+                <Smartphone className="w-4 h-4" />
+              </Button>
+            </div>
+
             {/* Fullscreen Toggle */}
             <Button
               variant="outline"
@@ -146,8 +175,13 @@ export default function WebBuilderLayout({
               </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto">
-              <div className="h-full">
+            <div className="flex-1 overflow-y-auto flex justify-center items-start p-4">
+              <div className={cn(
+                "bg-white shadow-xl rounded-lg overflow-hidden transition-all duration-300",
+                viewMode === 'desktop' && "w-full h-full",
+                viewMode === 'tablet' && "w-[768px] h-[1024px] scale-75 origin-top",
+                viewMode === 'mobile' && "w-96 h-[812px] scale-75 origin-top"
+              )}>
                 {previewComponent}
               </div>
             </div>

@@ -13,6 +13,11 @@ export const links = [
   },
   {
     id: crypto.randomUUID(),
+    title: "المدونة",
+    href: "/blogs",
+  },
+  {
+    id: crypto.randomUUID(),
     title: "الذكاء الاصطناعي",
     href: "/ai",
   },
