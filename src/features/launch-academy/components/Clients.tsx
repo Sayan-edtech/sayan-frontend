@@ -12,32 +12,32 @@ function Clients() {
     {
       id: 1,
       name: "شريك النجاح الأول",
-      logo: "/assets/images/partners/Logo-Files-02.png",
+      logo: "/assets/images/launch-academy/partners/1.png",
     },
     {
       id: 2,
       name: "شريك النجاح الثاني",
-      logo: "/assets/images/partners/Asset 1@2x.png",
+      logo: "/assets/images/launch-academy/partners/2.png",
     },
     {
       id: 3,
       name: "شريك النجاح الثالث",
-      logo: "/assets/images/partners/Screenshot_20250522_171933_Samsung-Internet-750x395-1.jpg",
+      logo: "/assets/images/launch-academy/partners/3.jpg",
     },
     {
       id: 4,
       name: "شريك النجاح الرابع",
-      logo: "/assets/images/partners/Logo-Files-02.png",
+      logo: "/assets/images/launch-academy/partners/2.png",
     },
     {
       id: 5,
       name: "شريك النجاح الخامس",
-      logo: "/assets/images/partners/Asset 1@2x.png",
+      logo: "/assets/images/launch-academy/partners/1.png",
     },
     {
       id: 6,
       name: "شريك النجاح السادس",
-      logo: "/assets/images/partners/Screenshot_20250522_171933_Samsung-Internet-750x395-1.jpg",
+      logo: "/assets/images/launch-academy/partners/3.jpg",
     },
   ];
 
