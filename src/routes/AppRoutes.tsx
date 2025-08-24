@@ -13,6 +13,8 @@ import Ai from "@/pages/ai";
 import { dashboardRoutes } from "./DashboardRoutes";
 import { authRoutes } from "./AuthRoutes";
 import { academyRoutes } from "./academy-routes";
+import Terms from "@/pages/terms";
+import Updates from "@/pages/updates";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -23,6 +25,8 @@ export const router = createBrowserRouter(
       <Route path="launch-academy" element={<LaunchAcademy />} />
       <Route path="ai" element={<Ai />} />
       <Route path="employee-training" element={<EmployeeTraining />} />
+      <Route path="terms" element={<Terms />} />
+      <Route path="updates" element={<Updates />} />
       {dashboardRoutes}
       {authRoutes}
       {academyRoutes}
