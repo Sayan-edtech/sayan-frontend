@@ -18,6 +18,8 @@ import { ProtectedRoute } from "@/components/shared/GuardRoute";
 import ManageCourse from "@/pages/dashboard/courses/mange";
 import DashboardLayout from "@/features/dashboard/components/DashboardLayout";
 import MyCourseDetails from "@/pages/dashboard/my-courses/[courseId]";
+import AcademyCoupons from "@/pages/coupons";
+import CouponStats from "@/pages/coupons/stats/[id]";
 
 export const dashboardRoutes = (
   <Route
@@ -54,6 +56,10 @@ export const dashboardRoutes = (
       path="affiliate-marketing"
       element={<div>التسويق بالعمولة - قريباً</div>}
     />
+    <Route path="coupons">
+      <Route index element={<AcademyCoupons />} />
+      <Route path="stats/:id" element={<CouponStats />} />
+    </Route>
 
     {templateRoutes}
   </Route>

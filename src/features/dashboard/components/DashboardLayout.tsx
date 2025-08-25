@@ -8,6 +8,7 @@ import { useAuth } from "@/features/auth/hooks/useAuthStore";
 function DashboardLayout() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { user, isLoading } = useAuth();
+
   if (isLoading) {
     return <DashboardLoading />;
   }
