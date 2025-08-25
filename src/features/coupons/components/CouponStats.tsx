@@ -1,4 +1,10 @@
-import { TrendingUp, Ticket, CheckCircle, Users, DollarSign } from "lucide-react";
+import {
+  TrendingUp,
+  Ticket,
+  CheckCircle,
+  Users,
+  DollarSign,
+} from "lucide-react";
 import type { Coupon } from "@/types/coupon";
 
 interface CouponStatsProps {
@@ -13,7 +19,13 @@ interface StatCardProps {
   changeType?: "positive" | "negative";
 }
 
-const StatCard = ({ title, value, icon, change, changeType }: StatCardProps) => {
+const StatCard = ({
+  title,
+  value,
+  icon,
+  change,
+  changeType,
+}: StatCardProps) => {
   return (
     <div className="bg-white rounded-lg border-0 shadow-sm p-6">
       <div className="flex items-center justify-between">
@@ -35,21 +47,23 @@ const StatCard = ({ title, value, icon, change, changeType }: StatCardProps) => 
       </div>
     </div>
   );
-}
+};
 
 export function CouponStats({ coupons }: CouponStatsProps) {
   const totalCoupons = coupons.length;
-  const activeCoupons = coupons.filter(coupon => coupon.status === 'active').length;
+  const activeCoupons = coupons.filter(
+    (coupon) => coupon.status === "active"
+  ).length;
   // const expiredCoupons = coupons.filter(coupon => coupon.status === 'expired').length;
   const totalUsage = coupons.reduce((sum, coupon) => sum + coupon.usedCount, 0);
-  
+
   // حساب إجمالي الايرادات (تقدير)
   const totalSavings = coupons.reduce((sum, coupon) => {
-    if (coupon.type === 'percentage') {
+    if (coupon.type === "percentage") {
       // تقدير مبدئي - يمكن تحسينه لاحقاً
-      return sum + (coupon.usedCount * 50 * (coupon.value / 100));
+      return sum + coupon.usedCount * 50 * (coupon.value / 100);
     } else {
-      return sum + (coupon.usedCount * coupon.value);
+      return sum + coupon.usedCount * coupon.value;
     }
   }, 0);
 

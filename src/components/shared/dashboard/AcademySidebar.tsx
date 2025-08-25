@@ -24,6 +24,8 @@ import {
   PanelLeftClose,
   Menu,
   Ticket,
+  Link2,
+  TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -80,7 +82,7 @@ function AcademySidebar({
         : [...prev, itemId]
     );
   };
-  
+
   const academy = getAcademyDetails(user);
 
   // If no academy found, return null or a fallback
@@ -146,6 +148,38 @@ function AcademySidebar({
           title: "الكوبونات",
           href: "/dashboard/coupons",
           icon: <Ticket className="w-4 h-4" />,
+        },
+      ],
+    },
+    {
+      id: "marketing-tools",
+      title: "أدوات التسويق",
+      icon: <TrendingUp className="w-5 h-5" />,
+      isExpandable: true,
+      subItems: [
+        {
+          id: "coupons",
+          title: "كوبونات الخصم",
+          href: "/dashboard/coupons",
+          icon: <Ticket className="w-4 h-4" />,
+        },
+        {
+          id: "affiliate-links",
+          title: "روابط التسويق بالعمولة",
+          href: "/dashboard/affiliate-links",
+          icon: <Link2 className="w-4 h-4" />,
+        },
+        {
+          id: "affiliate-applications",
+          title: "طلبات التسويق بالعمولة",
+          href: "/dashboard/affiliate-applications",
+          icon: <Users className="w-4 h-4" />,
+        },
+        {
+          id: "offers",
+          title: "العروض والخصومات",
+          href: "/dashboard/offers",
+          icon: <Star className="w-4 h-4" />,
         },
       ],
     },

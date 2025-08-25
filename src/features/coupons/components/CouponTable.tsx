@@ -11,9 +11,20 @@ import type {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
+  Table as ReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Edit, Trash2, Copy, BarChart3, Percent, DollarSign, Users, Calendar, Eye } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  Copy,
+  BarChart3,
+  Percent,
+  DollarSign,
+  Users,
+  Calendar,
+  Eye,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -33,11 +44,11 @@ import { CouponProductsModal } from "./CouponProductsModal";
 
 interface CouponTableProps {
   coupons: Coupon[];
-  onTableReady?: (table: unknown) => void;
+  onTableReady?: (table: ReactTable<Coupon> | null) => void;
   onEdit?: (coupon: Coupon) => void;
   onDelete?: (coupon: Coupon) => void;
   onCopy?: (coupon: Coupon) => void;
-  onStatusChange?: (coupon: Coupon, status: 'active' | 'inactive') => void;
+  onStatusChange?: (coupon: Coupon, status: "active" | "inactive") => void;
 }
 
 const columns: ColumnDef<Coupon>[] = [
@@ -75,7 +86,9 @@ const columns: ColumnDef<Coupon>[] = [
           ) : (
             <>
               <DollarSign className="w-4 h-4 text-blue-600" />
-              <span className="font-bold text-blue-600">{coupon.value} ر.س</span>
+              <span className="font-bold text-blue-600">
+                {coupon.value} ر.س
+              </span>
             </>
           )}
         </div>
@@ -87,7 +100,7 @@ const columns: ColumnDef<Coupon>[] = [
     header: "الحالة",
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
-      
+
       return (
         <Badge
           className={`${
@@ -98,7 +111,11 @@ const columns: ColumnDef<Coupon>[] = [
               : "bg-red-100 text-red-800 border-red-200"
           }`}
         >
-          {status === "active" ? "نشط" : status === "inactive" ? "غير نشط" : "منتهي"}
+          {status === "active"
+            ? "نشط"
+            : status === "inactive"
+            ? "غير نشط"
+            : "منتهي"}
         </Badge>
       );
     },
@@ -108,10 +125,10 @@ const columns: ColumnDef<Coupon>[] = [
     header: "الاستخدام",
     cell: ({ row }) => {
       const coupon = row.original;
-      const usagePercentage = coupon.usageLimit 
-        ? (coupon.usedCount / coupon.usageLimit) * 100 
+      const usagePercentage = coupon.usageLimit
+        ? (coupon.usedCount / coupon.usageLimit) * 100
         : 0;
-      
+
       return (
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-gray-500" />
@@ -121,8 +138,8 @@ const columns: ColumnDef<Coupon>[] = [
             </span>
             {coupon.usageLimit && (
               <div className="w-16 bg-gray-200 rounded-full h-1">
-                <div 
-                  className="bg-blue-600 h-1 rounded-full" 
+                <div
+                  className="bg-blue-600 h-1 rounded-full"
                   style={{ width: `${usagePercentage}%` }}
                 ></div>
               </div>
@@ -138,13 +155,15 @@ const columns: ColumnDef<Coupon>[] = [
     cell: ({ row }) => {
       const date = new Date(row.getValue("endDate"));
       const isExpired = date < new Date();
-      
+
       return (
-        <div className={`flex items-center gap-2 ${isExpired ? 'text-red-600' : 'text-gray-600'}`}>
+        <div
+          className={`flex items-center gap-2 ${
+            isExpired ? "text-red-600" : "text-gray-600"
+          }`}
+        >
           <Calendar className="w-4 h-4" />
-          <span className="text-sm">
-            {date.toLocaleDateString("ar-SA")}
-          </span>
+          <span className="text-sm">{date.toLocaleDateString("ar-SA")}</span>
         </div>
       );
     },
@@ -166,21 +185,22 @@ const columns: ColumnDef<Coupon>[] = [
         const productTypeMap = {
           course: "دورة",
           session: "جلسة",
-          "digital-product": "منتج رقمي"
+          "digital-product": "منتج رقمي",
         };
-        
+
         if (products.length === 0) {
-          return (
-            <div className="text-gray-400 text-sm">لا توجد منتجات</div>
-          );
+          return <div className="text-gray-400 text-sm">لا توجد منتجات</div>;
         }
-        
+
         if (products.length === 1) {
           const product = products[0];
           return (
             <div className="flex items-center gap-3">
               <img
-                src={product.image || "https://i.ibb.co/Zzr165m4/Chat-GPT-Image-8-2025-04-06-00.png"}
+                src={
+                  product.image ||
+                  "https://i.ibb.co/Zzr165m4/Chat-GPT-Image-8-2025-04-06-00.png"
+                }
                 alt={product.name}
                 className="w-12 h-12 rounded-lg object-cover"
               />
@@ -195,7 +215,7 @@ const columns: ColumnDef<Coupon>[] = [
             </div>
           );
         }
-        
+
         // عرض منتجات متعددة - زر لفتح المودال
         return (
           <div className="flex items-center gap-3">
@@ -209,7 +229,11 @@ const columns: ColumnDef<Coupon>[] = [
               products={products}
               couponCode={coupon.code}
               trigger={
-                <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-xs"
+                >
                   <Eye className="w-3 h-3 mr-1" />
                   عرض
                 </Button>
@@ -342,7 +366,9 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                       variant="ghost"
                       size="sm"
                       className="h-8 w-8 p-0 text-blue-600"
-                      onClick={() => console.log(`نسخ كود الكوبون ${coupon.code}`)}
+                      onClick={() =>
+                        console.log(`نسخ كود الكوبون ${coupon.code}`)
+                      }
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
@@ -370,12 +396,16 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                     {coupon.type === "percentage" ? (
                       <>
                         <Percent className="w-4 h-4 text-green-600" />
-                        <span className="font-bold text-green-600">{coupon.value}%</span>
+                        <span className="font-bold text-green-600">
+                          {coupon.value}%
+                        </span>
                       </>
                     ) : (
                       <>
                         <DollarSign className="w-4 h-4 text-blue-600" />
-                        <span className="font-bold text-blue-600">{coupon.value} ر.س</span>
+                        <span className="font-bold text-blue-600">
+                          {coupon.value} ر.س
+                        </span>
                       </>
                     )}
                   </div>
@@ -388,7 +418,11 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                         : "bg-red-100 text-red-800 border-red-200"
                     }`}
                   >
-                    {coupon.status === "active" ? "نشط" : coupon.status === "inactive" ? "غير نشط" : "منتهي"}
+                    {coupon.status === "active"
+                      ? "نشط"
+                      : coupon.status === "inactive"
+                      ? "غير نشط"
+                      : "منتهي"}
                   </Badge>
                 </div>
 
@@ -397,15 +431,21 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                     {coupon.applicationType === "general" ? (
                       <>
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-green-600 font-medium text-sm">كوبون عام</span>
+                        <span className="text-green-600 font-medium text-sm">
+                          كوبون عام
+                        </span>
                       </>
                     ) : (
                       <div className="space-y-2">
-                        {coupon.applicableProducts && coupon.applicableProducts.length > 0 ? (
+                        {coupon.applicableProducts &&
+                        coupon.applicableProducts.length > 0 ? (
                           coupon.applicableProducts.length === 1 ? (
                             <div className="flex items-center gap-2">
                               <img
-                                src={coupon.applicableProducts[0].image || "https://i.ibb.co/Zzr165m4/Chat-GPT-Image-8-2025-04-06-00.png"}
+                                src={
+                                  coupon.applicableProducts[0].image ||
+                                  "https://i.ibb.co/Zzr165m4/Chat-GPT-Image-8-2025-04-06-00.png"
+                                }
                                 alt={coupon.applicableProducts[0].name}
                                 className="w-8 h-8 rounded object-cover"
                               />
@@ -414,8 +454,13 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                                   {coupon.applicableProducts[0].name}
                                 </span>
                                 <span className="text-xs text-gray-500">
-                                  {coupon.applicableProducts[0].type === 'course' ? 'دورة' : 
-                                   coupon.applicableProducts[0].type === 'session' ? 'جلسة' : 'منتج رقمي'}
+                                  {coupon.applicableProducts[0].type ===
+                                  "course"
+                                    ? "دورة"
+                                    : coupon.applicableProducts[0].type ===
+                                      "session"
+                                    ? "جلسة"
+                                    : "منتج رقمي"}
                                 </span>
                               </div>
                             </div>
@@ -431,7 +476,11 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                                 products={coupon.applicableProducts}
                                 couponCode={coupon.code}
                                 trigger={
-                                  <Button variant="outline" size="sm" className="h-6 px-2 text-xs">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-6 px-2 text-xs"
+                                  >
                                     <Eye className="w-3 h-3 mr-1" />
                                     عرض
                                   </Button>
@@ -440,7 +489,9 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                             </div>
                           )
                         ) : (
-                          <span className="text-gray-400 text-sm">لا توجد منتجات</span>
+                          <span className="text-gray-400 text-sm">
+                            لا توجد منتجات
+                          </span>
                         )}
                       </div>
                     )}
@@ -449,11 +500,15 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                   <div className="flex justify-between items-center pt-2 border-t">
                     <div className="flex items-center gap-1 text-sm text-gray-600">
                       <Users className="w-4 h-4" />
-                      <span>{coupon.usedCount} / {coupon.usageLimit || "∞"}</span>
+                      <span>
+                        {coupon.usedCount} / {coupon.usageLimit || "∞"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-600">
                       <Calendar className="w-4 h-4" />
-                      <span>{new Date(coupon.endDate).toLocaleDateString("ar-SA")}</span>
+                      <span>
+                        {new Date(coupon.endDate).toLocaleDateString("ar-SA")}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -554,4 +609,4 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
   );
 }
 
-export { CouponTable };
+export default CouponTable;

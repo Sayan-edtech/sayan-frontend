@@ -9,7 +9,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Package, Eye } from "lucide-react";
-import type { Product } from "@/data/mockProducts";
+
+interface Product {
+  id: number;
+  name: string;
+  type: "course" | "session" | "digital-product";
+  image?: string;
+}
 
 interface CouponProductsModalProps {
   products: Product[];
@@ -17,25 +23,29 @@ interface CouponProductsModalProps {
   trigger?: React.ReactNode;
 }
 
-export function CouponProductsModal({ products, couponCode, trigger }: CouponProductsModalProps) {
+export function CouponProductsModal({
+  products,
+  couponCode,
+  trigger,
+}: CouponProductsModalProps) {
   const [open, setOpen] = useState(false);
 
   const productTypeMap = {
     course: "دورة تدريبية",
     session: "جلسة حضورية",
-    "digital-product": "منتج رقمي"
+    "digital-product": "منتج رقمي",
   };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'course':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'session':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'digital-product':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
+      case "course":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "session":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "digital-product":
+        return "bg-purple-100 text-purple-800 border-purple-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
@@ -49,7 +59,10 @@ export function CouponProductsModal({ products, couponCode, trigger }: CouponPro
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-hidden" dir="rtl">
+      <DialogContent
+        className="sm:max-w-2xl max-h-[80vh] overflow-hidden"
+        dir="rtl"
+      >
         <DialogHeader className="border-b border-gray-100 pb-4">
           <DialogTitle className="text-xl font-bold text-gray-900 flex items-center gap-3">
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -58,11 +71,14 @@ export function CouponProductsModal({ products, couponCode, trigger }: CouponPro
             المنتجات المشمولة في الكوبون {couponCode}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4 pt-4">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600">
-              إجمالي المنتجات المشمولة: <span className="font-medium text-blue-600">{products.length}</span>
+              إجمالي المنتجات المشمولة:{" "}
+              <span className="font-medium text-blue-600">
+                {products.length}
+              </span>
             </p>
           </div>
 
@@ -73,7 +89,10 @@ export function CouponProductsModal({ products, couponCode, trigger }: CouponPro
                 className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
               >
                 <img
-                  src={product.image || "https://i.ibb.co/Zzr165m4/Chat-GPT-Image-8-2025-04-06-00.png"}
+                  src={
+                    product.image ||
+                    "https://i.ibb.co/Zzr165m4/Chat-GPT-Image-8-2025-04-06-00.png"
+                  }
                   alt={product.name}
                   className="w-16 h-16 rounded-lg object-cover"
                 />
@@ -82,12 +101,14 @@ export function CouponProductsModal({ products, couponCode, trigger }: CouponPro
                     {product.name}
                   </h3>
                   <Badge className={`text-xs ${getTypeColor(product.type)}`}>
-                    {productTypeMap[product.type as keyof typeof productTypeMap]}
+                    {
+                      productTypeMap[
+                        product.type as keyof typeof productTypeMap
+                      ]
+                    }
                   </Badge>
                 </div>
-                <div className="text-sm text-gray-500">
-                  #{index + 1}
-                </div>
+                <div className="text-sm text-gray-500">#{index + 1}</div>
               </div>
             ))}
           </div>

@@ -15,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Filter, X, ChevronDown, Search } from "lucide-react";
+import type { Table } from "@tanstack/react-table";
+import type { Coupon } from "@/types/coupon";
 
 interface CouponFiltersProps {
   selectedStatus: string;
@@ -22,18 +24,9 @@ interface CouponFiltersProps {
   selectedType: string;
   onTypeChange: (type: string) => void;
   searchTerm: string;
-  onSearchChange: (searchTerm: string) => void;
+  onSearchChange: (search: string) => void;
   onClearFilters: () => void;
-  table?: {
-    getAllColumns: () => {
-      getCanHide: () => boolean;
-      getIsVisible: () => boolean;
-      toggleVisibility: (visible: boolean) => void;
-      id: string;
-      columnDef: { header: string };
-    }[];
-    setColumnVisibility: (visibility: Record<string, boolean>) => void;
-  }; // للتحكم في الأعمدة
+  table?: Table<Coupon> | null;
 }
 
 function CouponFilters({
@@ -46,34 +39,12 @@ function CouponFilters({
   onClearFilters,
   table,
 }: CouponFiltersProps) {
-  const statuses = [
-    "الكل",
-    "نشط",
-    "غير نشط", 
-    "منتهي الصلاحية",
-  ];
+  const statuses = ["الكل", "نشط", "غير نشط", "منتهي الصلاحية"];
 
-  const types = [
-    "الكل",
-    "نسبة مئوية",
-    "مبلغ ثابت",
-  ];
+  const types = ["الكل", "نسبة مئوية", "مبلغ ثابت"];
 
-  const hasActiveFilters = 
-    selectedStatus !== "الكل" || 
-    selectedType !== "الكل" || 
-    searchTerm !== "";
-
-  const handleColumnToggle = (columnId: string, checked: boolean) => {
-    if (table) {
-      const tableInstance = table as { setColumnVisibility: (visibility: Record<string, boolean>) => void };
-      const currentVisibility: Record<string, boolean> = {};
-      tableInstance.setColumnVisibility({
-        ...currentVisibility,
-        [columnId]: checked,
-      });
-    }
-  };
+  const hasActiveFilters =
+    selectedStatus !== "الكل" || selectedType !== "الكل" || searchTerm !== "";
 
   return (
     <div className="bg-white rounded-xl p-4 lg:p-6 shadow-sm border-0">
@@ -135,18 +106,23 @@ function CouponFilters({
               <DropdownMenuContent align="end" className="w-[200px]">
                 {table
                   .getAllColumns()
-                  .filter((column: { getCanHide: () => boolean }) => column.getCanHide())
-                  .map((column: { id: string; columnDef: { header: string }; getIsVisible: () => boolean }) => {
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    const headerValue =
+                      typeof column.columnDef.header === "function"
+                        ? column.id
+                        : column.columnDef.header || column.id;
+
                     return (
                       <DropdownMenuCheckboxItem
                         key={column.id}
                         className="capitalize"
                         checked={column.getIsVisible()}
                         onCheckedChange={(value) =>
-                          handleColumnToggle(column.id, !!value)
+                          column.toggleVisibility(!!value)
                         }
                       >
-                        {column.columnDef.header}
+                        {headerValue}
                       </DropdownMenuCheckboxItem>
                     );
                   })}
@@ -204,4 +180,4 @@ function CouponFilters({
   );
 }
 
-export { CouponFilters };
+export default CouponFilters;
