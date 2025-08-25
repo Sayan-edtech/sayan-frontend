@@ -67,7 +67,7 @@ function CouponFilters({
   const handleColumnToggle = (columnId: string, checked: boolean) => {
     if (table) {
       const tableInstance = table as { setColumnVisibility: (visibility: Record<string, boolean>) => void };
-      tableInstance.setColumnVisibility(prev => ({
+      tableInstance.setColumnVisibility((prev: Record<string, boolean>) => ({
         ...prev,
         [columnId]: checked,
       }));
