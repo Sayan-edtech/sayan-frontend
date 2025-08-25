@@ -11,7 +11,6 @@ import {
   PanelRightClose,
   PanelLeftClose,
   ChevronDown,
-  Brain,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -94,13 +93,7 @@ function StudentSidebar({
       href: "/dashboard/purchases",
       icon: <Menu className="w-5 h-5" />,
     },
-    {
-      id: "ai-learning-materials",
-      title: "المواد التعليمية الذكية",
-      href: "/dashboard/ai-learning-materials",
-      icon: <Brain className="w-5 h-5" />,
-      badge: "AI",
-    },
+
     {
       id: "shopping-cart",
       title: "عربة التسوق",

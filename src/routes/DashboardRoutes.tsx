@@ -17,10 +17,9 @@ import { templateRoutes } from "./TemplateRoutes";
 import { ProtectedRoute } from "@/components/shared/GuardRoute";
 import ManageCourse from "@/pages/dashboard/courses/mange";
 import DashboardLayout from "@/features/dashboard/components/DashboardLayout";
-import AILearningMaterials from "@/pages/dashboard/ai-learning-materials";
-import ComprehensiveWebDevelopment from "@/pages/dashboard/ai-learning-materials/comprehensive-web-development";
 import CouponsPage from "@/pages/dashboard/coupons";
 import CouponStatsPage from "@/pages/dashboard/coupons/stats/[id]";
+import MyCourseDetails from "@/pages/dashboard/my-courses/[courseId]";
 
 export const dashboardRoutes = (
   <Route
@@ -35,7 +34,10 @@ export const dashboardRoutes = (
     <Route path="profile" element={<Profile />} />
     <Route path="settings" element={<Settings />} />
     {/* Students Bag Routes */}
-    <Route path="my-courses" element={<MyCourses />} />
+    <Route path="my-courses">
+      <Route index element={<MyCourses />} />
+      <Route path=":courseId" element={<MyCourseDetails />} />
+    </Route>
     <Route path="trainers" element={<Trainers />} />
     <Route path="trainers/new" element={<AddNewTrainer />} />
     <Route path="courses" element={<AcademyCourses />} />
@@ -57,13 +59,6 @@ export const dashboardRoutes = (
       path="affiliate-marketing"
       element={<div>التسويق بالعمولة - قريباً</div>}
     />
-    <Route path="ai-learning-materials">
-      <Route index element={<AILearningMaterials />} />
-      <Route
-        path="comprehensive-web-development"
-        element={<ComprehensiveWebDevelopment />}
-      />
-    </Route>
 
     {templateRoutes}
   </Route>
