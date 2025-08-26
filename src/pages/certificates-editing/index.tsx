@@ -1,8 +1,6 @@
 import type { Table } from "@tanstack/react-table";
 import type { CourseCertificate } from "@/types/certificate";
-import { Award, Plus } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Award } from "lucide-react";
 import DashboardPageHeader from "@/components/shared/dashboard/DashboardPageHeader";
 import { useMemo, useState } from "react";
 import { CertificateStats } from "@/features/certificates-editing/components/CertificateStats";
@@ -151,19 +149,7 @@ function CertificatesEditing() {
 
   return (
     <div className="space-y-6">
-      <DashboardPageHeader
-        icon={Award}
-        title="إدارة الشهادات"
-        actions={
-          <Link
-            to="/dashboard/certificates-editing/new"
-            className={buttonVariants()}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            شهادة جديدة
-          </Link>
-        }
-      />
+      <DashboardPageHeader icon={Award} title="إدارة الشهادات" />
       <CertificateStats certificates={filteredCertificates} />
       <CertificateFilters
         selectedType={selectedType}
