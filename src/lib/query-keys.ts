@@ -10,17 +10,6 @@ export const authKeys = {
   userProfile: (id: string) => [...authKeys.profile(), id] as const,
 };
 
-// User/Profile query keys
-export const userKeys = {
-  all: ["user"] as const,
-  profile: () => [...userKeys.all, "profile"] as const,
-  settings: () => [...userKeys.all, "settings"] as const,
-
-  // Specific user queries
-  profileById: (id: string) => [...userKeys.profile(), id] as const,
-  currentUser: () => [...userKeys.profile(), "current"] as const,
-};
-
 // General query key factory patterns
 export const queryKeys = {
   courses: {
@@ -208,5 +197,23 @@ export const queryKeys = {
       update: (id: string) => [...queryKeys.exam.all, "update", id] as const,
       delete: (id: string) => [...queryKeys.exam.all, "delete", id] as const,
     },
+  },
+  coupons: {
+    all: ["coupons"] as const,
+    lists: () => [...queryKeys.coupons.all, "list"] as const,
+    list: (filters: string) => [...queryKeys.coupons.lists(), filters] as const,
+    details: () => [...queryKeys.coupons.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.coupons.details(), id] as const,
+    stats: () => [...queryKeys.coupons.all, "stats"] as const,
+    // Mutation keys for Coupon operations
+    mutations: {
+      create: () => [...queryKeys.coupons.all, "create"] as const,
+      update: (id: string) => [...queryKeys.coupons.all, "update", id] as const,
+      delete: (id: string) => [...queryKeys.coupons.all, "delete", id] as const,
+    },
+  },
+  currentUser: {
+    profile: () => [...authKeys.profile()] as const,
+    profileById: (id: string) => [...authKeys.userProfile(id)] as const,
   },
 };

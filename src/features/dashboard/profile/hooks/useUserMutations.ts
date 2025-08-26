@@ -5,7 +5,7 @@ import {
   type UpdateUserProfileRequest,
   type UpdateProfilePictureRequest,
 } from "../services/userService";
-import { userKeys } from "@/lib/query-keys";
+import { queryKeys } from "@/lib/query-keys";
 import type { User } from "@/types/user";
 
 // Type for API error response
@@ -28,17 +28,17 @@ export const useUpdateUserProfile = () => {
       userService.updateUserProfile(data),
     onSuccess: (updatedProfile: User) => {
       // Update the current user profile in cache
-      queryClient.setQueryData(userKeys.currentUser(), updatedProfile);
+      queryClient.setQueryData(queryKeys.currentUser.profile(), updatedProfile);
 
       // Also update specific profile cache if it exists
       queryClient.setQueryData(
-        userKeys.profileById(updatedProfile.id),
+        queryKeys.currentUser.profileById(updatedProfile.id),
         updatedProfile
       );
 
       // Invalidate related queries to ensure consistency
       queryClient.invalidateQueries({
-        queryKey: userKeys.profile(),
+        queryKey: queryKeys.currentUser.profile(),
       });
 
       toast.success("تم تحديث الملف الشخصي بنجاح");
@@ -63,17 +63,17 @@ export const useUpdateProfilePicture = () => {
       userService.updateProfilePicture(data),
     onSuccess: (updatedProfile: User) => {
       // Update the current user profile in cache
-      queryClient.setQueryData(userKeys.currentUser(), updatedProfile);
+      queryClient.setQueryData(queryKeys.currentUser.profile(), updatedProfile);
 
       // Also update specific profile cache if it exists
       queryClient.setQueryData(
-        userKeys.profileById(updatedProfile.id),
+        queryKeys.currentUser.profileById(updatedProfile.id),
         updatedProfile
       );
 
       // Invalidate related queries
       queryClient.invalidateQueries({
-        queryKey: userKeys.profile(),
+        queryKey: queryKeys.currentUser.profile(),
       });
 
       toast.success("تم تحديث صورة الملف الشخصي بنجاح");
@@ -97,17 +97,17 @@ export const useDeleteProfilePicture = () => {
     mutationFn: userService.deleteProfilePicture,
     onSuccess: (updatedProfile: User) => {
       // Update the current user profile in cache
-      queryClient.setQueryData(userKeys.currentUser(), updatedProfile);
+      queryClient.setQueryData(queryKeys.currentUser.profile(), updatedProfile);
 
       // Also update specific profile cache if it exists
       queryClient.setQueryData(
-        userKeys.profileById(updatedProfile.id),
+        queryKeys.currentUser.profileById(updatedProfile.id),
         updatedProfile
       );
 
       // Invalidate related queries
       queryClient.invalidateQueries({
-        queryKey: userKeys.profile(),
+        queryKey: queryKeys.currentUser.profile(),
       });
 
       toast.success("تم حذف صورة الملف الشخصي بنجاح");

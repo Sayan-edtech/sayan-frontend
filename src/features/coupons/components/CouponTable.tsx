@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/table";
 
 import type { Coupon } from "@/types/coupon";
-import { CouponProductsModal } from "./CouponProductsModal";
+import CouponCoursesModal from "./CouponCoursesModal";
 
 interface CouponTableProps {
   coupons: Coupon[];
@@ -64,7 +64,7 @@ const columns: ColumnDef<Coupon>[] = [
               {coupon.code}
             </span>
             <span className="text-sm text-gray-500 font-medium">
-              {coupon.name}
+              {coupon.code}
             </span>
           </div>
         </div>
@@ -72,22 +72,24 @@ const columns: ColumnDef<Coupon>[] = [
     },
   },
   {
-    accessorKey: "type",
+    accessorKey: "coupon_type",
     header: "النوع والقيمة",
     cell: ({ row }) => {
       const coupon = row.original;
       return (
         <div className="flex items-center gap-2">
-          {coupon.type === "percentage" ? (
+          {coupon.coupon_type === "percentage" ? (
             <>
               <Percent className="w-4 h-4 text-green-600" />
-              <span className="font-bold text-green-600">{coupon.value}%</span>
+              <span className="font-bold text-green-600">
+                {coupon.coupon_type}%
+              </span>
             </>
           ) : (
             <>
               <DollarSign className="w-4 h-4 text-blue-600" />
               <span className="font-bold text-blue-600">
-                {coupon.value} ر.س
+                {coupon.coupon_type} ر.س
               </span>
             </>
           )}
@@ -121,12 +123,12 @@ const columns: ColumnDef<Coupon>[] = [
     },
   },
   {
-    accessorKey: "usedCount",
+    accessorKey: "used_count",
     header: "الاستخدام",
     cell: ({ row }) => {
       const coupon = row.original;
-      const usagePercentage = coupon.usageLimit
-        ? (coupon.usedCount / coupon.usageLimit) * 100
+      const usagePercentage = coupon.usage_limit
+        ? (coupon.used_count / coupon.usage_limit) * 100
         : 0;
 
       return (
@@ -134,9 +136,9 @@ const columns: ColumnDef<Coupon>[] = [
           <Users className="w-4 h-4 text-gray-500" />
           <div className="flex flex-col">
             <span className="font-medium">
-              {coupon.usedCount} / {coupon.usageLimit || "∞"}
+              {coupon.used_count} / {coupon.usage_limit || "∞"}
             </span>
-            {coupon.usageLimit && (
+            {coupon.usage_limit && (
               <div className="w-16 bg-gray-200 rounded-full h-1">
                 <div
                   className="bg-blue-600 h-1 rounded-full"
@@ -150,10 +152,10 @@ const columns: ColumnDef<Coupon>[] = [
     },
   },
   {
-    accessorKey: "endDate",
+    accessorKey: "expires_at",
     header: "تاريخ الانتهاء",
     cell: ({ row }) => {
-      const date = new Date(row.getValue("endDate"));
+      const date = new Date(row.getValue("expires_at"));
       const isExpired = date < new Date();
 
       return (
@@ -169,11 +171,11 @@ const columns: ColumnDef<Coupon>[] = [
     },
   },
   {
-    accessorKey: "applicableProducts",
+    accessorKey: "application_scope",
     header: "المنتجات المطبقة",
     cell: ({ row }) => {
       const coupon = row.original;
-      if (coupon.applicationType === "general") {
+      if (coupon.application_scope === "GENERAL") {
         return (
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -181,35 +183,35 @@ const columns: ColumnDef<Coupon>[] = [
           </div>
         );
       } else {
-        const products = coupon.applicableProducts || [];
-        const productTypeMap = {
+        const courses = coupon.applicable_courses || [];
+        const courseTypeMap = {
           course: "دورة",
           session: "جلسة",
-          "digital-product": "منتج رقمي",
+          "digital-course": "منتج رقمي",
         };
 
-        if (products.length === 0) {
+        if (courses.length === 0) {
           return <div className="text-gray-400 text-sm">لا توجد منتجات</div>;
         }
 
-        if (products.length === 1) {
-          const product = products[0];
+        if (courses.length === 1) {
+          const course = courses[0];
           return (
             <div className="flex items-center gap-3">
               <img
                 src={
-                  product.image ||
+                  course.image ||
                   "https://i.ibb.co/Zzr165m4/Chat-GPT-Image-8-2025-04-06-00.png"
                 }
-                alt={product.name}
+                alt={course.title}
                 className="w-12 h-12 rounded-lg object-cover"
               />
               <div className="flex flex-col">
                 <span className="font-medium text-blue-600">
-                  {product.name}
+                  {course.title}
                 </span>
                 <span className="text-sm text-gray-500">
-                  {productTypeMap[product.type as keyof typeof productTypeMap]}
+                  {courseTypeMap[course.type as keyof typeof courseTypeMap]}
                 </span>
               </div>
             </div>
@@ -222,11 +224,11 @@ const columns: ColumnDef<Coupon>[] = [
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
               <span className="text-blue-600 font-medium text-sm">
-                {products.length} منتجات
+                {courses.length} منتجات
               </span>
             </div>
-            <CouponProductsModal
-              products={products}
+            <CouponCoursesModal
+              courses={courses}
               couponCode={coupon.code}
               trigger={
                 <Button
@@ -345,12 +347,9 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                 className="bg-white rounded-lg border-0 shadow-sm p-4 space-y-3"
               >
                 <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-mono font-bold text-blue-600 text-lg">
-                      {coupon.code}
-                    </h3>
-                    <p className="text-sm text-gray-600">{coupon.name}</p>
-                  </div>
+                  <h3 className="font-mono font-bold text-blue-600 text-lg">
+                    {coupon.code}
+                  </h3>
                   <div className="flex gap-1">
                     <Button
                       variant="ghost"
@@ -393,18 +392,18 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {coupon.type === "percentage" ? (
+                    {coupon.coupon_type === "percentage" ? (
                       <>
                         <Percent className="w-4 h-4 text-green-600" />
                         <span className="font-bold text-green-600">
-                          {coupon.value}%
+                          {coupon.percentage}%
                         </span>
                       </>
                     ) : (
                       <>
                         <DollarSign className="w-4 h-4 text-blue-600" />
                         <span className="font-bold text-blue-600">
-                          {coupon.value} ر.س
+                          {coupon.amount} ر.س
                         </span>
                       </>
                     )}
@@ -428,7 +427,7 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    {coupon.applicationType === "general" ? (
+                    {coupon.application_scope === "GENERAL" ? (
                       <>
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         <span className="text-green-600 font-medium text-sm">
@@ -437,43 +436,32 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                       </>
                     ) : (
                       <div className="space-y-2">
-                        {coupon.applicableProducts &&
-                        coupon.applicableProducts.length > 0 ? (
-                          coupon.applicableProducts.length === 1 ? (
+                        {coupon.applicable_courses &&
+                        coupon.applicable_courses.length > 0 ? (
+                          coupon.applicable_courses.length === 1 ? (
                             <div className="flex items-center gap-2">
                               <img
                                 src={
-                                  coupon.applicableProducts[0].image ||
+                                  coupon.applicable_courses[0].image ||
                                   "https://i.ibb.co/Zzr165m4/Chat-GPT-Image-8-2025-04-06-00.png"
                                 }
-                                alt={coupon.applicableProducts[0].name}
+                                alt={coupon.applicable_courses[0].title}
                                 className="w-8 h-8 rounded object-cover"
                               />
-                              <div className="flex flex-col">
-                                <span className="font-medium text-blue-600 text-sm">
-                                  {coupon.applicableProducts[0].name}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                  {coupon.applicableProducts[0].type ===
-                                  "course"
-                                    ? "دورة"
-                                    : coupon.applicableProducts[0].type ===
-                                      "session"
-                                    ? "جلسة"
-                                    : "منتج رقمي"}
-                                </span>
-                              </div>
+                              <span className="font-medium text-blue-600 text-sm">
+                                {coupon.applicable_courses[0].title}
+                              </span>
                             </div>
                           ) : (
                             <div className="flex items-center gap-2">
                               <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                                 <span className="text-blue-600 font-medium text-sm">
-                                  {coupon.applicableProducts.length} منتجات
+                                  {coupon.applicable_courses.length} منتجات
                                 </span>
                               </div>
-                              <CouponProductsModal
-                                products={coupon.applicableProducts}
+                              <CouponCoursesModal
+                                courses={coupon.applicable_courses}
                                 couponCode={coupon.code}
                                 trigger={
                                   <Button
@@ -501,13 +489,15 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                     <div className="flex items-center gap-1 text-sm text-gray-600">
                       <Users className="w-4 h-4" />
                       <span>
-                        {coupon.usedCount} / {coupon.usageLimit || "∞"}
+                        {coupon.used_count} / {coupon.usage_limit || "∞"}
                       </span>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-600">
                       <Calendar className="w-4 h-4" />
                       <span>
-                        {new Date(coupon.endDate).toLocaleDateString("ar-SA")}
+                        {new Date(coupon.expires_at).toLocaleDateString(
+                          "ar-SA"
+                        )}
                       </span>
                     </div>
                   </div>

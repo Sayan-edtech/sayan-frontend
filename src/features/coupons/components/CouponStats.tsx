@@ -55,15 +55,18 @@ export function CouponStats({ coupons }: CouponStatsProps) {
     (coupon) => coupon.status === "active"
   ).length;
   // const expiredCoupons = coupons.filter(coupon => coupon.status === 'expired').length;
-  const totalUsage = coupons.reduce((sum, coupon) => sum + coupon.usedCount, 0);
+  const totalUsage = coupons.reduce(
+    (sum, coupon) => sum + coupon.used_count,
+    0
+  );
 
   // حساب إجمالي الايرادات (تقدير)
   const totalSavings = coupons.reduce((sum, coupon) => {
-    if (coupon.type === "percentage") {
+    if (coupon.coupon_type === "percentage") {
       // تقدير مبدئي - يمكن تحسينه لاحقاً
-      return sum + coupon.usedCount * 50 * (coupon.value / 100);
+      return sum + coupon.used_count * 50 * (coupon.percentage! / 100);
     } else {
-      return sum + coupon.usedCount * coupon.value;
+      return sum + coupon.used_count * coupon.amount!;
     }
   }, 0);
 

@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Coupon } from "@/types/coupon";
 import {
   ArrowLeft,
   BarChart3,
@@ -98,24 +97,6 @@ const couponUsageData: CouponUsage[] = [
     orderNumber: "ORD-001241",
   },
 ];
-
-// بيانات الكوبون التجريبية
-const couponData: Coupon = {
-  id: 1,
-  code: "WELCOME20",
-  name: "خصم ترحيبي للعملاء الجدد",
-  type: "percentage",
-  value: 20,
-  usageLimit: 1000,
-  usedCount: 456,
-  status: "active",
-  startDate: "2024-01-01T00:00:00Z",
-  endDate: "2024-12-31T23:59:59Z",
-  applicationType: "general",
-  createdAt: "2024-01-01T10:00:00Z",
-  updatedAt: "2024-01-15T14:30:00Z",
-  createdBy: "أحمد محمد",
-};
 
 // مكون بطاقات الإحصائيات المخصص
 const CouponStatsCards = ({ usageData }: { usageData: CouponUsage[] }) => {
@@ -208,7 +189,7 @@ export default function CouponStats() {
       {/* Header */}
       <DashboardPageHeader
         icon={BarChart3}
-        title={`إحصائيات الكوبون: ${couponData.code}`}
+        title="إحصائيات الكوبون"
         actions={
           <Link to="/dashboard/coupons">
             <Button variant="outline" size="sm">

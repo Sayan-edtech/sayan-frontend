@@ -22,6 +22,9 @@ import CouponStatsPage from "@/pages/dashboard/coupons/stats/[id]";
 import MyCourseDetails from "@/pages/dashboard/my-courses/[courseId]";
 import AcademyCoupons from "@/pages/coupons";
 import CouponStats from "@/pages/coupons/stats/[id]";
+import CertificatesEditing from "@/pages/certificates-editing";
+import EditCertificate from "@/pages/certificates-editing/edit/[id]";
+import CertificateStats from "@/pages/certificates-editing/stats/[id]";
 
 export const dashboardRoutes = (
   <Route
@@ -65,6 +68,13 @@ export const dashboardRoutes = (
       <Route index element={<AcademyCoupons />} />
       <Route path="stats/:id" element={<CouponStats />} />
     </Route>
+
+    <Route path="certificates-editing" element={<CertificatesEditing />} />
+    <Route path="certificates-editing/edit/:id" element={<EditCertificate />} />
+    <Route
+      path="certificates-editing/stats/:id"
+      element={<CertificateStats />}
+    />
 
     {templateRoutes}
   </Route>

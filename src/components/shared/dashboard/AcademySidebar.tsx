@@ -104,6 +104,12 @@ function AcademySidebar({
           icon: <Award className="w-4 h-4" />,
         },
         {
+          id: "certificates-editing",
+          title: "تحرير الشهادات",
+          href: "/dashboard/certificates-editing",
+          icon: <Award className="w-4 h-4" />,
+        },
+        {
           id: "live-sessions",
           title: "الجلسات الحضورية",
           href: "/dashboard/live-sessions",
@@ -111,6 +117,7 @@ function AcademySidebar({
           badge: "قريباً",
           comingSoon: true,
         },
+
         {
           id: "certificates-editing",
           title: "تحرير الشهادات",
