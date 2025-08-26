@@ -4,7 +4,7 @@ export interface Coupon {
   code: string;
   coupon_type: "percentage" | "fixed";
   flat_discount: number | null;
-  percentage: number;
+  percentage?: number;
   max_discount: number;
   usage_limit: number;
   starts_at: string;
@@ -15,9 +15,12 @@ export interface Coupon {
   used_count: number;
   created_at: string;
   updated_at: string | null;
+  application_scope: "GENERAL" | "SPECIFIC";
   status: "expired" | "active" | "inactive";
+  applicable_courses?: Course[];
   usage_percentage: number;
   days_remaining: number;
+  amount?: number;
 }
 
 export interface CouponStats {

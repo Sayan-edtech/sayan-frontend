@@ -9,25 +9,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Package, Eye } from "lucide-react";
+import type { Course } from "@/types/couse";
 
-interface Product {
-  id: number;
-  name: string;
-  type: "course" | "session" | "digital-product";
-  image?: string;
-}
-
-interface CouponProductsModalProps {
-  products: Product[];
+interface CouponCoursesModalProps {
+  courses: Course[];
   couponCode: string;
   trigger?: React.ReactNode;
 }
 
-export function CouponProductsModal({
-  products,
+export default function CouponCoursesModal({
+  courses,
   couponCode,
   trigger,
-}: CouponProductsModalProps) {
+}: CouponCoursesModalProps) {
   const [open, setOpen] = useState(false);
 
   const productTypeMap = {
@@ -77,13 +71,13 @@ export function CouponProductsModal({
             <p className="text-sm text-gray-600">
               إجمالي المنتجات المشمولة:{" "}
               <span className="font-medium text-blue-600">
-                {products.length}
+                {courses.length}
               </span>
             </p>
           </div>
 
           <div className="max-h-96 overflow-y-auto space-y-3">
-            {products.map((product, index) => (
+            {courses.map((product, index) => (
               <div
                 key={product.id}
                 className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
@@ -93,12 +87,12 @@ export function CouponProductsModal({
                     product.image ||
                     "https://i.ibb.co/Zzr165m4/Chat-GPT-Image-8-2025-04-06-00.png"
                   }
-                  alt={product.name}
+                  alt={product.title}
                   className="w-16 h-16 rounded-lg object-cover"
                 />
                 <div className="flex-1">
                   <h3 className="font-medium text-gray-900 mb-1">
-                    {product.name}
+                    {product.title}
                   </h3>
                   <Badge className={`text-xs ${getTypeColor(product.type)}`}>
                     {
@@ -113,7 +107,7 @@ export function CouponProductsModal({
             ))}
           </div>
 
-          {products.length === 0 && (
+          {courses.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               <Package className="w-12 h-12 mx-auto text-gray-300 mb-3" />
               <p>لا توجد منتجات مشمولة في هذا الكوبون</p>
