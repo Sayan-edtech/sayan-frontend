@@ -24,13 +24,10 @@ export default function CouponsPage() {
 
     const matchesType =
       selectedType === "الكل" ||
-      (selectedType === "نسبة مئوية" && coupon.type === "percentage") ||
-      (selectedType === "مبلغ ثابت" && coupon.type === "fixed");
+      (selectedType === "نسبة مئوية" && coupon.coupon_type === "percentage") ||
+      (selectedType === "مبلغ ثابت" && coupon.coupon_type === "fixed");
 
-    const matchesSearch =
-      searchTerm === "" ||
-      coupon.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      coupon.code.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = searchTerm === "";
 
     return matchesStatus && matchesType && matchesSearch;
   }) as Coupon[];
@@ -65,9 +62,6 @@ export default function CouponsPage() {
                 إنشاء كوبون جديد
               </Button>
             }
-            onCreateCoupon={(data) => {
-              console.log("New coupon data:", data);
-            }}
           />
         </div>
 
@@ -125,9 +119,6 @@ export default function CouponsPage() {
                     إنشاء كوبون جديد
                   </Button>
                 }
-                onCreateCoupon={(data) => {
-                  console.log("New coupon data:", data);
-                }}
               />
             </div>
           </div>
