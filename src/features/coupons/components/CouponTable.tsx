@@ -78,7 +78,7 @@ const columns: ColumnDef<Coupon>[] = [
       const coupon = row.original;
       return (
         <div className="flex items-center gap-2">
-          {coupon.type === "percentage" ? (
+          {coupon.coupon_type === "percentage" ? (
             <>
               <Percent className="w-4 h-4 text-green-600" />
               <span className="font-bold text-green-600">{coupon.value}%</span>
@@ -169,7 +169,7 @@ const columns: ColumnDef<Coupon>[] = [
     },
   },
   {
-    accessorKey: "applicableProducts",
+    accessorKey: "app",
     header: "المنتجات المطبقة",
     cell: ({ row }) => {
       const coupon = row.original;
@@ -181,7 +181,7 @@ const columns: ColumnDef<Coupon>[] = [
           </div>
         );
       } else {
-        const products = coupon.applicableProducts || [];
+        const products = coupon.app || [];
         const productTypeMap = {
           course: "دورة",
           session: "جلسة",
@@ -393,7 +393,7 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {coupon.type === "percentage" ? (
+                    {coupon.coupon_type === "percentage" ? (
                       <>
                         <Percent className="w-4 h-4 text-green-600" />
                         <span className="font-bold text-green-600">
@@ -437,28 +437,25 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                       </>
                     ) : (
                       <div className="space-y-2">
-                        {coupon.applicableProducts &&
-                        coupon.applicableProducts.length > 0 ? (
-                          coupon.applicableProducts.length === 1 ? (
+                        {coupon.app && coupon.app.length > 0 ? (
+                          coupon.app.length === 1 ? (
                             <div className="flex items-center gap-2">
                               <img
                                 src={
-                                  coupon.applicableProducts[0].image ||
+                                  coupon.app[0].image ||
                                   "https://i.ibb.co/Zzr165m4/Chat-GPT-Image-8-2025-04-06-00.png"
                                 }
-                                alt={coupon.applicableProducts[0].name}
+                                alt={coupon.app[0].name}
                                 className="w-8 h-8 rounded object-cover"
                               />
                               <div className="flex flex-col">
                                 <span className="font-medium text-blue-600 text-sm">
-                                  {coupon.applicableProducts[0].name}
+                                  {coupon.app[0].name}
                                 </span>
                                 <span className="text-xs text-gray-500">
-                                  {coupon.applicableProducts[0].type ===
-                                  "course"
+                                  {coupon.app[0].type === "course"
                                     ? "دورة"
-                                    : coupon.applicableProducts[0].type ===
-                                      "session"
+                                    : coupon.app[0].type === "session"
                                     ? "جلسة"
                                     : "منتج رقمي"}
                                 </span>
@@ -469,11 +466,11 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                               <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                                 <span className="text-blue-600 font-medium text-sm">
-                                  {coupon.applicableProducts.length} منتجات
+                                  {coupon.app.length} منتجات
                                 </span>
                               </div>
                               <CouponProductsModal
-                                products={coupon.applicableProducts}
+                                products={coupon.app}
                                 couponCode={coupon.code}
                                 trigger={
                                   <Button
@@ -501,13 +498,15 @@ function CouponTable({ coupons, onTableReady }: CouponTableProps) {
                     <div className="flex items-center gap-1 text-sm text-gray-600">
                       <Users className="w-4 h-4" />
                       <span>
-                        {coupon.usedCount} / {coupon.usageLimit || "∞"}
+                        {coupon.used_count} / {coupon.usage_limit || "∞"}
                       </span>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-600">
                       <Calendar className="w-4 h-4" />
                       <span>
-                        {new Date(coupon.endDate).toLocaleDateString("ar-SA")}
+                        {new Date(coupon.expires_at).toLocaleDateString(
+                          "ar-SA"
+                        )}
                       </span>
                     </div>
                   </div>
