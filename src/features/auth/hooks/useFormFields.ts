@@ -42,12 +42,6 @@ const useFormFields = ({ slug }: IFormFieldsVariables) => {
         { value: UserType.ACADEMY, label: "أكاديمية" },
       ],
     },
-    {
-      label: "صورة الملف الشخصي",
-      name: "profile_picture",
-      type: "image",
-      placeholder: "اختر صورة شخصية",
-    },
 
     {
       label: "رقم الهاتف",
@@ -72,6 +66,12 @@ const useFormFields = ({ slug }: IFormFieldsVariables) => {
       name: "confirm_password",
       type: "password",
       placeholder: "••••••••",
+    },
+    {
+      label: "صورة الملف الشخصي (اختياري)",
+      name: "profile_picture",
+      type: "image",
+      placeholder: "اختر صورة شخصية",
     },
   ];
 
