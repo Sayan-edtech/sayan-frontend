@@ -158,19 +158,29 @@ const AuthForm: React.FC<{
               : "تسجيل الدخول باستخدام"}
           </SiginWithGoogle>
 
-          <div className="relative flex items-center">
+          <div className="relative flex items-center my-4">
             <div className="flex-grow border-t border-border"></div>
             <span className="text-muted-foreground text-sm px-4">أو</span>
             <div className="flex-grow border-t border-border"></div>
           </div>
         </>
       )}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {getFormFields().map((field: IFormField) => (
-          <div key={field.name} className="mb-4">
-            <FormFields {...field} control={control} errors={errors} />
-          </div>
-        ))}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <ul className="grid grid-cols-2 gap-4">
+          {getFormFields().map((field: IFormField) => (
+            <li
+              key={field.name}
+              className={
+                field.name === "confirm_password" ||
+                field.name === "profile_picture"
+                  ? "col-span-2"
+                  : ""
+              }
+            >
+              <FormFields {...field} control={control} errors={errors} />
+            </li>
+          ))}
+        </ul>
 
         {slug === Pages.SIGNIN && (
           <ForgotPassword control={control} errors={errors} />
@@ -341,7 +351,7 @@ function NavigationLink({
   const linkData = getText();
 
   return (
-    <div className="mt-6 flex items-center gap-2">
+    <div className="mt-2 flex items-center gap-2">
       <p className="text-card-foreground text-sm">{linkData.desc}</p>
       {linkData.isButton ? (
         <button

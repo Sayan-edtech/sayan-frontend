@@ -1,29 +1,44 @@
-import AuthForm from "../../features/auth/components/AuthForm";
 import { Pages } from "@/constants/enums";
-import { motion } from "framer-motion";
+import AuthForm from "@/features/auth/components/AuthForm";
+import { UserPlus } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const Signup = () => {
+function Signup() {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8 }}
-      className="h-full max-h-screen flex flex-col"
-    >
-      <div className="flex-shrink-0 space-y-2 mb-6">
-        <h1 className="text-3xl lg:text-4xl font-bold text-card-foreground">
-          إنشاء حساب جديد
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          قم بإنشاء حساب جديد للبدء في استخدام خدماتنا
-        </p>
-      </div>
-
-      <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
+    <>
+      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+        {/* Header */}
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+            <UserPlus className="w-6 h-6 text-white" />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+            إنشاء حساب جديد
+          </h2>
+        </div>
         <AuthForm slug={Pages.SIGNUP} />
       </div>
-    </motion.div>
+      {/* Footer */}
+      <div className="text-center mt-6">
+        <p className="text-sm text-gray-600">
+          بالتسجيل، أنت توافق على{" "}
+          <Link
+            to="/terms"
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            شروط الخدمة
+          </Link>
+          {" و "}
+          <Link
+            to="/privacy"
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            سياسة الخصوصية
+          </Link>
+        </p>
+      </div>
+    </>
   );
-};
+}
 
 export default Signup;
