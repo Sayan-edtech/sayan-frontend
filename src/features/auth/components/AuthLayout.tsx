@@ -1,64 +1,101 @@
 import { PublicRoute } from "@/components/shared/GuardRoute";
+import { ArrowRight, Clock, Shield } from "lucide-react";
 import { Outlet, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
+const benefits = [
+  {
+    icon: Shield,
+    title: "بياناتك آمنة",
+    description: "حماية كاملة لمعلوماتك الشخصية",
+  },
+  {
+    icon: Clock,
+    title: "دقيقة واحدة",
+    description: "التسجيل سريع وسهل",
+  },
+];
 function AuthLayout() {
   return (
     <PublicRoute>
-      <main className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-        <div className="hidden lg:block relative">
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-bl-[200px]"
-            style={{
-              backgroundImage: "url('/assets/images/auth/auth.png')",
-            }}
-          />
-          <div className="absolute inset-0 rounded-bl-[200px] bg-black/30">
-            <div className="absolute left-20 top-10 z-10">
-              <img
-                src="/assets/images/footer-logo.svg"
-                alt="Sayan Logo"
-                loading="eager"
-                className="w-32 h-[75px]"
-              />
-            </div>
-            <div className="absolute right-10 bottom-10 z-10">
-              <Navbar />
-            </div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-6xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="hidden lg:block space-y-8"
+            >
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <Link
+                    to="/"
+                    className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors duration-200 group"
+                  >
+                    <ArrowRight className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
+                    <span className="text-sm font-medium">العودة للرئيسية</span>
+                  </Link>
+
+                  <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+                    انضم الآن إلى{" "}
+                    <span className="text-blue-600">منصة سيان</span>
+                  </h1>
+                </div>
+
+                {/* Benefits */}
+                <div className="space-y-4">
+                  {benefits.map((benefit, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100"
+                    >
+                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <benefit.icon className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          {benefit.title}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {benefit.description}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-4 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">50K+</div>
+                    <div className="text-sm text-gray-600">طالب نشط</div>
+                  </div>
+                  <div className="text-center border-x border-gray-200">
+                    <div className="text-2xl font-bold text-green-600">
+                      500+
+                    </div>
+                    <div className="text-sm text-gray-600">دورة تدريبية</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">
+                      95%
+                    </div>
+                    <div className="text-sm text-gray-600">معدل الرضا</div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+            <Outlet />
           </div>
         </div>
-        {/* Left Side - Content Area */}
-        <div className="flex-1 flex flex-col py-10">
-          <div className="flex-1 flex items-center justify-center px-8">
-            <div className="w-full max-w-md">
-              <Outlet />
-            </div>
-          </div>
-        </div>
-      </main>
+      </div>
+      =
     </PublicRoute>
   );
 }
 
 export default AuthLayout;
-
-function Navbar() {
-  const links = [
-    { id: crypto.randomUUID(), title: "من نحن", href: "/about" },
-    { id: crypto.randomUUID(), title: "تواصل معنا", href: "/contact" },
-    { id: crypto.randomUUID(), title: "سياسة الخصوصية", href: "/privacy" },
-    { id: crypto.randomUUID(), title: "الشروط والأحكام", href: "/terms" },
-  ];
-  return (
-    <nav className="flex items-center justify-center space-x-6">
-      {links.map((link) => (
-        <Link
-          key={link.id}
-          to={link.href}
-          className="text-white opacity-80 hover:opacity-100 hover:underline transition-opacity duration-200"
-        >
-          {link.title}
-        </Link>
-      ))}
-    </nav>
-  );
-}

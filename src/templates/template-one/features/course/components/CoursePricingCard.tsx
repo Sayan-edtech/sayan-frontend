@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/features/auth/hooks/useAuthStore";
 
 interface Course {
   price: number;
@@ -23,6 +24,12 @@ interface CoursePricingCardProps {
 export default function CoursePricingCard({
   courseData,
 }: CoursePricingCardProps) {
+  const { isAuthenticated, setOpenAuthModal } = useAuth();
+  const handlePurchase = () => {
+    if (!isAuthenticated) {
+      setOpenAuthModal(true);
+    }
+  };
   return (
     <Card className="border-gray-200 bg-white">
       <CardContent className="p-6">
@@ -44,6 +51,7 @@ export default function CoursePricingCard({
         <div className="flex items-center gap-2 mb-6">
           <Button
             size="lg"
+            onClick={handlePurchase}
             className="flex-grow h-12 text-base font-semibold bg-blue-600 hover:bg-blue-700 transition-all duration-200"
           >
             <ShoppingCart className="w-5 h-5 ml-2" />

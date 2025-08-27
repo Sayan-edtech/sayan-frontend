@@ -12,6 +12,7 @@ import { userService } from "../dashboard/profile/services";
 
 interface AuthState {
   // State
+  openAuthModal: boolean;
   user: User | null;
   accessToken: string | null;
   refreshToken: string | null;
@@ -41,6 +42,7 @@ interface AuthState {
     confirm_password: string;
     verification_token: string;
   }) => Promise<AuthResponse>;
+  setOpenAuthModal: (open: boolean) => void;
   // Computed
   isStudent: () => boolean;
   isAcademy: () => boolean;
@@ -50,6 +52,7 @@ interface AuthState {
 const initializeAuthState = () => {
   const user = authCookies.getUser();
   return {
+    openAuthModal: false,
     user,
     accessToken: null,
     refreshToken: null,
@@ -63,16 +66,19 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   ...initializeAuthState(),
   // Actions
   loadUser: async () => {
+    set(() => ({ isLoading: true }));
     const user = await userService.getCurrentUserProfile();
     set(() => ({
       user,
+      isAuthenticated: true,
+      isLoading: false,
     }));
   },
   setLoading: (loading) =>
     set(() => ({
       isLoading: loading,
     })),
-
+  setOpenAuthModal: (open) => set(() => ({ openAuthModal: open })),
   login: async (credentials) => {
     set(() => ({ isLoading: true }));
 
@@ -290,3 +296,8 @@ export const useResetPassword = () =>
   useAuthStore((state) => state.resetPasswprd);
 
 export const useLoadUser = () => useAuthStore((state) => state.loadUser);
+export const useOpenAuthModal = () =>
+  useAuthStore((state) => state.openAuthModal);
+
+export const useSetOpenAuthModal = () =>
+  useAuthStore((state) => state.setOpenAuthModal);
