@@ -62,9 +62,6 @@ const AuthForm: React.FC<{
           });
 
           toast.success(message);
-          navigate(Routes.DASHBOARD, {
-            replace: true,
-          });
         } else if (slug === Pages.SIGNUP) {
           const { status_code, message } = await signup({
             fname: data.fname as string,

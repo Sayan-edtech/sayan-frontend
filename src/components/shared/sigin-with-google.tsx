@@ -47,9 +47,6 @@ function SiginWithGoogle({
         }
 
         toast.success(message || "تم تسجيل الدخول بنجاح");
-        navigate(Routes.DASHBOARD, {
-          replace: true,
-        });
 
         return;
       } catch (error) {

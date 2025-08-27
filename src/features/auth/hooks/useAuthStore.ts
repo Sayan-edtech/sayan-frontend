@@ -11,6 +11,8 @@ import {
   useResnedOtp,
   useResetPassword,
   useLoadUser,
+  useSetOpenAuthModal,
+  useOpenAuthModal,
 } from "@/features/auth/store";
 
 // Main authentication hook that combines all the functionality
@@ -27,6 +29,9 @@ export function useAuth() {
   const resendOtp = useResnedOtp();
   const resetPassword = useResetPassword();
   const loadUser = useLoadUser();
+  const setOpenAuthModal = useSetOpenAuthModal();
+  const openAuthModal = useOpenAuthModal();
+
   return {
     user,
     isAuthenticated,
@@ -40,5 +45,7 @@ export function useAuth() {
     resendOtp,
     resetPassword,
     loadUser,
+    setOpenAuthModal,
+    openAuthModal,
   };
 }
