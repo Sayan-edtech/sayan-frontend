@@ -1,6 +1,6 @@
 import { PublicRoute } from "@/components/shared/GuardRoute";
 import { ArrowRight, Clock, Shield } from "lucide-react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const benefits = [
@@ -16,6 +16,9 @@ const benefits = [
   },
 ];
 function AuthLayout() {
+  const { pathname } = useLocation();
+  console.log(pathname);
+  const title = pathname === "/auth/signup" ? "انضم الآن إلى" : "مرحبا بك في";
   return (
     <PublicRoute>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center px-4 py-10">
@@ -38,7 +41,7 @@ function AuthLayout() {
                   </Link>
 
                   <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-                    انضم الآن إلى{" "}
+                    {title} {""}
                     <span className="text-blue-600">منصة سيان</span>
                   </h1>
                 </div>
